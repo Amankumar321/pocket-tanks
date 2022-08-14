@@ -3,6 +3,8 @@ import { type1 } from './types/type1';
 import { type2 } from './types/type2';
 import { type3 } from './types/type3';
 import { type4 } from './types/type4';
+import { drawBackBtn } from '../../graphics/back-btn';
+import WebFontFile from '../../classes/WebFontFile';
 
 export class Scene3 extends Scene {
     constructor() {
@@ -19,6 +21,7 @@ export class Scene3 extends Scene {
 
 
     preload = () => {
+        this.load.addFile(new WebFontFile(this.load, ['Audiowide', 'Exo 2:600', 'Bungee', 'Righteous', 'Days One', 'Iceland']))
         //this.load.baseURL = 'assets/';
         //this.load.image('tank', 'sprites/tank.png');
     }
@@ -41,9 +44,15 @@ export class Scene3 extends Scene {
             this.handleType4()
         }
 
-
-        var backbtn = this.add.rectangle(0, this.game.renderer.height, 100, 50, 0x8080F0, 1)
-    
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        canvas.width = 150
+        canvas.height = 100
+        drawBackBtn(ctx, canvas.width, canvas.height)
+        this.textures.addCanvas('back-btn', canvas)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        backbtn.setDepth(10)
+        
         backbtn.setInteractive()
         backbtn.on('pointerdown', () => {
             this.scene.start('scene-2')
