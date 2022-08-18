@@ -75,10 +75,13 @@ export class Terrain extends Textures.CanvasTexture {
             })
     
             this.matrix.forEach((ele) => {
-                var data = this.context.getImageData(ele.x, ele.top, 1, ele.base - ele.top)
-                this.context.putImageData(data, ele.x, ele.top + 1)
-                ele.top = ele.top + 1
-                ele.base = ele.base + 1
+                try {
+                    var data = this.context.getImageData(ele.x, ele.top, 1, ele.base - ele.top)
+                    this.context.putImageData(data, ele.x, ele.top + 1)
+                    ele.top = ele.top + 1
+                    ele.base = ele.base + 1
+                } 
+                catch {}
             })
             this.update()
         }

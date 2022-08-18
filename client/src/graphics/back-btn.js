@@ -3,8 +3,8 @@
  */
 
 export const drawBackBtn = (ctx, width, height) => {
-    ctx.fillStyle = 'rgba(220,220,220,1)'
-    ctx.strokeStyle = 'rgba(180,180,180,1)'
+    ctx.fillStyle = 'rgba(240,240,240,1)'
+    ctx.strokeStyle = 'rgba(200,200,200,1)'
     ctx.lineWidth = 3
 
     ctx.beginPath()

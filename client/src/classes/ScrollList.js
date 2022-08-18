@@ -29,14 +29,15 @@ export class ScrollList {
 
 
     create = () => {
-        this.scrollBox = this.scene.add.rectangle(this.sw/2 + 200, this.sh * 5/6, 100, 150, 0x222222, 0).setStrokeStyle(2, 0x000000, 1)
+        this.scrollBox = this.scene.add.rectangle(this.selectedDisplay.x, this.selectedDisplay.y - 50, 100, 150, 0x222222, 0).setStrokeStyle(2, 0x000000, 1)
         this.scrollBox.setDepth(9)
-        this.scrollBackground = this.scene.add.rectangle(this.sw/2 + 200, this.sh * 5/6, 100, 150, 0x222222, 255)
+        this.scrollBackground = this.scene.add.rectangle(this.selectedDisplay.x, this.selectedDisplay.y - 50, 100, 150, 0x222222, 255)
         this.scrollBackground.setDepth(8)
 
         this.scrollList = this.scene.add.group()
         this.scrollTiles = this.scene.add.group()
         
+        this.selectedDisplay.setInteractive()
         this.selectedDisplay.on('pointerdown', () => {
             this.scene.input.mouse.requestPointerLock()
             this.toShow = true
@@ -88,14 +89,14 @@ export class ScrollList {
         this.selected.setText(weapons[tank.selectedWeapon]?.name)
 
         weapons.forEach((weapon, index) => {
-            x = this.scene.add.text(this.sw/2 + 200, this.sh * 5/6, weapon.name)
-            y = this.scene.add.rectangle(this.sw/2 + 200, this.sh * 5/6, 100, 50, 0x660000, 255)
+            x = this.scene.add.text(this.selectedDisplay.x, this.selectedDisplay.y - 50, weapon.name)
+            y = this.scene.add.rectangle(this.selectedDisplay.x, this.selectedDisplay.y - 50, 100, 50, 0x660000, 255)
             this.scrollList.add(x)
             this.scrollTiles.add(y)
             y.textContent = x
 
             var g = this.scene.add.graphics()
-            g.fillRect(this.sw/2 + 200, this.sh * 5/6, 100, 150)
+            g.fillRect(this.selectedDisplay.x, this.selectedDisplay.y - 50, 100, 150)
             g.setPosition(g.x - 50, g.y - 75)
             var mask = new Phaser.Display.Masks.GeometryMask(this.scene, g)
             y.setMask(mask)
@@ -156,11 +157,11 @@ export class ScrollList {
             this.scrollList.incY(this.scene.input.mousePointer.movementY)
             this.scrollTiles.incY(this.scene.input.mousePointer.movementY)
 
-            this.scrollList.setY(Math.min(this.scrollList.getChildren()[0].y, this.sh * 5/6), 50)
-            this.scrollTiles.setY(Math.min(this.scrollTiles.getChildren()[0].y, this.sh * 5/6), 50)
+            this.scrollList.setY(Math.min(this.scrollList.getChildren()[0].y, this.selectedDisplay.y - 50), 50)
+            this.scrollTiles.setY(Math.min(this.scrollTiles.getChildren()[0].y, this.selectedDisplay.y - 50), 50)
 
-            this.scrollList.setY(Math.max(this.scrollList.getChildren()[0].y, this.sh * 5/6 - (this.scrollList.getLength() - 1) * 50), 50)
-            this.scrollTiles.setY(Math.max(this.scrollTiles.getChildren()[0].y, this.sh * 5/6 - (this.scrollTiles.getLength() - 1) * 50), 50)
+            this.scrollList.setY(Math.max(this.scrollList.getChildren()[0].y, this.selectedDisplay.y - 50 - (this.scrollList.getLength() - 1) * 50), 50)
+            this.scrollTiles.setY(Math.max(this.scrollTiles.getChildren()[0].y, this.selectedDisplay.y - 50 - (this.scrollTiles.getLength() - 1) * 50), 50)
         }
 
         else if (this.visible === true) {

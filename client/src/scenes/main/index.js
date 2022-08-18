@@ -1,4 +1,4 @@
-import { Scene, GameObjects, BlendModes, Textures } from 'phaser';
+import { Scene, GameObjects, BlendModes, Textures, Display } from 'phaser';
 import { HUD } from '../../classes/HUD';
 import { Tank } from '../../classes/Tank';
 import { Terrain } from '../../classes/Terrain';
@@ -211,18 +211,24 @@ export class MainScene extends Scene {
         this.tank2.active = false
         this.activeTank = 0
 
-        var x = this.add.text(screenCenterX, screenCenterY, 'Play again')
-        var a = this.add.text(screenCenterX - 28, screenCenterY + 30, 'Yes')
-        var y = this.add.text(screenCenterX, screenCenterY + 30, '/')
-        var b = this.add.text(screenCenterX + 24, screenCenterY + 30, 'No')
+        var x = this.add.text(screenCenterX, screenCenterY, 'PLAY AGAIN ?')
+        var a = this.add.text(screenCenterX - 80, screenCenterY + 50, 'YES')
+        var y = this.add.text(screenCenterX, screenCenterY + 50, '/')
+        var b = this.add.text(screenCenterX + 80, screenCenterY + 50, 'NO')
 
-        x.setFontSize(30).setOrigin(0.5).setVisible(false)
-        a.setFontSize(20).setOrigin(0.5).setVisible(false)
-        b.setFontSize(20).setOrigin(0.5).setVisible(false)
-        y.setFontSize(20).setOrigin(0.5).setVisible(false)
+        x.setFontSize(50).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+        a.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+        b.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+        y.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+
+        strokeText(x, 4)
+        strokeText(a, 4)
+        strokeText(b, 4)
+        strokeText(y, 4)
 
         a.setInteractive()
         b.setInteractive()
+
 
         a.on('pointerdown', () => {
             if (this.sceneData.gameType === 3) {
@@ -276,4 +282,27 @@ export class MainScene extends Scene {
     handleType4 = () => {
         type4(this)
     }
+}
+
+
+const strokeText = (txt, thickness) => {
+    var re = /rgba\((\d+),(\d+),(\d+),(\d+)\)/
+    var match = new RegExp(re).exec(txt.style.color)
+    var r, g, b, a, k = 0.7;
+    r = parseInt(match[1])
+    g = parseInt(match[2])
+    b = parseInt(match[3])
+    a = parseInt(match[4])
+
+    r = Math.ceil(r * k)
+    g = Math.ceil(g * k)
+    b = Math.ceil(b * k)
+
+    txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
+}
+
+const int2rgba = (colorInt) => {
+    var rgba = new Display.Color.IntegerToRGB(colorInt)
+    var rgbaString = 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')'
+    return rgbaString
 }

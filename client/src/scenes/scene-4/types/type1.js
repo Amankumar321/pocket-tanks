@@ -71,7 +71,7 @@ export const type1 = (scene) => {
     const g = scene.add.text(screenCenterX, 700, 'CONTINUE').setFontSize(50).setOrigin(0.5);
     g.setFontFamily('"Days One"')
     g.setOrigin(0.5)
-    g.setColor('rgba(240,240,0,1)')
+    g.setColor('rgba(255,255,0,1)')
     strokeText(g, 6)
 
     g.setInteractive()

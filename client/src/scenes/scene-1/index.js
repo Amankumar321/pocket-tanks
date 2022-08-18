@@ -1,4 +1,5 @@
 import { Scene, GameObjects, BlendModes, Textures } from 'phaser';
+import { WeaponShopScroll } from '../../classes/WeaponShopScroll';
 import WebFontFile from '../../classes/WebFontFile';
 
 export class Scene1 extends Scene {
@@ -6,6 +7,7 @@ export class Scene1 extends Scene {
         super('scene-1');
         this.fps = null
         this.playbtn = null
+        this.k = null
     }
 
 
@@ -15,6 +17,15 @@ export class Scene1 extends Scene {
         this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400']))
     }
 
+    toggleFullscreen = () => {
+        if (this.scale.isFullscreen) {
+            this.scale.stopFullscreen();
+            // On stop fulll screen
+        } else {
+            this.scale.startFullscreen();
+            // On start fulll screen
+        }
+    }
 
 
     create = () => {
@@ -31,6 +42,13 @@ export class Scene1 extends Scene {
         //b.setOrigin(0.5).setFontSize(200)
         
         this.createPlayBtn()
+
+        var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
+        fullscreen.setInteractive({draggable: true})
+        fullscreen.on('pointerdown', this.toggleFullscreen)
+        //fullscreen.on('dragend', () => {alert()})
+        //this.k = new WeaponShopScroll(this)
+        //this.k.reset([{name: 'abd', id: 1}, {name: 'd', id: 2}, {name: 'ad', id: 3}, {name: 'sd', id: 4}, {name: 'td', id: 5}])
     }
 
     createPlayBtn = () => {
@@ -116,7 +134,7 @@ export class Scene1 extends Scene {
 
     update = (time, delta) => {
         this.fps.setText(this.game.loop.actualFps)
-    
+        //this.k.update()
     }
 
 }

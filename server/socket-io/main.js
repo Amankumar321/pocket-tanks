@@ -43,6 +43,22 @@ const mainsocket = (io) => {
                 client.isHost = false
             }
         })
+
+
+
+        client.on('deleteRoom', () => {
+            if (client.roomId !== null) {
+                client.leave(client.roomId)
+                rooms = rooms.filter((room) => { 
+                    return (room.roomId !== client.roomId)
+                })
+                io.sockets.in(client.roomId).emit('opponentLeft', {})
+                io.emit('setRooms', {rooms: rooms})
+                io.socketsLeave(client.roomId);
+                client.roomId = null
+                client.isHost = false
+            }
+        })
         
 
 
@@ -89,7 +105,7 @@ const mainsocket = (io) => {
             client.roomId = roomId
             client.isHost = true
             var host = {name: player.name, color: player.color, socketId: client.id, isReady: false, playAgain: false}
-            rooms.push({roomId: roomId, host: host})
+            rooms.unshift({roomId: roomId, host: host})
             io.emit('setRooms', {rooms: rooms})
         })
 

@@ -18,7 +18,7 @@ export const type1 = (scene) => {
 
     [a,b,c,d,e,f].forEach((text) => { text.setFontFamily('"Days One"') })
 
-    a.setOrigin(0.5)
+    a.setOrigin(0.5, 0)
     b.setOrigin(1, 0)
     c.setOrigin(0, 0)
     e.setOrigin(1, 0)
@@ -88,7 +88,7 @@ export const type1 = (scene) => {
     const g = scene.add.text(screenCenterX, 700, 'CONTINUE').setFontSize(50);
     g.setFontFamily('"Days One"')
     g.setOrigin(0.5)
-    g.setColor('rgba(240,240,0,1)')
+    g.setColor('rgba(255,255,0,1)')
     strokeText(g, 6)
 
     g.setInteractive()

@@ -1,4 +1,6 @@
 import { weaponArray } from "../../../weapons/array";
+import { Display } from "phaser";
+
 
 /**
 * @param {Phaser.Scene} scene
@@ -12,20 +14,31 @@ export const type2 = (scene) => {
 
     const screenCenterX = scene.cameras.main.worldView.x + scene.cameras.main.width / 2;
     const screenCenterY = scene.cameras.main.worldView.y + scene.cameras.main.height / 2;
-    const a = scene.add.text(screenCenterX / 2 - 50, 50, scene.player1.name);
-    const b = scene.add.text(screenCenterX * 3/2 + 50, 50, scene.player2.name);
+    const a = scene.add.text(screenCenterX / 2 - 150, 170, scene.player1.name);
+    const b = scene.add.text(screenCenterX * 3/2 + 150, 170, scene.player2.name);
+
+    a.setFontFamily('"Days One"')
+    b.setFontFamily('"Days One"')
+    a.setColor(int2rgba(scene.player1.color))
+    b.setColor(int2rgba(scene.player2.color))
+
+    const c = scene.add.text(screenCenterX, 100, 'WEAPON SHOP').setFontSize(50);
+    c.setColor('rgba(240,240,240,1)')
+    c.setOrigin(0.5, 0.5)
+    c.setFontFamily('"Days One"')
+    strokeText(c, 6)
 
     a.setOrigin(0.5).setFontSize(30)
     b.setOrigin(0.5).setFontSize(30)
 
-    var rect1 = scene.add.rectangle(screenCenterX / 2 - 50, screenCenterY, scene.renderer.width/3 - 100, scene.renderer.height/2)
-    rect1.setStrokeStyle(6, scene.player1.color)
+    var rect1 = scene.add.rectangle(screenCenterX / 2 - 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    rect1.setStrokeStyle(4, scene.player1.color)
     
     var rect2 = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width/3 - 100, scene.renderer.height/2)
-    rect2.setStrokeStyle(6, 0xFFFFFF)
+    //rect2.setStrokeStyle(6, 0xFFFFFF)
 
-    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 50, screenCenterY, scene.renderer.width/3 - 100, scene.renderer.height/2)
-    rect3.setStrokeStyle(6, scene.player2.color)
+    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    rect3.setStrokeStyle(4, scene.player2.color)
 
     scene.player1.weapons = []
     scene.player2.weapons = []
@@ -50,23 +63,84 @@ export const type2 = (scene) => {
         }
     }
 
-    for (let index = 0; index < totalWeapons; index++) {
+    for (let index = 0; index < totalWeapons/2; index++) {
         var randomWeaponIndex = Math.floor(Math.random() * weaponArray.length)
-        pickableArray.push(scene.add.text(rect2.x - rect2.width/2 + 10, rect2.y - rect2.height/2 + 10 + index * 40, weaponArray[randomWeaponIndex].name))
-        pickableArray[index].setFontSize(24)
-        pickableArray[index].setInteractive()
-        pickableArray[index].weaponIndex = weaponArray[randomWeaponIndex].id
+        var pickable = scene.add.container(rect2.x - rect2.width/2 - 50, rect2.y - rect2.height/2 + 10 + index * 40)
+        var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
+        var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
+        var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
+        //rect.setStrokeStyle(2, 0xff0000)
+        pickable.add(txt)
+        pickable.text = weaponArray[randomWeaponIndex].name
+        pickable.add(rect)
+        pickable.add(img)
+        pickableArray.push(pickable)
+        txt.setFontSize(20)
+        txt.setFontFamily('"Andale Mono"')
+        pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
+        pickable.arrayIndex = index
 
-        pickableArray[index].on('pointerdown', () => {
+        rect.setInteractive()
+        rect.on('pointerdown', () => {
             pickWeapon(pickableArray[index])
         })
     }
 
+    for (let index = 0; index < totalWeapons/2; index++) {
+        var randomWeaponIndex = Math.floor(Math.random() * weaponArray.length)
+        var pickable = scene.add.container(rect2.x - rect2.width/2 + 280, rect2.y - rect2.height/2 + 10 + index * 40)
+        var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
+        var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
+        var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
+        //rect.setStrokeStyle(2, 0xff0000)
+        pickable.add(txt)
+        pickable.text = weaponArray[randomWeaponIndex].name
+        pickable.add(rect)
+        pickable.add(img)
+        pickableArray.push(pickable)
+        txt.setFontSize(20)
+        txt.setFontFamily('"Andale Mono"')
+        pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
+        pickable.arrayIndex = index + totalWeapons/2
 
-    const g = scene.add.text(screenCenterX, 700, 'Continue').setFontSize(40).setOrigin(0.5);
+        rect.setInteractive()
+        rect.on('pointerdown', () => {
+            pickWeapon(pickableArray[index + totalWeapons/2])
+        })
+    }
+
+
+    const g = scene.add.text(screenCenterX, 700, 'CONTINUE').setFontSize(50).setOrigin(0.5);
+    g.setFontFamily('"Days One"')
+    g.setOrigin(0.5)
+    g.setColor('rgba(255,255,0,1)')
+    strokeText(g, 6)
 
     g.setInteractive()
     g.on('pointerdown', () => {
         scene.scene.start('main-scene', {gameType: 2, player1: scene.player1, player2: scene.player2})
     })
+}
+
+
+const int2rgba = (colorInt) => {
+    var rgba = new Display.Color.IntegerToRGB(colorInt)
+    var rgbaString = 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')'
+    return rgbaString
+}
+
+const strokeText = (txt, thickness) => {
+    var re = /rgba\((\d+),(\d+),(\d+),(\d+)\)/
+    var match = new RegExp(re).exec(txt.style.color)
+    var r, g, b, a, k = 0.7;
+    r = parseInt(match[1])
+    g = parseInt(match[2])
+    b = parseInt(match[3])
+    a = parseInt(match[4])
+
+    r = Math.ceil(r * k)
+    g = Math.ceil(g * k)
+    b = Math.ceil(b * k)
+
+    txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
 }

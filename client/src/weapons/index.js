@@ -1,11 +1,14 @@
 import Phaser, { Physics } from "phaser"
 import { Weapon } from "../classes/Weapon"
+import * as Logos from "./logos"
+
 
 export class bigshot {
     constructor() {
         this.id = 0
         this.name = 'Big Shot'
         this.projectile = null
+        this.logoCanvas = Logos.bigshot
     }
 
     reset = () => {
@@ -132,6 +135,7 @@ export class pineapple {
         this.destroyed = false
         this.projectile = null
         this.maxParticles = 6
+        this.logoCanvas = Logos.pineapple
     }
 
     reset = () => {
@@ -391,6 +395,7 @@ export class groundhog {
         this.projectile = null
         this.insideTerrain = false
         this.prevState = null
+        this.logoCanvas = Logos.groundhog
     }
 
     reset = () => {
@@ -507,6 +512,7 @@ export class superstar {
         this.dissociated = false
         this.bulletCount = 0
         this.bullets = []
+        this.logoCanvas = Logos.superstar
     }
 
     reset = () => {
@@ -893,6 +899,7 @@ export class earthmover {
     constructor() {
         this.id = 4
         this.name = 'Earth Mover'
+        this.logoCanvas = Logos.earthmover
     }
 
     reset = () => {
@@ -1030,6 +1037,7 @@ export class island {
         this.circlesLeft = 24
         this.maxCircles = 24
         this.distance = 60
+        this.logoCanvas = Logos.island
     }
 
     reset = () => {
@@ -1175,6 +1183,7 @@ export class bouncydirt {
         this.ballsCount = 16
         this.ballRadius = 4
         this.timer = null
+        this.logoCanvas = Logos.bouncydirt
     }
 
     reset = () => {

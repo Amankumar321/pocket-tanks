@@ -3,6 +3,7 @@ import { type1 } from './types/type1';
 import { type2 } from './types/type2';
 import { type3 } from './types/type3';
 import { type4 } from './types/type4';
+import { drawBackBtn } from '../../graphics/back-btn';
 
 export class Scene5 extends Scene {
     constructor() {
@@ -29,7 +30,14 @@ export class Scene5 extends Scene {
     create = () => {
         this.fps = this.add.text(0, 0, this.game.loop.actualFps)
 
-        var backbtn = this.add.rectangle(0, this.game.renderer.height, 100, 50, 0x8080F0, 1)
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        canvas.width = 150
+        canvas.height = 100
+        drawBackBtn(ctx, canvas.width, canvas.height)
+        this.textures.addCanvas('back-btn', canvas)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        backbtn.setDepth(10)
         
         backbtn.setInteractive()
         backbtn.on('pointerdown', () => {

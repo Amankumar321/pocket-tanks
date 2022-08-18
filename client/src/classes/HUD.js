@@ -1,6 +1,11 @@
-import { Textures } from "phaser";
+import { Textures, Display } from "phaser";
 import { ScrollList } from "./ScrollList";
 import { socket } from "../socket";
+import { createFireButton } from "../graphics/fire-btn";
+import { createPowerDisplay } from "../graphics/power-display";
+import { createAngleDisplay } from "../graphics/angle-display";
+import { createWeaponDisplay } from "../graphics/weapon-display";
+import { createMoveDisplay } from "../graphics/move-display";
 
 export class HUD extends Textures.CanvasTexture {
 
@@ -25,10 +30,12 @@ export class HUD extends Textures.CanvasTexture {
         this.width = canvas.width;
         this.height = canvas.height;
         this.fireButton = null
-        this.powerDisplay = null
-        this.weaponDisplay = null
+        this.powerDisplayText = null
+        this.angleDisplayText = null
         this.weaponName = null
+        this.weaponDisplay = null
         this.weaponScrollDisplay = null
+        this.moveDisplayText = null
         this.scoreDisplay1 = null
         this.scoreDisplay2 = null
         this.overlay = null
@@ -53,16 +60,29 @@ export class HUD extends Textures.CanvasTexture {
         ctx.closePath()
         ctx.fill()
 
-        this.createFireButton()
-        this.createPowerDisplay()
-        this.createWeaponDisplay()
-        this.createWeaponScrollDisplay()
+        createFireButton(this)
+        createPowerDisplay(this)
+        createWeaponDisplay(this)
+        createMoveDisplay(this)
+        createAngleDisplay(this)
         this.createOverlay()
 
-        this.scoreDisplay1 = this.scene.add.text(0, 0, this.scene.tank1.name + '\n' + this.scene.tank1.score)
-        this.scoreDisplay2 = this.scene.add.text(this.width, 0, this.scene.tank2.name + '\n' + this.scene.tank2.score)
-        this.scoreDisplay1.setOrigin(0, 0)
-        this.scoreDisplay2.setOrigin(1, 0)
+        var name1 = this.scene.add.text(0, 0, this.scene.tank1.name).setFontSize(30).setFontFamily('"Days One"')
+        this.scoreDisplay1 = this.scene.add.text(0, 35, this.scene.tank1.score)
+        var name2 = this.scene.add.text(this.width, 0, this.scene.tank2.name).setFontSize(30).setFontFamily('"Days One"').setOrigin(1, 0)
+        this.scoreDisplay2 = this.scene.add.text(this.width, 35, this.scene.tank2.score)
+        this.scoreDisplay1.setOrigin(0, 0).setFontSize(30).setFontFamily('"Days One"')
+        this.scoreDisplay2.setOrigin(1, 0).setFontSize(30).setFontFamily('"Days One"')
+
+        name1.setColor(this.scene.tank1.color)
+        name2.setColor(this.scene.tank2.color)
+        this.scoreDisplay1.setColor('rgba(240,240,240,1)')
+        this.scoreDisplay2.setColor('rgba(240,240,240,1)')
+
+        strokeText(name1, 4)
+        strokeText(name2, 4)
+        strokeText(this.scoreDisplay1, 4)
+        strokeText(this.scoreDisplay2, 4)
     
         this.update()
 
@@ -89,72 +109,17 @@ export class HUD extends Textures.CanvasTexture {
         this.overlay.setDepth(100)
         this.overlay.visible = false
         this.overlay.setInteractive()
-    } 
-
-    
-
-    createFireButton = () => {
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d')
-        canvas.height = 40 
-        canvas.width = 100
-
-        ctx.fillStyle = 'rgba(200,0,0,1)'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-    
-        this.scene.textures.addCanvas('fireButton', canvas);
-        
-        this.fireButton = this.scene.add.image(this.width/2, this.height * 5/6, 'fireButton')
-        this.fireButton.setDepth(6)
-        this.fireButton.setInteractive();
-
-        this.fireButton.on('pointerdown', () => {
-            if (this.scene.activeTank === 1) {
-                if (this.scene.sceneData.gameType === 3)
-                    socket.emit('shoot', {selectedWeapon: this.scene.tank1.selectedWeapon, power: this.scene.tank1.power, rotation: this.scene.tank1.turret.rotation})
-                this.scene.tank1.shoot()
-            }
-            else if (this.scene.activeTank === 2) {
-                if (this.scene.sceneData.gameType === 3)
-                    socket.emit('shoot', {selectedWeapon: this.scene.tank2.selectedWeapon, power: this.scene.tank2.power, rotation: this.scene.tank2.turret.rotation})
-                this.scene.tank2.shoot()
-            }
-        })
     }
-
-
-
-    createPowerDisplay = () => {
-        this.powerDisplay = this.scene.add.text(this.width/2 - 200, this.height * 5/6, '')
-        this.powerDisplay.setDepth(6)
-    }
-
-
-
-    createWeaponDisplay = () => {
-        this.weaponDisplay = this.scene.add.rectangle(this.width/2 + 200, this.height * 5/6, 100, 50, 0x000000, 0).setStrokeStyle(2, 0x000000, 1)
-        this.weaponName = this.scene.add.text(this.width/2 + 200, this.height * 5/6, '')
-        this.weaponName.setDepth(7).setOrigin(0.5)
-        this.weaponDisplay.setInteractive()
-        this.weaponDisplay.setDepth(6)
-    }
-
-
-
-    createWeaponScrollDisplay = () => {
-        this.weaponScrollDisplay = new ScrollList(this.scene, this.weaponName, this.weaponDisplay)
-    }
-
 
     
     reset = () => {
         if (this.scene.activeTank === 1) {
-            this.powerDisplay.setText(this.scene.tank1.power)
+            this.powerDisplayText.setText(this.scene.tank1.power)
             this.weaponName.setText(this.scene.tank1.weapons[this.scene.tank1.selectedWeapon]?.name)
             this.weaponScrollDisplay.reset(this.scene.tank1)
         }
         else if (this.scene.activeTank === 2) {
-            this.powerDisplay.setText(this.scene.tank2.power)
+            this.powerDisplayText.setText(this.scene.tank2.power)
             this.weaponName.setText(this.scene.tank2.weapons[this.scene.tank2.selectedWeapon]?.name)
             this.weaponScrollDisplay.reset(this.scene.tank2)
         }
@@ -174,12 +139,18 @@ export class HUD extends Textures.CanvasTexture {
 
 
     refresh = () => {
+        var angle = 0
         if (this.scene.activeTank === 1) {
-            this.powerDisplay.setText(this.scene.tank1.power)
+            angle = (180 - this.scene.tank1.turret.angle) - 90
+            if (angle < 0) angle += 360
+            this.powerDisplayText.setText(this.scene.tank1.power)
+            this.angleDisplayText.setText(Math.ceil(angle) + String.fromCharCode(176))
         }
         else if (this.scene.activeTank === 2) {
-            this.powerDisplay.setText(this.scene.tank2.power)
-            
+            angle = (180 - this.scene.tank2.turret.angle) - 90
+            if (angle < 0) angle += 360
+            this.powerDisplayText.setText(this.scene.tank2.power)
+            this.angleDisplayText.setText(Math.ceil(angle) + String.fromCharCode(176))
         }
 
         if ((this.scene.tank1.turret.activeWeapon !== null) || (this.scene.tank2.turret.activeWeapon !== null)) {
@@ -199,9 +170,37 @@ export class HUD extends Textures.CanvasTexture {
             }
         }
 
-        this.scoreDisplay1.setText(this.scene.tank1.name + '\n' + this.scene.tank1.score)
-        this.scoreDisplay2.setText(this.scene.tank2.name + '\n' + this.scene.tank2.score)
+        if (this.scene.gameOver == true) {
+            this.disable()
+        }
+
+        this.scoreDisplay1.setText(this.scene.tank1.score)
+        this.scoreDisplay2.setText(this.scene.tank2.score)
 
         this.weaponScrollDisplay.update()
     }
+}
+
+
+
+const strokeText = (txt, thickness) => {
+    var re = /rgba\((\d+),(\d+),(\d+),(\d+)\)/
+    var match = new RegExp(re).exec(txt.style.color)
+    var r, g, b, a, k = 0.7;
+    r = parseInt(match[1])
+    g = parseInt(match[2])
+    b = parseInt(match[3])
+    a = parseInt(match[4])
+
+    r = Math.ceil(r * k)
+    g = Math.ceil(g * k)
+    b = Math.ceil(b * k)
+
+    txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
+}
+
+const int2rgba = (colorInt) => {
+    var rgba = new Display.Color.IntegerToRGB(colorInt)
+    var rgbaString = 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')'
+    return rgbaString
 }

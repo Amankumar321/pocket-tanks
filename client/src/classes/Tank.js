@@ -11,7 +11,7 @@ export class Tank extends GameObjects.Sprite {
         var canvas = document.createElement('canvas');
         canvas.height = 24 // tank height
         canvas.width = 36  // tank width
-        
+    
         scene.textures.addCanvas('tank' + id, canvas);
         //scene.add.sprite(0, 0, 'tank');
         super(scene, 0, 0, 'tank' + id)
