@@ -1,72 +1,103 @@
 import { Terrain } from "../classes/Terrain";
 
+export const setTerrain = (ctx, width, height, path) => {
+    var img1 = new Image();
+    img1.onload = start
+    img1.src = "./assets/images/6.png";
+
+    function start () {
+        var pattern1 = ctx.createPattern(img1, 'repeat');
+        ctx.fillStyle = pattern1
+
+        ctx.beginPath()
+        ctx.moveTo(-200, height)
+        ctx.lineTo(path[0].x, path[0].y)
+
+        for (let index = 1; index < path.length; index++) {
+            ctx.lineTo(path[index].x, path[index].y)
+        }
+        ctx.lineTo(width, height)
+        ctx.closePath()
+        ctx.fill()
+
+        createLayers(ctx, path)
+    }
+
+    function makeDummyTerrain () {
+        ctx.fillStyle = 'rgba(0,0,0,1)'
+
+        ctx.beginPath()
+        ctx.moveTo(-200, height)
+        ctx.lineTo(path[0].x, path[0].y)
+
+        for (let index = 1; index < path.length; index++) {
+            ctx.lineTo(path[index].x, path[index].y)
+        }
+        ctx.lineTo(width, height)
+        ctx.closePath()
+        ctx.fill()
+    }
+
+    makeDummyTerrain()
+}
+
 /**
  * @param {CanvasRenderingContext2D} ctx 
  * @param {Terrain} terrain
  */
 
 export const drawTerrain = (ctx, width, height) => {
-    var img1 = new Image();
-    img1.onload = start;
-    img1.src="./assets/images/6.png";
-    function start(){
-        var pattern1 = ctx.createPattern(img1, 'repeat');
-        ctx.fillStyle = pattern1
-        //ctx.fillStyle = 'rgba(0,100,50,1)'
+    var path = makePath(width, height)
+    setTerrain(ctx, width, height, path)
+    return path
+}
+
+
+
+const makePath = (width, height) => {
+    var x, y, prevX, prevY, radius, angle, factor, path = [];
+    x = -200
+    y = height
+    y = height * Math.random() + height/10
+    prevX = x
+    prevY = y
+    path.push({x, y})
     
-        var x, y, prevX, prevY, radius, angle, factor, path = [];
-        x = -200
-        y = height
-        ctx.moveTo(x, y)
-        y = height * Math.random() + height/10
-        ctx.lineTo(x, y)
-        prevX = x
-        prevY = y
-        path.push({x, y})
+    while (x != width + 200) {
+        factor = Math.floor(Math.random() * 1)
+        radius = Math.floor(Math.random() * 30 + 10)
+        angle = getAngle(prevX, prevY, width, height)
         
-        while (x != width + 200) {
-            factor = Math.floor(Math.random() * 1)
-            radius = Math.floor(Math.random() * 30 + 10)
-            angle = getAngle(prevX, prevY, width, height)
-            
-            // if (Math.abs(prevAngle - angle) > 0.2) {
-            //     radius = Math.floor(Math.random() * 10 + 1)
-            // }
+        // if (Math.abs(prevAngle - angle) > 0.2) {
+        //     radius = Math.floor(Math.random() * 10 + 1)
+        // }
 
-            x = prevX + radius * Math.cos(angle)
-            y = prevY + radius * Math.sin(angle)
+        x = prevX + radius * Math.cos(angle)
+        y = prevY + radius * Math.sin(angle)
 
-            if (x > width + 200) {
-                x = width + 200
-            }
-            if (y > height) {
-                y = height
-            } 
-            if (y < height/5) {
-                y = prevY - radius * Math.sin(angle)
-            }
-
-            if (factor === 0) {
-                if (Math.random() < 0.2) {
-                    x = prevX + radius
-                    y = prevY
-                }
-                ctx.lineTo(x, y)
-                path.push({x, y})
-            }
-
-            prevX = x
-            prevY = y
+        if (x > width + 200) {
+            x = width + 200
+        }
+        if (y > height) {
+            y = height
+        } 
+        if (y < height/5) {
+            y = prevY - radius * Math.sin(angle)
         }
 
-        ctx.lineTo(width, height)
-        ctx.closePath()
-        ctx.fill()
+        if (factor === 0) {
+            if (Math.random() < 0.2) {
+                x = prevX + radius
+                y = prevY
+            }
+            path.push({x, y})
+        }
 
-        createLayers(ctx, path)
-
-        return path
+        prevX = x
+        prevY = y
     }
+
+    return path
 }
 
 
@@ -124,8 +155,10 @@ const createLayers = (ctx, path) => {
             ctx.strokeStyle = pattern[index]
             ctx.globalCompositeOperation = 'source-atop'
             ctx.stroke()
-            if (index === 0)
+            if (index === 0) {
                 return
+            }
+
             makeLayer(layers[index - 1], index - 1)
         }
 
@@ -134,19 +167,3 @@ const createLayers = (ctx, path) => {
 }
 
 
-
-export const setTerrain = (ctx, width, height, path) => {
-    ctx.fillStyle = 'rgba(0,100,50,1)'
-    ctx.beginPath()
-    ctx.moveTo(-200, height)
-    ctx.lineTo(path[0].x, path[0].y)
-
-    for (let index = 1; index < path.length; index++) {
-        ctx.lineTo(path[index].x, path[index].y)
-    }
-    ctx.lineTo(width, height)
-    ctx.closePath()
-    ctx.fill()
-
-    createLayers(ctx, path)
-}

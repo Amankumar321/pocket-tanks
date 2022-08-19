@@ -51,15 +51,7 @@ export class Tank extends GameObjects.Sprite {
         this.color = tankColor
         this.name = name
 
-        var initX = Math.ceil(Math.random() * this.terrain.width / 1.0)
-        var initY;
-
-        for (let y = 0; y < this.scene.game.renderer.height; y++) {
-            if (this.scene.terrain.getPixel(initX, y).alpha > 0) {
-                initY = y;
-                break;
-            }
-        }
+        this.randomPos()
 
         ctx.beginPath();
         ctx.moveTo(this.canvas.width/6, this.canvas.height/2)
@@ -73,7 +65,6 @@ export class Tank extends GameObjects.Sprite {
         ctx.closePath()
         ctx.fill()
 
-        this.setPosition(initX, initY)
         this.selectedWeapon = this.weapons.length >= 1 ? 0 : null
 
         socket.on('opponentShoot', ({selectedWeapon, power, rotation}) => {
@@ -84,6 +75,20 @@ export class Tank extends GameObjects.Sprite {
             this.scene.HUD.weaponScrollDisplay.reset(this)
             this.shoot()
         })
+    }
+
+
+
+    randomPos = () => {
+        var initX = Math.ceil(Math.random() * this.terrain.width / 1.0)
+        var initY;
+        for (let y = 0; y < this.scene.game.renderer.height; y++) {
+            if (this.scene.terrain.getPixel(initX, y).alpha > 0) {
+                initY = y;
+                break;
+            }
+        }
+        this.setPosition(initX, initY)
     }
 
 

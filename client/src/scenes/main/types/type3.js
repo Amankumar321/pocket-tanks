@@ -18,24 +18,23 @@ export const type3 = (scene) => {
     scene.tank1.weapons = player1.weapons
     scene.tank2.weapons = player2.weapons
     
-    
+    scene.tank1.create(int2rgba(player1.color), player1.name)
+    scene.tank2.create(int2rgba(player2.color), player2.name)
+
+
     if (socket.id === hostId) {
         scene.terrain.create()
-        scene.tank1.create(int2rgba(player1.color), player1.name)
-        scene.tank2.create(int2rgba(player2.color), player2.name)
-        
+        scene.tank1.randomPos()
+        scene.tank2.randomPos()
         socket.emit('terrainPath', {path: scene.terrain.path, hostPos: {x: scene.tank1.x, y: scene.tank1.y}, playerPos: {x: scene.tank2.x, y: scene.tank2.y}})
     }
     else {
         socket.once('setTerrainPath', ({path, hostPos, playerPos}) => {
             scene.terrain.setPath(path)
-            scene.tank1.create(int2rgba(player1.color), player1.name)
-            scene.tank2.create(int2rgba(player2.color), player2.name)
-
             scene.tank1.setPosition(playerPos.x, playerPos.y)
             scene.tank2.setPosition(hostPos.x, hostPos.y)
         })
-    
+        
         socket.emit('getTerrainPath', {})
     }
 
@@ -53,13 +52,17 @@ export const type3 = (scene) => {
     })
 
 
-    const m = scene.add.text(screenCenterX, screenCenterY, 'Opponent left')
-    const n = scene.add.text(screenCenterX, screenCenterY + 60, 'Exit')
+    const m = scene.add.text(screenCenterX, screenCenterY - 35, 'OPPONENT LEFT')
+    const n = scene.add.text(screenCenterX, screenCenterY + 35, 'EXIT')
     const overlay = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width, scene.renderer.height, 0x000000)
 
-    m.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
-    n.setFontSize(30).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
+    m.setFontSize(50).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
+    n.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
     overlay.setVisible(false).setAlpha(0.8).setDepth(19)
+    m.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+    n.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+    strokeText(m, 4)
+    strokeText(n, 4)
 
     n.setInteractive()
     
@@ -82,4 +85,21 @@ const int2rgba = (colorInt) => {
     var rgba = new Display.Color.IntegerToRGB(colorInt)
     var rgbaString = 'rgba(' + rgba.r + ',' + rgba.g + ',' + rgba.b + ',' + rgba.a + ')'
     return rgbaString
+}
+
+
+const strokeText = (txt, thickness) => {
+    var re = /rgba\((\d+),(\d+),(\d+),(\d+)\)/
+    var match = new RegExp(re).exec(txt.style.color)
+    var r, g, b, a, k = 0.7;
+    r = parseInt(match[1])
+    g = parseInt(match[2])
+    b = parseInt(match[3])
+    a = parseInt(match[4])
+
+    r = Math.ceil(r * k)
+    g = Math.ceil(g * k)
+    b = Math.ceil(b * k)
+
+    txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
 }

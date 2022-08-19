@@ -7,7 +7,7 @@ import { Computer } from "../../../classes/Computer"
 
 export const type1 = (scene) => {
     scene.terrain.create()
-    
+
     var player1 = scene.sceneData.player1
     var cpu1 = scene.sceneData.cpu1
 
@@ -19,10 +19,9 @@ export const type1 = (scene) => {
     scene.tank1.create(int2rgba(player1.color), player1.name)
     scene.tank2.create(int2rgba(cpu1.color), cpu1.name)
 
-
     scene.tank1.active = true
     scene.activeTank = 1
-    
+        
 }
 
 

@@ -141,12 +141,16 @@ export const type3 = (scene) => {
     g.setColor('rgba(255,255,0,1)')
     strokeText(g, 6)
 
-    const m = scene.add.text(screenCenterX, screenCenterY, 'Opponent left')
-    const n = scene.add.text(screenCenterX, screenCenterY + 60, 'Exit')
+    const m = scene.add.text(screenCenterX, screenCenterY - 35, 'OPPONENT LEFT')
+    const n = scene.add.text(screenCenterX, screenCenterY + 35, 'EXIT')
     const overlay = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width, scene.renderer.height, 0x000000)
+    m.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+    n.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+    strokeText(m, 4)
+    strokeText(n, 4)
 
-    m.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
-    n.setFontSize(30).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
+    m.setFontSize(50).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
+    n.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
     overlay.setVisible(false).setAlpha(0.8).setDepth(19)
 
     n.setInteractive()

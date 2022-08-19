@@ -180,14 +180,17 @@ const mainsocket = (io) => {
             room.host.pos = {...hostPos}
             room.player.pos = {...playerPos}
             client.broadcast.emit('setTerrainPath', {path: room.terrainPath, hostPos: room.host.pos, playerPos: room.player.pos})
+            console.log(room.terrainPath)
         })
 
 
 
         client.on('getTerrainPath', () => {
             var room = rooms.find(ele => { return ele.roomId === client.roomId })
-            if (room.terrainPath !== undefined && rooms.terrainPath !== null)
+            if (room.terrainPath !== undefined && rooms.terrainPath !== null) {
                 client.emit('setTerrainPath', {path: room.terrainPath})
+                console.log(room.terrainPath)
+            }
         })
 
 
