@@ -132,7 +132,6 @@ const createLayers = (ctx, path) => {
 
     const makeLayer = (layer, index) => {
         ctx.beginPath()
-        console.log(index)
 
         angle = Math.atan((path[1].y - path[0].y) / (path[1].x - path[0].x))
         ctx.moveTo(path[0].x - 5000 * Math.cos(angle), path[0].y - 5000 * Math.sin(angle))
@@ -147,8 +146,7 @@ const createLayers = (ctx, path) => {
         img[index] = new Image();
         img[index].onload = start;
         img[index].src = `./assets/images/${index + 1}.png`;
-        function start(){
-            console.log(index)
+        function start() {
             pattern[index] = ctx.createPattern(img[index], 'repeat');
             ctx.fillStyle = pattern[index]
             ctx.lineWidth = layer.width

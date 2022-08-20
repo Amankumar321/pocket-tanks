@@ -14,7 +14,7 @@ export class Scene1 extends Scene {
 
     preload = () => {
         //this.load.image('cover', 'assets/images/c.png')
-        this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400']))
+        this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400', 'Russo One']))
     }
 
     toggleFullscreen = () => {

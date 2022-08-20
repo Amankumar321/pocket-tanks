@@ -33,8 +33,9 @@ export class HUD extends Textures.CanvasTexture {
         this.powerDisplayText = null
         this.angleDisplayText = null
         this.weaponName = null
-        this.weaponDisplay = null
+        this.weaponBox = null
         this.weaponScrollDisplay = null
+        this.powerMeter = null
         this.moveDisplayText = null
         this.scoreDisplay1 = null
         this.scoreDisplay2 = null
@@ -145,12 +146,14 @@ export class HUD extends Textures.CanvasTexture {
             if (angle < 0) angle += 360
             this.powerDisplayText.setText(this.scene.tank1.power)
             this.angleDisplayText.setText(Math.ceil(angle) + String.fromCharCode(176))
+            this.moveDisplayText.setText(this.scene.tank1.movesRemaining)
         }
         else if (this.scene.activeTank === 2) {
             angle = (180 - this.scene.tank2.turret.angle) - 90
             if (angle < 0) angle += 360
             this.powerDisplayText.setText(this.scene.tank2.power)
             this.angleDisplayText.setText(Math.ceil(angle) + String.fromCharCode(176))
+            this.moveDisplayText.setText(this.scene.tank2.movesRemaining)
         }
 
         if ((this.scene.tank1.turret.activeWeapon !== null) || (this.scene.tank2.turret.activeWeapon !== null)) {
@@ -174,10 +177,15 @@ export class HUD extends Textures.CanvasTexture {
             this.disable()
         }
 
+        if ((this.scene.tank1.moving) || (this.scene.tank2.moving)) {
+            this.disable()
+        }
+
         this.scoreDisplay1.setText(this.scene.tank1.score)
         this.scoreDisplay2.setText(this.scene.tank2.score)
 
         this.weaponScrollDisplay.update()
+        this.powerMeter.refresh()
     }
 }
 

@@ -25,16 +25,16 @@ const drawAngleDisplay = (ctx, width, height) => {
  */
 
 const drawArrow = (ctx, width, height, angle) => {
-    var txt = "->"
+    var txt =  String.fromCharCode(0x25B6)
     //var strokeThickness = 4
-    if (angle === Math.PI) txt = "<-" 
+    if (angle === Math.PI) txt = String.fromCharCode(0x25C0)
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.strokeStyle = 'rgba(160,160,160,1)'
 
     ctx.fillRect(0, 0, width, height)
     ctx.textAlign = 'center'
     ctx.fillStyle = 'rgba(0,0,0,1)'
-    ctx.font = '18px Arial'
+    ctx.font = '16px Arial'
     ctx.fillText(txt, width/2, height * 3/4)
 }
 
@@ -45,7 +45,7 @@ const drawArrow = (ctx, width, height, angle) => {
 
 export const createAngleDisplay = (hud) => {
     var angleDisplay = hud.scene.add.container(hud.width * 3/4, hud.height * 9/12)
-    var h = 90, w = 100
+    var h = 90, w = 120
 
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
@@ -110,7 +110,7 @@ export const createAngleDisplay = (hud) => {
         }
     })
 
-    hud.angleDisplayText = hud.scene.add.text(0, h/3, '').setOrigin(0.5)
+    hud.angleDisplayText = hud.scene.add.text(0, h/3, '').setOrigin(0.5).setFont('18px Geneva')
     angleDisplay.add(hud.angleDisplayText)
 }
 

@@ -230,6 +230,8 @@ export class Terrain extends Textures.CanvasTexture {
                 }
             }
         }
+        if (x === this.width)
+            k = null
         
         return k;
     }
@@ -248,6 +250,8 @@ export class Terrain extends Textures.CanvasTexture {
                 }
             }
         }
+        if (x === 0)
+            k = null
 
         return k;
     }

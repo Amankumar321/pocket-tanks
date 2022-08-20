@@ -31,6 +31,10 @@ export class Tank extends GameObjects.Sprite {
         this.settled = true
         this.color = null
         this.centre = {x: 0, y: 0}
+        this.leftSteps = 0
+        this.rightSteps = 0
+        this.movesRemaining = 4
+        this.moving = false
         this.hitRadius = this.height/4
         
         this.keyA = this.scene.input.keyboard.addKey('A');
@@ -96,12 +100,12 @@ export class Tank extends GameObjects.Sprite {
     update = () => {
         // position
         if (this.terrain.getPixel(this.x, this.y).alpha > 0) {
-            this.checkRotation()
+            this.setRotation(this.terrain.getSlope(this.x, this.y))
             this.settled = true
             //nothing
         }
         else if (this.y >= this.terrain.height) {
-            this.checkRotation()
+            this.setRotation(this.terrain.getSlope(this.x, this.y))
             this.y = this.terrain.height
             this.settled = true
         }
@@ -134,145 +138,31 @@ export class Tank extends GameObjects.Sprite {
             if (this.active)
                 this.power--;
         }
-    }
 
-    
-
-    checkRotation = () => {
-        var i, posRight, posLeft, temp, slope, avgRightX = 0, avgRightY = 0, avgLeftX = 0, avgLeftY = 0, countRight = 0, countLeft = 0;
-        posRight = {x: this.x, y: this.y}
-        posLeft = {x: this.x, y: this.y}
-
-        for (i = 0; i < 5; i++) {
-            temp = this.groundRight(posRight.x, posRight.y)
-            if (temp === null) {
-                break;
-            }
-            posRight = this.groundRight(posRight.x, posRight.y)
-            avgRightX += posRight.x
-            avgRightY += posRight.y
-            countRight++
+        if (this.leftSteps > 0) {
+            this.leftSteps--
+            this.moveLeft()
         }
-
-        for (i = 0; i < 5; i++) {
-            temp = this.groundLeft(posLeft.x, posLeft.y)
-            if (temp === null) {
-                break;
-            }
-            posLeft = this.groundLeft(posLeft.x, posLeft.y)
-            avgLeftX += posLeft.x
-            avgLeftY += posLeft.y
-            countLeft++
-        }
-
-        if (posRight.x === posLeft.x && posRight.y === posLeft.y) {
-            //slope = this.rotation
-        }
-        else {
-            if ((posRight.x === this.x && posRight.y === this.y) || (posLeft.x === this.x && posLeft.y === this.y)) {
-                // null
-            }
-            else {
-                avgLeftX = avgLeftX/countLeft
-                avgLeftY = avgLeftY/countLeft
-                avgRightX = avgRightX/countRight
-                avgRightY = avgRightY/countRight
-
-                slope = (avgRightY - avgLeftY) / (avgRightX - avgLeftX)
-                if (slope > 10000) {
-                    slope = 10000
-                }
-                if (slope < -10000) {
-                    slope = -10000
-                }
-
-                this.setRotation(Math.atan(slope))
-            }
-        }
-        
-        if (this.y > this.terrain.height) {
-            this.setRotation(0)
+        if (this.rightSteps > 0) {
+            this.rightSteps--
+            this.moveRight()
+        } 
+        if (this.leftSteps === 0 && this.rightSteps === 0) {
+            this.moving = false
         }
     }
 
 
 
     groundRight = (x, y) => {
-        var options = [{x: x + 1, y: y - 1}, {x: x + 1, y: y}, {x: x + 1, y: y + 1}]
-        var point = null;
-        var pixel, abovePixel;
-
-        for (let index = 0; index < options.length; index++) {
-            pixel = this.terrain.getPixel(options[index].x, options[index].y)
-            abovePixel = this.terrain.getPixel(options[index].x, options[index].y - 1)
-            
-            if (pixel.alpha > 0 && abovePixel.alpha === 0) {
-                point = options[index]
-                break;
-            }
-        }
-
-        if (point === null) {
-            var x = this.x + 1
-            var minY = this.y - 30 > 0 ? this.y - 30 : 0;
-            var maxY = this.y + 30 < this.terrain.height ? this.y + 30 : this.terrain.height;
-
-            for (let y = minY; y < maxY; y++) {
-                pixel = this.terrain.getPixel(x, y)
-                abovePixel = this.terrain.getPixel(x, y - 1)
-
-                if (pixel.alpha > 0 && abovePixel.alpha === 0) {
-                    point = {x: x, y: y}
-                    break;
-                }
-            }
-        }
-
-        if (this.y > this.terrain.height - this.height/2 && point === null) {
-            point = {x: x + 1, y: y}
-        }
-
-
+        var point = this.terrain.getRightGround(x, y)
         return point;
     }
 
 
 
     groundLeft = (x, y) => {
-        var options = [{x: x - 1, y: y - 1}, {x: x - 1, y: y}, {x: x - 1, y: y + 1}]
-        var point = null;
-        var pixel, abovePixel;
-
-        for (let index = 0; index < options.length; index++) {
-            pixel = this.terrain.getPixel(options[index].x, options[index].y)
-            abovePixel = this.terrain.getPixel(options[index].x, options[index].y - 1) 
-            if (pixel.alpha > 0 && abovePixel.alpha === 0) {
-                point = options[index]
-                break;
-            }
-        }
-
-        if (point === null) {
-            var x = this.x - 1
-            var minY = this.y - 30 > 0 ? this.y - 30 : 0;
-            var maxY = this.y + 30 < this.terrain.height ? this.y + 30 : this.terrain.height;
-
-            for (let y = minY; y < maxY; y++) {
-                pixel = this.terrain.getPixel(x, y)
-                abovePixel = this.terrain.getPixel(x, y - 1)
-
-                if (pixel.alpha > 0 && abovePixel.alpha === 0) {
-                    point = {x: x, y: y}
-                    break;
-                }
-            }
-        }
-
-        if (this.y > this.terrain.height - this.height/2 && point === null) {
-            point = {x: x - 1, y: y}
-        }
-
-
+        var point = this.terrain.getLeftGround(x, y)
         return point;
     }
 
@@ -281,15 +171,14 @@ export class Tank extends GameObjects.Sprite {
     moveLeft = () => {
         if (!this.active) return
 
-        var nextPos, slope, angle;
+        var nextPos;
         nextPos = this.groundLeft(this.x, this.y);
         if (nextPos === null) {
             //
         }
         else {
-            slope = (this.y - nextPos.y) / (this.x - nextPos.x)
-            angle = Math.atan(slope)
-            this.setPosition(this.x - Math.cos(angle), this.y - Math.sin(angle))
+            this.setPosition(nextPos.x, nextPos.y)
+            this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
 
@@ -298,15 +187,34 @@ export class Tank extends GameObjects.Sprite {
     moveRight = () => {
         if (!this.active) return
 
-        var nextPos, slope, angle;
+        var nextPos;
         nextPos = this.groundRight(this.x, this.y);
         if (nextPos === null) {
             //
         }
         else {
-            slope = (this.y - nextPos.y) / (this.x - nextPos.x)
-            angle = Math.atan(slope)
-            this.setPosition(this.x + Math.cos(angle), this.y + Math.sin(angle))
+            this.setPosition(nextPos.x, nextPos.y)
+            this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
+        }
+    }
+
+
+
+    stepLeft = () => {
+        if (this.movesRemaining > 0) {
+            this.leftSteps = 80
+            this.moving = true
+            //this.movesRemaining--
+        }
+    }
+
+
+
+    stepRight = () => {
+        if (this.movesRemaining > 0) {
+            this.rightSteps = 80
+            this.moving = true
+            //this.movesRemaining--
         }
     }
 

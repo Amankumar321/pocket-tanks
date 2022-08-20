@@ -3,13 +3,19 @@
  */
 
 const drawFireBtn = (ctx, width, height) => {
-    ctx.fillStyle = 'rgba(200,0,0,1)'
+    ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.fillRect(0, 0, width, height)
-    ctx.lineWidth = 4
-    ctx.fillStyle = 'rgba(0,0,0,1)'
+    ctx.lineWidth = 2
+    var g = ctx.createLinearGradient(width/2, 0, width/2, height)
+    g.addColorStop(0, 'rgba(255,0,0,1)')
+    g.addColorStop(1, 'rgba(255,255,0,1)')
+
+    ctx.strokeStyle = 'rgba(0,0,0,1)'
+    ctx.fillStyle = g
     ctx.textAlign = 'center'
-    ctx.font = '30px Arial'
-    ctx.fillText('FIRE', width/2, height/2 + 12)
+    ctx.font = 'italic 700 50px Verdana'
+    ctx.fillText('Fire', width/2, height/2 + 18)
+    ctx.strokeText('Fire', width/2, height/2 + 18)
 }
 
 
@@ -18,8 +24,8 @@ export const createFireButton = (hud) => {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
 
-    canvas.height = 40 
-    canvas.width = 100
+    canvas.height = 60 
+    canvas.width = 160
 
     drawFireBtn(ctx, canvas.width, canvas.height)
 
