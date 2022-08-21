@@ -92,7 +92,7 @@ export const createAngleDisplay = (hud) => {
     hud.scene.textures.addCanvas('angle-aim-display', canvas);
 
     hud.crossAir = hud.scene.add.image(0, 0, 'angle-aim-display')
-    hud.crossAir.setDepth(7).setVisible(true)
+    hud.crossAir.setDepth(7).setVisible(false)
     
     var angleBtn = hud.scene.add.image(0, 0, 'angle-display')
     angleDisplay.add(angleBtn)
@@ -104,79 +104,77 @@ export const createAngleDisplay = (hud) => {
             hud.scene.input.mouse.requestPointerLock()
             hud.crossAir.setVisible(true)
             var alpha = hud.scene.tank1.turret.rotation
-            hud.crossAir.setPosition(hud.scene.tank1.turret.x - 50 * Math.sin(alpha), hud.scene.tank1.turret.y - 50 * Math.cos(alpha))
+            hud.crossAir.setPosition(hud.scene.tank1.turret.x + 50 * Math.sin(alpha), hud.scene.tank1.turret.y - 50 * Math.cos(alpha))
             
             hud.scene.input.once('pointerdown', () => {
-                if (hud.scene.input.mouse.locked === true)
+                if (hud.scene.input.mouse.locked === true) {
                     hud.scene.input.mouse.releasePointerLock()
+                    hud.crossAir.setVisible(false)
+                }
             })
         }
         else if (hud.scene.activeTank === 2) {
             hud.scene.input.mouse.requestPointerLock()
             hud.crossAir.setVisible(true)
             var alpha = hud.scene.tank2.turret.rotation
-            hud.crossAir.setPosition(hud.scene.tank2.turret.x - 50 * Math.sin(alpha), hud.scene.tank2.turret.y - 50 * Math.cos(alpha))
-
+            hud.crossAir.setPosition(hud.scene.tank2.turret.x + 50 * Math.sin(alpha), hud.scene.tank2.turret.y - 50 * Math.cos(alpha))
+            
             hud.scene.input.once('pointerdown', () => {
-                if (hud.scene.input.mouse.locked === true)
+                if (hud.scene.input.mouse.locked === true) {
                     hud.scene.input.mouse.releasePointerLock()
+                    hud.crossAir.setVisible(false)
+                }
             })
         }
     })
 
 
     hud.crossAir.refresh = () => {
-        return
+        if (hud.scene.input.mouse.locked === false) return
         if (hud.scene.activeTank === 1) {
-            var alpha = 0, beta = 0, theta = 0, currX, currY;
-            currX = hud.scene.input.mousePointer.movementX + hud.scene.tank1.turret.x
-            currY = hud.scene.input.mousePointer.movementY + hud.scene.tank1.turret.y
-            beta = Math.atan((currY - hud.crossAir.getData('centreY')) / (currX - hud.crossAir.getData('centreX')))
-            theta = Math.atan((hud.crossAir.y - hud.crossAir.getData('centreY')) / (hud.crossAir.x - hud.crossAir.getData('centreX')))
-            //if (beta === NaN || theta === NaN) return
-            alpha = (beta - theta)%Math.PI
-            if (typeof alpha !== typeof 1)
-            //Phaser.Actions.RotateAroundDistance(hud.crossAir, {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, alpha, 50)
-            hud.crossAir.setData('alpha', hud.crossAir.getData('alpha') + alpha)
-            alpha = hud.crossAir.getData('alpha')
-            hud.crossAir.setPosition(hud.scene.tank1.turret.x + 50 * Math.cos(alpha), hud.scene.tank1.turret.y + 50 * Math.sin(alpha))
+            var prevX, prevY, currX, currY, vec1, vec2, angle, sign;
+            prevX = hud.crossAir.x
+            prevY = hud.crossAir.y
+
+            hud.crossAir.setPosition(hud.crossAir.x + hud.scene.input.mousePointer.movementX, hud.crossAir.y + hud.scene.input.mousePointer.movementY)
+            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, 0, 50)
+
+            currX = hud.crossAir.x
+            currY = hud.crossAir.y
+            vec1 = new Phaser.Math.Vector2(currX - hud.scene.tank1.turret.x, currY - hud.scene.tank1.turret.y)
+            vec2 = new Phaser.Math.Vector2(prevX - hud.scene.tank1.turret.x, prevY - hud.scene.tank1.turret.y)
+            angle = Math.acos(vec1.dot(vec2) / (vec1.length()*vec2.length()))
+            if (isNaN(angle)) return
+            sign = vec1.cross(vec2)
+            angle = sign >= 0 ? -angle : angle 
             
-            if (Phaser.Math.Distance.Between() <= 50) {
-                hud.crossAir.setData('centreX', hud.scene.tank1.turret.x)
-                hud.crossAir.setData('centreY', hud.scene.tank1.turret.y)
-            }
-            else {
-                if (hud.scene.input.mousePointer.movementX === 0) return
-                alpha = Math.atan(hud.scene.input.mousePointer.movementY / hud.scene.input.mousePointer.movementX)
-                hud.crossAir.setData('centreX', currX - 50 * Math.cos(alpha))
-                hud.crossAir.setData('centreY', currY - 50 * Math.sin(alpha))
-            }
+            hud.scene.tank1.turret.relativeRotation += angle
         }
 
         else if (hud.scene.activeTank === 2) {
-            var alpha = 0, beta = 0, theta = 0, currX, currY;
-            currX = hud.scene.input.mousePointer.movementX + hud.scene.tank2.turret.x
-            currY = hud.scene.input.mousePointer.movementY + hud.scene.tank2.turret.y
-            beta = Math.atan((currY - hud.crossAir.getData('centreY')) / (currX - hud.crossAir.getData('centreX')))
-            theta = Math.atan((hud.crossAir.y - hud.crossAir.getData('centreY')) / (hud.crossAir.x - hud.crossAir.getData('centreX')))
-            alpha = (beta - theta)%Math.PI
-            if (typeof alpha !== typeof 1) return
-            //Phaser.Actions.RotateAroundDistance(hud.crossAir, {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, alpha, 50)
-            hud.crossAir.setData('alpha', hud.crossAir.getData('alpha') + alpha)
-            alpha = hud.crossAir.getData('alpha')
-            hud.crossAir.setPosition(hud.scene.tank2.turret.x + 50 * Math.sin(alpha), hud.scene.tank2.turret.y + 50 * Math.cos(alpha))
+            var prevX, prevY, currX, currY, vec1, vec2, angle;
+            prevX = hud.crossAir.x
+            prevY = hud.crossAir.y
+
+            hud.crossAir.setPosition(hud.crossAir.x + hud.scene.input.mousePointer.movementX, hud.crossAir.y + hud.scene.input.mousePointer.movementY)
+            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, 0, 50)
+
+            currX = hud.crossAir.x
+            currY = hud.crossAir.y
+
+            vec1 = new Phaser.Math.Vector2(currX - hud.scene.tank2.turret.x, currY - hud.scene.tank2.turret.y)
+            vec2 = new Phaser.Math.Vector2(prevX - hud.scene.tank2.turret.x, prevY - hud.scene.tank2.turret.y)
+
+            angle = Math.acos(vec1.dot(vec2) / (vec1.length()*vec2.length()))
+            if (isNaN(angle)) return
+            sign = vec1.cross(vec2)
+            angle = sign >= 0 ? -angle : angle
             
-            if (Phaser.Math.Distance.Between() <= 50) {
-                hud.crossAir.setData('centreX', hud.scene.tank2.turret.x)
-                hud.crossAir.setData('centreY', hud.scene.tank2.turret.y)
-            }
-            else {
-                if (hud.scene.input.mousePointer.movementX === 0) return
-                alpha = Math.atan(hud.scene.input.mousePointer.movementY / hud.scene.input.mousePointer.movementX)
-                hud.crossAir.setData('centreX', currX - 50 * Math.sin(alpha))
-                hud.crossAir.setData('centreY', currY - 50 * Math.cos(alpha))
-            }
+            hud.scene.tank2.turret.relativeRotation += angle
         }
+
+        hud.scene.input.mousePointer.movementX = 0
+        hud.scene.input.mousePointer.movementY = 0
     }
 
 
