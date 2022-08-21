@@ -32,6 +32,7 @@ export class HUD extends Textures.CanvasTexture {
         this.fireButton = null
         this.powerDisplayText = null
         this.angleDisplayText = null
+        this.crossAir = null
         this.weaponName = null
         this.weaponBox = null
         this.weaponScrollDisplay = null
@@ -186,6 +187,7 @@ export class HUD extends Textures.CanvasTexture {
 
         this.weaponScrollDisplay.update()
         this.powerMeter.refresh()
+        this.crossAir.refresh()
     }
 }
 

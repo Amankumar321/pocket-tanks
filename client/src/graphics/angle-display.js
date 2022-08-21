@@ -1,4 +1,5 @@
 import { HUD } from "../classes/HUD"
+import Phaser from "phaser"
 
 /**
  * @param {CanvasRenderingContext2D} ctx 
@@ -18,6 +19,19 @@ const drawAngleDisplay = (ctx, width, height) => {
     ctx.font = '18px Arial'
     ctx.fillText('Angle', width/2, height * 1/2)
 }
+
+
+/**
+ * @param {CanvasRenderingContext2D} ctx 
+ */
+
+ const drawCrossair = (ctx, width, height) => {
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,255,255,1)'
+    ctx.font = '16px Arial'
+    ctx.fillText('o', width/2, height * 3/4)
+}
+
 
 
 /**
@@ -69,6 +83,16 @@ export const createAngleDisplay = (hud) => {
     canvas.width = 30
     drawArrow(ctx, canvas.width, canvas.height, Math.PI)
     hud.scene.textures.addCanvas('angle-display-left', canvas);
+
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d')
+    canvas.height = 30 
+    canvas.width = 30
+    drawCrossair(ctx, canvas.width, canvas.height, Math.PI)
+    hud.scene.textures.addCanvas('angle-aim-display', canvas);
+
+    hud.crossAir = hud.scene.add.image(0, 0, 'angle-aim-display')
+    hud.crossAir.setDepth(7).setVisible(true)
     
     var angleBtn = hud.scene.add.image(0, 0, 'angle-display')
     angleDisplay.add(angleBtn)
@@ -77,12 +101,84 @@ export const createAngleDisplay = (hud) => {
 
     angleBtn.on('pointerdown', () => {
         if (hud.scene.activeTank === 1) {
+            hud.scene.input.mouse.requestPointerLock()
+            hud.crossAir.setVisible(true)
+            var alpha = hud.scene.tank1.turret.rotation
+            hud.crossAir.setPosition(hud.scene.tank1.turret.x - 50 * Math.sin(alpha), hud.scene.tank1.turret.y - 50 * Math.cos(alpha))
             
+            hud.scene.input.once('pointerdown', () => {
+                if (hud.scene.input.mouse.locked === true)
+                    hud.scene.input.mouse.releasePointerLock()
+            })
         }
         else if (hud.scene.activeTank === 2) {
-            
+            hud.scene.input.mouse.requestPointerLock()
+            hud.crossAir.setVisible(true)
+            var alpha = hud.scene.tank2.turret.rotation
+            hud.crossAir.setPosition(hud.scene.tank2.turret.x - 50 * Math.sin(alpha), hud.scene.tank2.turret.y - 50 * Math.cos(alpha))
+
+            hud.scene.input.once('pointerdown', () => {
+                if (hud.scene.input.mouse.locked === true)
+                    hud.scene.input.mouse.releasePointerLock()
+            })
         }
     })
+
+
+    hud.crossAir.refresh = () => {
+        return
+        if (hud.scene.activeTank === 1) {
+            var alpha = 0, beta = 0, theta = 0, currX, currY;
+            currX = hud.scene.input.mousePointer.movementX + hud.scene.tank1.turret.x
+            currY = hud.scene.input.mousePointer.movementY + hud.scene.tank1.turret.y
+            beta = Math.atan((currY - hud.crossAir.getData('centreY')) / (currX - hud.crossAir.getData('centreX')))
+            theta = Math.atan((hud.crossAir.y - hud.crossAir.getData('centreY')) / (hud.crossAir.x - hud.crossAir.getData('centreX')))
+            //if (beta === NaN || theta === NaN) return
+            alpha = (beta - theta)%Math.PI
+            if (typeof alpha !== typeof 1)
+            //Phaser.Actions.RotateAroundDistance(hud.crossAir, {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, alpha, 50)
+            hud.crossAir.setData('alpha', hud.crossAir.getData('alpha') + alpha)
+            alpha = hud.crossAir.getData('alpha')
+            hud.crossAir.setPosition(hud.scene.tank1.turret.x + 50 * Math.cos(alpha), hud.scene.tank1.turret.y + 50 * Math.sin(alpha))
+            
+            if (Phaser.Math.Distance.Between() <= 50) {
+                hud.crossAir.setData('centreX', hud.scene.tank1.turret.x)
+                hud.crossAir.setData('centreY', hud.scene.tank1.turret.y)
+            }
+            else {
+                if (hud.scene.input.mousePointer.movementX === 0) return
+                alpha = Math.atan(hud.scene.input.mousePointer.movementY / hud.scene.input.mousePointer.movementX)
+                hud.crossAir.setData('centreX', currX - 50 * Math.cos(alpha))
+                hud.crossAir.setData('centreY', currY - 50 * Math.sin(alpha))
+            }
+        }
+
+        else if (hud.scene.activeTank === 2) {
+            var alpha = 0, beta = 0, theta = 0, currX, currY;
+            currX = hud.scene.input.mousePointer.movementX + hud.scene.tank2.turret.x
+            currY = hud.scene.input.mousePointer.movementY + hud.scene.tank2.turret.y
+            beta = Math.atan((currY - hud.crossAir.getData('centreY')) / (currX - hud.crossAir.getData('centreX')))
+            theta = Math.atan((hud.crossAir.y - hud.crossAir.getData('centreY')) / (hud.crossAir.x - hud.crossAir.getData('centreX')))
+            alpha = (beta - theta)%Math.PI
+            if (typeof alpha !== typeof 1) return
+            //Phaser.Actions.RotateAroundDistance(hud.crossAir, {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, alpha, 50)
+            hud.crossAir.setData('alpha', hud.crossAir.getData('alpha') + alpha)
+            alpha = hud.crossAir.getData('alpha')
+            hud.crossAir.setPosition(hud.scene.tank2.turret.x + 50 * Math.sin(alpha), hud.scene.tank2.turret.y + 50 * Math.cos(alpha))
+            
+            if (Phaser.Math.Distance.Between() <= 50) {
+                hud.crossAir.setData('centreX', hud.scene.tank2.turret.x)
+                hud.crossAir.setData('centreY', hud.scene.tank2.turret.y)
+            }
+            else {
+                if (hud.scene.input.mousePointer.movementX === 0) return
+                alpha = Math.atan(hud.scene.input.mousePointer.movementY / hud.scene.input.mousePointer.movementX)
+                hud.crossAir.setData('centreX', currX - 50 * Math.sin(alpha))
+                hud.crossAir.setData('centreY', currY - 50 * Math.cos(alpha))
+            }
+        }
+    }
+
 
     var angleRightBtn = hud.scene.add.image(w/2, h/2, 'angle-display-right')
     angleDisplay.add(angleRightBtn)

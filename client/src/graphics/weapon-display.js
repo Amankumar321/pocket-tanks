@@ -130,7 +130,6 @@ const createWeaponScrollDisplay = (hud, weaponLogo) => {
 
     hud.weaponScrollDisplay.scrollBackground = hud.scene.add.rectangle(0, h/24, w - w/12, h - h/6, 0x000000).setOrigin(0.5)
     scrollContainer.add(hud.weaponScrollDisplay.scrollBackground)
-    console.log(hud.weaponScrollDisplay.scrollBackground)
 
     hud.weaponScrollDisplay.tileHeight = h/3 - h/6
 
