@@ -84,13 +84,18 @@ export const createPowerDisplay = (hud) => {
     powerBtn.setInteractive();
 
     powerBtn.on('pointerdown', () => {
-        if (hud.scene.activeTank === 1) {
-            
-        }
-        else if (hud.scene.activeTank === 2) {
-            
-        }
+        hud.scene.input.mouse.requestPointerLock()
+        powerBtn.setData('active', true)
+        hud.scene.input.on('pointerdown', () => {
+            if (hud.scene.input.mousePointer.locked === true) {
+                hud.scene.input.mouse.releasePointerLock()
+                powerBtn.setData('active', false)
+            }
+        })
     })
+
+
+    
 
     var powerRightBtn = hud.scene.add.image(w/2, 0, 'power-display-right')
     powerDisplay.add(powerRightBtn)
@@ -98,10 +103,10 @@ export const createPowerDisplay = (hud) => {
 
     powerRightBtn.on('pointerdown', () => {
         if (hud.scene.activeTank === 1) {
-            hud.scene.tank1.power++
+            hud.scene.tank1.setPower(hud.scene.tank1.power + 1)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank2.power++
+            hud.scene.tank1.setPower(hud.scene.tank2.power + 1)
         }
     })
 
@@ -111,10 +116,10 @@ export const createPowerDisplay = (hud) => {
 
     powerLeftBtn.on('pointerdown', () => {
         if (hud.scene.activeTank === 1) {
-            hud.scene.tank1.power--
+            hud.scene.tank1.setPower(hud.scene.tank1.power - 1)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank2.power--
+            hud.scene.tank2.setPower(hud.scene.tank1.power - 1)
         }
     })
 
@@ -126,11 +131,20 @@ export const createPowerDisplay = (hud) => {
     hud.scene.textures.addCanvas('power-display-meter', canvas);
     hud.powerMeter = hud.scene.add.image(0, -h/4, 'power-display-meter')
     powerDisplay.add(hud.powerMeter)
+    
     hud.powerMeter.refresh = () => {
         if (hud.scene.activeTank === 1) {
+            if (powerBtn.getData('active') === true) {
+                hud.scene.tank1.setPower(hud.scene.tank1.power + hud.scene.input.mousePointer.movementX)
+                hud.scene.input.mousePointer.movementX = 0
+            }
             drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank1.power)
         }
         else if (hud.scene.activeTank === 2) {
+            if (powerBtn.getData('active') === true) {
+                hud.scene.tank2.setPower(hud.scene.tank2.power + hud.scene.input.mousePointer.movementX)
+                hud.scene.input.mousePointer.movementX = 0
+            }
             drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank2.power)
         }
     }

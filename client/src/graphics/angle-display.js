@@ -26,10 +26,34 @@ const drawAngleDisplay = (ctx, width, height) => {
  */
 
  const drawCrossair = (ctx, width, height) => {
-    ctx.textAlign = 'center'
-    ctx.fillStyle = 'rgba(255,255,255,1)'
-    ctx.font = '16px Arial'
-    ctx.fillText('o', width/2, height * 3/4)
+    // ctx.textAlign = 'center'
+    // ctx.fillStyle = 'rgba(255,255,255,1)'
+    // ctx.font = '16px Arial'
+    // ctx.fillText('o', width/2, height * 3/4)
+    ctx.fillStyle = 'rgba(240,240,240,1)'
+    ctx.moveTo(width/2, height * 2/5)
+    ctx.lineTo(width/2 - width/20, height/8)
+    ctx.arcTo(width/2, 0, width/2 + width/20, height/8, height/16)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.moveTo(width * 3/5 - 1, height/2)
+    ctx.lineTo(width * 7/8, height/2 - height/20)
+    ctx.arcTo(width, height/2, width * 7/8, height/2 + height/20, width/16)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.moveTo(width/2, height * 3/5)
+    ctx.lineTo(width/2 - width/20, height * 7/8)
+    ctx.arcTo(width/2, height, width/2 + width/20, height * 7/8, height/16)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.moveTo(width * 2/5 + 1, height/2)
+    ctx.lineTo(width * 1/8, height/2 - height/20)
+    ctx.arcTo(0, height/2, width * 1/8, height/2 + height/20, width/16)
+    ctx.closePath()
+    ctx.fill()
 }
 
 
@@ -91,8 +115,10 @@ export const createAngleDisplay = (hud) => {
     drawCrossair(ctx, canvas.width, canvas.height, Math.PI)
     hud.scene.textures.addCanvas('angle-aim-display', canvas);
 
+    const crossAirRadius = 80
     hud.crossAir = hud.scene.add.image(0, 0, 'angle-aim-display')
     hud.crossAir.setDepth(7).setVisible(false)
+    hud.crossAir.setData('toShow', false)
     
     var angleBtn = hud.scene.add.image(0, 0, 'angle-display')
     angleDisplay.add(angleBtn)
@@ -103,26 +129,30 @@ export const createAngleDisplay = (hud) => {
         if (hud.scene.activeTank === 1) {
             hud.scene.input.mouse.requestPointerLock()
             hud.crossAir.setVisible(true)
+            hud.crossAir.setData('toShow', true)
             var alpha = hud.scene.tank1.turret.rotation
-            hud.crossAir.setPosition(hud.scene.tank1.turret.x + 50 * Math.sin(alpha), hud.scene.tank1.turret.y - 50 * Math.cos(alpha))
+            hud.crossAir.setPosition(hud.scene.tank1.turret.x + crossAirRadius * Math.sin(alpha), hud.scene.tank1.turret.y - crossAirRadius * Math.cos(alpha))
             
-            hud.scene.input.once('pointerdown', () => {
-                if (hud.scene.input.mouse.locked === true) {
+            hud.scene.input.on('pointerdown', () => {
+                if (hud.scene.input.mousePointer.locked === true) {
                     hud.scene.input.mouse.releasePointerLock()
                     hud.crossAir.setVisible(false)
+                    hud.crossAir.setData('toShow', false)
                 }
             })
         }
         else if (hud.scene.activeTank === 2) {
             hud.scene.input.mouse.requestPointerLock()
             hud.crossAir.setVisible(true)
+            hud.crossAir.setData('toShow', true)
             var alpha = hud.scene.tank2.turret.rotation
-            hud.crossAir.setPosition(hud.scene.tank2.turret.x + 50 * Math.sin(alpha), hud.scene.tank2.turret.y - 50 * Math.cos(alpha))
+            hud.crossAir.setPosition(hud.scene.tank2.turret.x + crossAirRadius * Math.sin(alpha), hud.scene.tank2.turret.y - crossAirRadius * Math.cos(alpha))
             
-            hud.scene.input.once('pointerdown', () => {
-                if (hud.scene.input.mouse.locked === true) {
+            hud.scene.input.on('pointerdown', () => {
+                if (hud.scene.input.mousePointer.locked === true) {
                     hud.scene.input.mouse.releasePointerLock()
                     hud.crossAir.setVisible(false)
+                    hud.crossAir.setData('toShow', false)
                 }
             })
         }
@@ -130,14 +160,26 @@ export const createAngleDisplay = (hud) => {
 
 
     hud.crossAir.refresh = () => {
-        if (hud.scene.input.mouse.locked === false) return
+        if (hud.scene.input.mousePointer.locked === false) {
+            hud.crossAir.setVisible(false)
+            return
+        }
+        
+        if (hud.crossAir.getData('toShow') === true) {
+            hud.crossAir.setVisible(true)
+        }
+        else {
+            hud.crossAir.setVisible(false)
+            return
+        }
+
         if (hud.scene.activeTank === 1) {
             var prevX, prevY, currX, currY, vec1, vec2, angle, sign;
             prevX = hud.crossAir.x
             prevY = hud.crossAir.y
 
             hud.crossAir.setPosition(hud.crossAir.x + hud.scene.input.mousePointer.movementX, hud.crossAir.y + hud.scene.input.mousePointer.movementY)
-            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, 0, 50)
+            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, 0, crossAirRadius)
 
             currX = hud.crossAir.x
             currY = hud.crossAir.y
@@ -157,7 +199,7 @@ export const createAngleDisplay = (hud) => {
             prevY = hud.crossAir.y
 
             hud.crossAir.setPosition(hud.crossAir.x + hud.scene.input.mousePointer.movementX, hud.crossAir.y + hud.scene.input.mousePointer.movementY)
-            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, 0, 50)
+            Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, 0, crossAirRadius)
 
             currX = hud.crossAir.x
             currY = hud.crossAir.y

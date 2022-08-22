@@ -238,4 +238,14 @@ export class Tank extends GameObjects.Sprite {
         if (points === 0) return
         this.scoreHandler.add(points)
     }
+
+
+
+    setPower = (power) => {
+        if (power > 100)
+            power = 100
+        if (power < 0)
+            power = 0
+        this.power = power
+    }
 }
