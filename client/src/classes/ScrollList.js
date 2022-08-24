@@ -93,7 +93,6 @@ export class ScrollList {
         var key = Math.random().toString(32).slice(3,7)
         var logoCanvas = weaponArray[tank.selectedWeapon].logoCanvas
         this.scene.textures.addCanvas(key, logoCanvas)
-        console.log(logoCanvas)
         this.weaponLogo.setTexture(key)
     }
 

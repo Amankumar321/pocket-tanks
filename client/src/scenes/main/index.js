@@ -37,8 +37,8 @@ export class MainScene extends Scene {
 
 
     preload = () => {
-        // this.load.baseURL = 'assets/';
-        // this.load.image('tank', 'sprites/tank.png');
+        this.load.baseURL = 'assets/images/';
+        this.load.image('wall', 'wall.png');
         this.textures.each((texture) => {
             this.textures.remove(texture)
         })
@@ -56,6 +56,7 @@ export class MainScene extends Scene {
         this.createBlastLayer()
         this.createPointsLayer()
         this.createTerrain()
+        this.createBoundWalls()
         this.createTank1()
         this.createTank2()
        
@@ -90,6 +91,17 @@ export class MainScene extends Scene {
 
 
 
+    createBoundWalls = () => {
+        this.rightWall = this.physics.add.image(this.renderer.width, this.renderer.height, 'wall')
+        this.leftWall = this.physics.add.image(0, this.renderer.height, 'wall')
+        this.rightWall.setScale(1, this.renderer.height * 4)
+        this.leftWall.setScale(1, this.renderer.height * 4)
+        this.leftWall.setImmovable(true).setAlpha(0)
+        this.rightWall.setImmovable(true).setAlpha(0)
+    }
+
+
+
     createBackground = () => {
         var canvas = document.createElement('canvas')
         var ctx = canvas.getContext('2d')
@@ -120,8 +132,8 @@ export class MainScene extends Scene {
         canvas.height = this.renderer.height
         canvas.width = this.renderer.width
 
-        this.blastLayer = this.textures.addCanvas('blast-layer', canvas)
-        this.add.image(canvas.width/2, canvas.height/2, 'blast-layer').setDepth(3)
+        this.textures.addCanvas('blast-layer', canvas)
+        this.blastLayer = this.add.image(canvas.width/2, canvas.height/2, 'blast-layer').setDepth(3)
     }
 
 

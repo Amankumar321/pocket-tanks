@@ -1,6 +1,7 @@
 import { Textures } from "phaser";
 import { drawTerrain, setTerrain } from "../graphics/terrain";
 import { Blast } from "./Blast";
+import { Tank } from "./Tank";
 
 export class Terrain extends Textures.CanvasTexture {
     /**
@@ -89,9 +90,9 @@ export class Terrain extends Textures.CanvasTexture {
 
 
 
-    blast = (type, x, y, radius, data) => {
+    blast = (type, x, y, radius, data, blowTank) => {
         this.animate = true
-        var hole = new Blast(this.scene, type, x, y, radius, data)
+        var hole = new Blast(this.scene, type, x, y, radius, data, blowTank)
         this.blastArray.push(hole)
     }
 
@@ -207,7 +208,7 @@ export class Terrain extends Textures.CanvasTexture {
             var angle = Math.atan(slope) + ((right.x - left.x) > 0 ? 0 : Math.PI)
         }
         else {
-            var angle = 0
+            var angle = undefined
         }
 
         if (returnPoints === true)
@@ -230,7 +231,7 @@ export class Terrain extends Textures.CanvasTexture {
                 }
             }
         }
-        if (x === this.width)
+        if (x >= this.width)
             k = null
         
         return k;
@@ -250,9 +251,28 @@ export class Terrain extends Textures.CanvasTexture {
                 }
             }
         }
-        if (x === 0)
+        if (x <= 0)
             k = null
 
         return k;
+    }
+
+
+
+    getSurface = (x, y, angle) => {
+        if (this.getPixel(x - 1 * Math.sin(angle), y + 1 * Math.cos(angle)).alpha === 0) return null
+
+        var newX = null, newY = null
+        for (let i = 0; i < 100; i = i + 3) {
+            newX = x - i * Math.sin(angle)
+            newY = y + i * Math.cos(angle)
+            if (this.getPixel(newX, newY).alpha === 0) {
+                this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
+                return {x: newX, y: newY}
+            }
+            this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
+        }
+
+        return null
     }
 }

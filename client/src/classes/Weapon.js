@@ -43,7 +43,6 @@ export class Weapon {
     }
 
 
-
     defaultShoot = (obj, v, g = 300, p, r) => {
         var velocity = v === undefined ? this.tank.power * this.powerFactor : v
         var gravity = g
@@ -58,7 +57,7 @@ export class Weapon {
 
         obj.setRotation(rotation)
         obj.setVelocity(velocity * Math.sin(rotation), -velocity * Math.cos(rotation)) 
-        obj.setGravityY(gravity)
+        obj.body.setGravityY(gravity)
         obj.setDepth(2)
     }
 
@@ -122,7 +121,7 @@ export class Weapon {
 
 
     updateTail = (obj, factor, minimum, thickness, color, taper) => {
-        var tailLength = Math.sqrt(obj.body.velocity.dot(obj.body.velocity)) / factor + minimum
+        var tailLength = obj.body.speed / factor + minimum
         tailLength = Math.floor(tailLength)
     
         var centreX = obj.canvas.width/2
@@ -156,15 +155,15 @@ export class Weapon {
         var dist2 = Math.sqrt(Math.pow((tank2.centre.x - x), 2) + Math.pow((tank2.centre.y - y), 2))
 
         if (tank1 === this.tank) {
-            var pointReduce = dist1 - blastRadius > tank1.hitRadius ? 0 : Math.ceil((blastRadius + tank1.hitRadius - dist1) * factor)
-            var pointIncrease = dist2 - blastRadius > tank2.hitRadius ? 0 : Math.ceil((blastRadius + tank2.hitRadius - dist2) * factor)
+            var pointReduce = dist1 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist1) * factor)
+            var pointIncrease = dist2 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist2) * factor)
 
             this.tank.updateScore(pointIncrease)
             this.tank.updateScore(-pointReduce)
         }
         else if (tank2 === this.tank) {
-            var pointReduce = dist2 - blastRadius > tank2.hitRadius ? 0 : Math.ceil((blastRadius + tank2.hitRadius - dist2) * factor)
-            var pointIncrease = dist1 - blastRadius > tank1.hitRadius ? 0 : Math.ceil((blastRadius + tank1.hitRadius - dist1) * factor)
+            var pointReduce = dist2 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist2) * factor)
+            var pointIncrease = dist1 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist1) * factor)
 
             this.tank.updateScore(pointIncrease)
             this.tank.updateScore(-pointReduce)
@@ -276,7 +275,7 @@ export class Weapon {
             var f = factor
             
             v.rotate(2 * alpha - Math.PI)
-            obj.body.setVelocity(v.x * f, v.y * f)
+            obj.setVelocity(v.x * f, v.y * f)
         }
     }
 }

@@ -15,9 +15,9 @@ const gameConfig = {
   },
   physics: {
     default: 'arcade',
-    arcade: {
-      debug: false,
-    },
+    arcade : {
+      debug: true
+  }  
   },
   render: {
     antialiasGL: false,
@@ -34,6 +34,7 @@ const gameConfig = {
   },
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
+
 
 window.socket = socket
 window.game = new Phaser.Game(gameConfig);
@@ -55,6 +56,7 @@ window.addEventListener('touchstart', () => {
     //openFullscreen()
   } 
 })
+
 
 
 function App() {

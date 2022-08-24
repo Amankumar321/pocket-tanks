@@ -119,11 +119,13 @@ export class HUD extends Textures.CanvasTexture {
             this.powerDisplayText.setText(this.scene.tank1.power)
             this.weaponName.setText(this.scene.tank1.weapons[this.scene.tank1.selectedWeapon]?.name)
             this.weaponScrollDisplay.reset(this.scene.tank1)
+            this.weaponScrollDisplay.setActive(this.scene.tank1.selectedWeapon)
         }
         else if (this.scene.activeTank === 2) {
             this.powerDisplayText.setText(this.scene.tank2.power)
             this.weaponName.setText(this.scene.tank2.weapons[this.scene.tank2.selectedWeapon]?.name)
             this.weaponScrollDisplay.reset(this.scene.tank2)
+            this.weaponScrollDisplay.setActive(this.scene.tank2.selectedWeapon)
         }
     }
 
@@ -179,6 +181,10 @@ export class HUD extends Textures.CanvasTexture {
         }
 
         if ((this.scene.tank1.moving) || (this.scene.tank2.moving)) {
+            this.disable()
+        }
+
+        if (this.scene.terrain.blastArray.length !== 0 || this.scene.terrain.animate === true) {
             this.disable()
         }
 

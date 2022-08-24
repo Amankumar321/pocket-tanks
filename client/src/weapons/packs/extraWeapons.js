@@ -1,6 +1,6 @@
 import Phaser, { Physics } from "phaser"
-import { Weapon } from "../classes/Weapon"
-import * as Logos from "./logos"
+import { Weapon } from "../../classes/Weapon"
+import * as Logos from "./Standard/logos"
 
 
 export class bigshot {
@@ -585,11 +585,11 @@ export class superstar {
             this.childUpdate(weapon, this.star1)
             this.childUpdate(weapon, this.star2)
             if (this.star1 !== null) {
-                weapon.defaultDigTerrain(this.star1, 8, 0.1)
+                weapon.defaultDigTerrain(this.star1, 8, 0.05)
                 weapon.defaultUpdate(this.star1)
             }
             if (this.star2 !== null) {
-                weapon.defaultDigTerrain(this.star2, 8, 0.1)
+                weapon.defaultDigTerrain(this.star2, 8, 0.05)
                 weapon.defaultUpdate(this.star2)
             }
         }
@@ -802,7 +802,7 @@ export class superstar {
 
     blastGun = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(0,0,200,1)'}, {relativePosition: 1, color: 'rgba(0,0,255,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 8, {thickness: 8, gradient: grd})
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 4, {thickness: 4, gradient: grd})
         obj.destroy()
         weapon.scene.textures.remove(obj.texture.key)
         obj.active = false

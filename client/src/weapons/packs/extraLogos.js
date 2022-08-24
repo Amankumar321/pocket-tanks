@@ -1,13 +1,6 @@
 const w = 30
 const h = 30
 
-export const bigshot = document.createElement('canvas')
-bigshot.height = h
-bigshot.width = w
-const bigshotctx = bigshot.getContext('2d')
-bigshotctx.fillStyle = 'rgba(0,255,0,1)'
-bigshotctx.fillRect(0, 0, bigshot.width, bigshot.height)
-
 
 export const pineapple = document.createElement('canvas')
 pineapple.height = h

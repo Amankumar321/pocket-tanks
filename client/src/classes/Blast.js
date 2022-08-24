@@ -1,3 +1,5 @@
+import Phaser from "phaser"
+
 export class Blast {
     /**
      * @param {Phaser.Scene} scene 
@@ -5,8 +7,9 @@ export class Blast {
      * @param {number} x 
      * @param {number} y 
      * @param {number} radius
+     * @param {boolean} blowTank
      */
-    constructor(scene, type, x, y, radius, data) {
+    constructor(scene, type, x, y, radius, data, blowTank) {
         this.type = type 
         this.data = data
         this.scene = scene
@@ -28,6 +31,7 @@ export class Blast {
         this.x = x
         this.y = y
         this.toRemove = false
+        this.blowTank = blowTank
 
         this.init()
     }
@@ -61,26 +65,28 @@ export class Blast {
         this.outerRadius++
         if (this.maxRadius > this.innerRadius) {
             this.animateHole1()
+            var dist1 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank1.x, this.scene.tank1.y)
+            var dist2 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank2.x, this.scene.tank2.y)
+            var angle = 0, vec;
+            if (this.blowTank && (this.innerRadius + 4*this.scene.tank1.hitRadius > dist1)) {
+                angle = Math.atan((this.scene.tank1.centre.y - this.y) / (this.scene.tank1.centre.x - this.x))
+                angle = angle + ((this.scene.tank1.centre.x - this.x) > 0 ? 0 : -Math.PI)
+                this.scene.tank1.body.setVelocity(300 * Math.cos(angle), 300 * Math.sin(angle) - 300)
+                this.scene.tank1.body.setGravityY(300)
+                this.blowTank = false
+            }
+            if (this.blowTank && (this.innerRadius + 4*this.scene.tank2.hitRadius > dist2)) {
+                angle = Math.atan((this.scene.tank2.centre.y - this.y) / (this.scene.tank2.centre.x - this.x))
+                //vec = new Phaser.Math.Vector2(1,1).setAngle(angle).setLength(400)
+                //alert(vec.x)
+                angle = angle + ((this.scene.tank2.centre.x - this.x) > 0 ? 0 : -Math.PI)
+                this.scene.tank2.body.setVelocity(300 * Math.cos(angle), 300 * Math.sin(angle) - 300)
+                this.scene.tank2.body.setGravityY(300)
+                this.blowTank = false
+            }
         }
         else {
             this.innerRadius = this.maxRadius
-            var i, j, a, b, c, radius = this.maxRadius, x = this.x, y = this.y;
-            // for (i = x - radius; i <= x + radius; i++) {
-            //     for (j = y - radius; j <= y + radius; j++) {
-            //         a = i - x;
-            //         b = j - y;
-            //         c = Math.sqrt( a*a + b*b )
-            //         if (c < this.maxRadius) {
-            //             if (this.terrain.getPixel().alpha > 0)
-            //                 this.terrain.setPixel(i, j, 255, 0, 0, 255)
-            //         }
-            //     }   
-            // }
-            // for (let r = this.maxRadius - 4; r < this.maxRadius + 4; r = r + 0.5) {
-            //     for (let theta = 0; theta < Math.PI * 2; theta = theta + 0.001) {
-            //         this.terrain.setPixel(r * Math.cos(theta), r * Math.sin(theta), 0, 0, 0, 0)
-            //     }
-            // }
             this.terrain.fixTerrain(this.x, this.y, this.maxRadius)
             this.toRemove = true
             this.image.destroy(true)
@@ -129,10 +135,6 @@ export class Blast {
         ctx2.closePath()
         ctx2.fill()
         
-        //this.canvas.update()
-        //this.texture.update()
-        //this.texture.refresh()
-        
         ctx2.globalCompositeOperation = 'destination-in'
 
         ctx2.fillStyle = 'rgba(0,0,0,1)'
@@ -141,15 +143,6 @@ export class Blast {
         ctx2.arc(this.x, this.y, this.maxRadius, 0, Math.PI * 2)
         ctx2.closePath()
         ctx2.fill()
-
-        // ctx2.globalCompositeOperation = 'destination-out'
-
-        // ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        // ctx2.beginPath()
-        // ctx2.arc(this.x, this.y, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
-        // ctx2.closePath()
-        // ctx2.fill()
     }
 
 
@@ -163,17 +156,6 @@ export class Blast {
         }
         else {
             this.innerRadius = this.maxRadius
-            var i, j, a, b, c, radius = this.maxRadius, x = this.x, y = this.y;
-            // for (i = x - radius; i <= x + radius; i++) {
-            //     for (j = y - radius; j <= y + radius; j++) {
-            //         a = i - x;
-            //         b = j - y;
-            //         c = Math.sqrt( a*a + b*b )
-            //         if (c < this.maxRadius) {
-            //             this.terrain.setPixel(i, j, 0, 0, 0, 0)
-            //         }
-            //     }   
-            // }
             this.terrain.fixTerrain(this.x, this.y, this.maxRadius)
             this.toRemove = true
             this.image.destroy(true)
@@ -228,11 +210,7 @@ export class Blast {
                 break
             }
         }
-        
-        //this.canvas.update()
-        //this.texture.update()
-
-        
+   
         ctx2.globalCompositeOperation = 'destination-in'
 
         ctx2.fillStyle = 'rgba(0,0,0,1)'

@@ -1,9 +1,10 @@
-import { GameObjects } from "phaser";
+import { GameObjects, Physics } from "phaser";
 import { Turret } from "./Turret";
 import { Score } from "./Score";
 import { socket } from "../socket";
 
 export class Tank extends GameObjects.Sprite {
+    static length = 36
     /**
     * @param {Phaser.Scene} scene
     */
@@ -70,12 +71,17 @@ export class Tank extends GameObjects.Sprite {
         ctx.fill()
 
         this.selectedWeapon = this.weapons.length >= 1 ? 0 : null
+        this.scene.physics.world.enable(this)
+        //this.body.setCollideWorldBounds(true)
+        this.body.setBounce(1, 0)
+        this.scene.physics.add.collider(this, this.scene.leftWall)
+        this.scene.physics.add.collider(this, this.scene.rightWall)
 
         socket.on('opponentShoot', ({selectedWeapon, power, rotation}) => {
             if (this.active === false) return
             this.selectedWeapon = selectedWeapon
             this.power = power
-            this.turret.setRotation(rotation)
+            this.turret.setRelativeRotation(rotation)
             this.scene.HUD.weaponScrollDisplay.reset(this)
             this.shoot()
         })
@@ -100,13 +106,26 @@ export class Tank extends GameObjects.Sprite {
     update = () => {
         // position
         if (this.terrain.getPixel(this.x, this.y).alpha > 0) {
-            this.setRotation(this.terrain.getSlope(this.x, this.y))
+            if (this.body.speed !== 0) {
+                // var angle = this.body.velocity.x !== 0 ? Math.tan(this.body.velocity.y / this.body.velocity.x) : -Math.PI/2
+                // angle = angle + (this.body.velocity.x < 0 ? 0 : Math.PI/2) 
+                // var pos = this.terrain.getSurface(this.x, this.y, Math.PI - angle)
+                // if (pos !== null) {
+                //     this.setPosition(pos.x, pos.y)
+                // }
+                this.setPosition(this.prevPos.x, this.prevPos.y)
+                this.body.stop()
+                this.body.setGravity(0)     
+            }
+            var rotation = this.terrain.getSlope(this.x, this.y)
+            if (rotation !== undefined) {
+                this.setRotation(rotation)
+            }
             this.settled = true
-            //nothing
         }
         else if (this.y >= this.terrain.height) {
-            this.setRotation(this.terrain.getSlope(this.x, this.y))
             this.y = this.terrain.height
+            this.setRotation(this.terrain.getSlope(this.x, this.y))
             this.settled = true
         }
         else {
@@ -150,6 +169,8 @@ export class Tank extends GameObjects.Sprite {
         if (this.leftSteps === 0 && this.rightSteps === 0) {
             this.moving = false
         }
+
+        this.prevPos = {x: this.x, y: this.y}
     }
 
 
@@ -176,9 +197,13 @@ export class Tank extends GameObjects.Sprite {
         if (nextPos === null) {
             //
         }
+        else if (this.x - (this.canvas.width/2) * Math.cos(this.rotation) <= 0) {
+            this.x = (this.canvas.width/2) * Math.cos(this.rotation)
+            this.body.setVelocityX(-this.body.velocity.x)
+        }
         else {
             this.setPosition(nextPos.x, nextPos.y)
-            this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
+            //this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
 
@@ -192,9 +217,13 @@ export class Tank extends GameObjects.Sprite {
         if (nextPos === null) {
             //
         }
+        else if (this.x + (this.canvas.width/2) * Math.cos(this.rotation) >= this.terrain.width) {
+            this.x = this.terrain.width - (this.canvas.width/2) * Math.cos(this.rotation)
+            this.body.setVelocityX(-this.body.velocity.x)
+        }
         else {
             this.setPosition(nextPos.x, nextPos.y)
-            this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
+            //this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
 

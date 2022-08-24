@@ -38,12 +38,12 @@ export const createFireButton = (hud) => {
     hud.fireButton.on('pointerdown', () => {
         if (hud.scene.activeTank === 1) {
             if (hud.scene.sceneData.gameType === 3)
-                socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power, rotation: hud.scene.tank1.turret.rotation})
+                socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power, rotation: hud.scene.tank1.turret.relativeRotation})
             hud.scene.tank1.shoot()
         }
         else if (hud.scene.activeTank === 2) {
             if (hud.scene.sceneData.gameType === 3)
-                socket.emit('shoot', {selectedWeapon: hud.scene.tank2.selectedWeapon, power: hud.scene.tank2.power, rotation: hud.scene.tank2.turret.rotation})
+                socket.emit('shoot', {selectedWeapon: hud.scene.tank2.selectedWeapon, power: hud.scene.tank2.power, rotation: hud.scene.tank2.turret.relativeRotation})
             hud.scene.tank2.shoot()
         }
     })

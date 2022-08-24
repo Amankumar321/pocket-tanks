@@ -70,4 +70,9 @@ export class Turret extends GameObjects.Sprite {
         this.activeWeapon = new Weapon(this.scene, this.tank, selectedWeapon) 
     }
 
+
+    setRelativeRotation = (r) => {
+        this.relativeRotation = r
+        this.setRotation(this.relativeRotation + this.tank.rotation)
+    }
 }

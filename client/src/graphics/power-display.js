@@ -106,7 +106,7 @@ export const createPowerDisplay = (hud) => {
             hud.scene.tank1.setPower(hud.scene.tank1.power + 1)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank1.setPower(hud.scene.tank2.power + 1)
+            hud.scene.tank2.setPower(hud.scene.tank2.power + 1)
         }
     })
 
@@ -119,7 +119,7 @@ export const createPowerDisplay = (hud) => {
             hud.scene.tank1.setPower(hud.scene.tank1.power - 1)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank2.setPower(hud.scene.tank1.power - 1)
+            hud.scene.tank2.setPower(hud.scene.tank2.power - 1)
         }
     })
 

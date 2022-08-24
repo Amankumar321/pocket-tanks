@@ -1,24 +1,31 @@
-import * as Allweapons from './index'
+import * as Allweapons from './packs/Standard/Standard'
 
 export const weaponArray = []
+
+const singleshot = new Allweapons.singleshot()
+weaponArray[singleshot.id] = singleshot
 
 const bigshot = new Allweapons.bigshot()
 weaponArray[bigshot.id] = bigshot
 
-const pineapple = new Allweapons.pineapple()
-weaponArray[pineapple.id] = pineapple
+const threeshot = new Allweapons.threeshot()
+weaponArray[threeshot.id] = threeshot
 
-const groundhog = new Allweapons.groundhog()
-weaponArray[groundhog.id] = groundhog
 
-const superstar = new Allweapons.superstar()
-weaponArray[superstar.id] = superstar
+// const pineapple = new Allweapons.pineapple()
+// weaponArray[pineapple.id] = pineapple
 
-const earthmover = new Allweapons.earthmover()
-weaponArray[earthmover.id] = earthmover
+// const groundhog = new Allweapons.groundhog()
+// weaponArray[groundhog.id] = groundhog
 
-const island = new Allweapons.island()
-weaponArray[island.id] = island
+// const superstar = new Allweapons.superstar()
+// weaponArray[superstar.id] = superstar
 
-const bouncydirt = new Allweapons.bouncydirt()
-weaponArray[bouncydirt.id] = bouncydirt
+// const earthmover = new Allweapons.earthmover()
+// weaponArray[earthmover.id] = earthmover
+
+// const island = new Allweapons.island()
+// weaponArray[island.id] = island
+
+// const bouncydirt = new Allweapons.bouncydirt()
+// weaponArray[bouncydirt.id] = bouncydirt
