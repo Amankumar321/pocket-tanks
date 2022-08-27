@@ -1,4 +1,5 @@
 import { GameObjects, Physics } from "phaser";
+import Phaser from "phaser";
 import { Turret } from "./Turret";
 import { Score } from "./Score";
 import { socket } from "../socket";
@@ -107,15 +108,22 @@ export class Tank extends GameObjects.Sprite {
         // position
         if (this.terrain.getPixel(this.x, this.y).alpha > 0) {
             if (this.body.speed !== 0) {
-                // var angle = this.body.velocity.x !== 0 ? Math.tan(this.body.velocity.y / this.body.velocity.x) : -Math.PI/2
-                // angle = angle + (this.body.velocity.x < 0 ? 0 : Math.PI/2) 
-                // var pos = this.terrain.getSurface(this.x, this.y, Math.PI - angle)
-                // if (pos !== null) {
-                //     this.setPosition(pos.x, pos.y)
-                // }
-                this.setPosition(this.prevPos.x, this.prevPos.y)
+                var angle = Phaser.Math.Angle.Between(this.x, this.y, this.prevPos.x, this.prevPos.y)
+                var pos = this.terrain.getSurface(this.x, this.y, angle)
+                if (pos !== null) {
+                    this.setPosition(pos.x, pos.y)
+                    this.setRotation(this.terrain.getSlope(pos.x, pos.y))
+                }
                 this.body.stop()
                 this.body.setGravity(0)     
+            }
+            if (this.isInsideTerrain()) {
+                var angle = Phaser.Math.Angle.Between(this.x, this.y, this.prevPos.x, this.prevPos.y)
+                var pos = this.terrain.getSurface(this.x, this.y, angle)
+                if (pos !== null) {
+                    this.setPosition(pos.x, pos.y)
+                    this.setRotation(this.terrain.getSlope(pos.x, pos.y))
+                }
             }
             var rotation = this.terrain.getSlope(this.x, this.y)
             if (rotation !== undefined) {
@@ -171,6 +179,17 @@ export class Tank extends GameObjects.Sprite {
         }
 
         this.prevPos = {x: this.x, y: this.y}
+    }
+
+
+
+    isInsideTerrain = () => {
+        var x = this.x + 1 * Math.sin(this.rotation)
+        var y = this.y - 1 * Math.cos(this.rotation)
+        if (this.terrain.getPixel(x, y).alpha > 0) {
+            return true
+        }
+        return false
     }
 
 

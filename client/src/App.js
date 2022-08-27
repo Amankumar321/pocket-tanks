@@ -10,13 +10,13 @@ const gameConfig = {
   scale: {
     mode: Phaser.Scale.ScaleModes.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 600 * window.devicePixelRatio,
-    height: 400 * window.devicePixelRatio,
+    width: 1200,
+    height: 800,
   },
   physics: {
     default: 'arcade',
     arcade : {
-      debug: true
+      debug: false
   }  
   },
   render: {

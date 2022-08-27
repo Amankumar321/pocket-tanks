@@ -65,23 +65,24 @@ export class Blast {
         this.outerRadius++
         if (this.maxRadius > this.innerRadius) {
             this.animateHole1()
-            var dist1 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank1.x, this.scene.tank1.y)
-            var dist2 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank2.x, this.scene.tank2.y)
+            var dist1 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank1.centre.x, this.scene.tank1.centre.y)
+            var dist2 = Phaser.Math.Distance.Between(this.x, this.y, this.scene.tank2.centre.x, this.scene.tank2.centre.y)
             var angle = 0, vec;
-            if (this.blowTank && (this.innerRadius + 4*this.scene.tank1.hitRadius > dist1)) {
+            if (this.blowTank && this.innerRadius + this.thickness + this.scene.tank1.hitRadius > dist1) {
                 angle = Math.atan((this.scene.tank1.centre.y - this.y) / (this.scene.tank1.centre.x - this.x))
                 angle = angle + ((this.scene.tank1.centre.x - this.x) > 0 ? 0 : -Math.PI)
-                this.scene.tank1.body.setVelocity(300 * Math.cos(angle), 300 * Math.sin(angle) - 300)
+                this.scene.tank1.body.setVelocity(200 * Math.cos(angle), 400 * Math.sin(angle))
                 this.scene.tank1.body.setGravityY(300)
+                this.scene.tank1.setPosition(this.scene.tank1.centre.x, this.scene.tank1.centre.y)
                 this.blowTank = false
             }
-            if (this.blowTank && (this.innerRadius + 4*this.scene.tank2.hitRadius > dist2)) {
+            if (this.blowTank && this.innerRadius + this.thickness + this.scene.tank2.hitRadius > dist2) {
                 angle = Math.atan((this.scene.tank2.centre.y - this.y) / (this.scene.tank2.centre.x - this.x))
-                //vec = new Phaser.Math.Vector2(1,1).setAngle(angle).setLength(400)
-                //alert(vec.x)
                 angle = angle + ((this.scene.tank2.centre.x - this.x) > 0 ? 0 : -Math.PI)
-                this.scene.tank2.body.setVelocity(300 * Math.cos(angle), 300 * Math.sin(angle) - 300)
+                console.log(angle)
+                this.scene.tank2.body.setVelocity(200 * Math.cos(angle), 400 * Math.sin(angle))
                 this.scene.tank2.body.setGravityY(300)
+                this.scene.tank2.setPosition(this.scene.tank2.centre.x, this.scene.tank2.centre.y)
                 this.blowTank = false
             }
         }

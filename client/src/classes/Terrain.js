@@ -260,17 +260,19 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     getSurface = (x, y, angle) => {
-        if (this.getPixel(x - 1 * Math.sin(angle), y + 1 * Math.cos(angle)).alpha === 0) return null
+        //if (this.getPixel(x - 1 * Math.sin(angle), y + 1 * Math.cos(angle)).alpha === 0) return null
 
-        var newX = null, newY = null
-        for (let i = 0; i < 100; i = i + 3) {
-            newX = x - i * Math.sin(angle)
-            newY = y + i * Math.cos(angle)
+        var newX = x, newY = y, prevX = x, prevY = y
+        for (let i = 0; i < 20; i++) {
+            prevX = newX
+            prevY = newY
+            newX = x + i * Math.cos(angle)
+            newY = y + i * Math.sin(angle)
             if (this.getPixel(newX, newY).alpha === 0) {
-                this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
-                return {x: newX, y: newY}
+                //this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
+                return {x: prevX, y: prevY}
             }
-            this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
+            //this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
         }
 
         return null

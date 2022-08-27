@@ -11,6 +11,20 @@ weaponArray[bigshot.id] = bigshot
 const threeshot = new Allweapons.threeshot()
 weaponArray[threeshot.id] = threeshot
 
+const fiveshot = new Allweapons.fiveshot()
+weaponArray[fiveshot.id] = fiveshot
+
+const jackhammer = new Allweapons.jackhammer()
+weaponArray[jackhammer.id] = jackhammer
+
+const heatseeker = new Allweapons.heatseeker()
+weaponArray[heatseeker.id] = heatseeker
+
+const tracer = new Allweapons.tracer()
+weaponArray[tracer.id] = tracer
+
+const piledriver = new Allweapons.piledriver()
+weaponArray[piledriver.id] = piledriver
 
 // const pineapple = new Allweapons.pineapple()
 // weaponArray[pineapple.id] = pineapple
