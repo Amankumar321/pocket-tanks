@@ -32,6 +32,10 @@ const gameConfig = {
   audio: {
     disableWebAudio: false,
   },
+  fps: {
+    target: 60,
+    //forceSetTimeOut: true
+  },
   scene: [Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 

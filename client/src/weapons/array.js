@@ -26,6 +26,9 @@ weaponArray[tracer.id] = tracer
 const piledriver = new Allweapons.piledriver()
 weaponArray[piledriver.id] = piledriver
 
+const dirtmover = new Allweapons.dirtmover()
+weaponArray[dirtmover.id] = dirtmover
+
 // const pineapple = new Allweapons.pineapple()
 // weaponArray[pineapple.id] = pineapple
 

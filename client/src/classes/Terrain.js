@@ -2,6 +2,7 @@ import { Textures } from "phaser";
 import { drawTerrain, setTerrain } from "../graphics/terrain";
 import { Blast } from "./Blast";
 import { Tank } from "./Tank";
+import Phaser from "phaser";
 
 export class Terrain extends Textures.CanvasTexture {
     /**
@@ -174,6 +175,88 @@ export class Terrain extends Textures.CanvasTexture {
 
 
 
+    fixTerrainShape = (points) => {
+        this.update()
+        
+        var r, x, y, angle;
+        var ax, ay, do_break = false, base, top, ground, j, duplicateIndex, duplicate = false;
+        
+        for (let i = 0; i < points.length - 2; i++) {
+            x = points[i].x
+            y = points[i].y
+            r = Phaser.Math.Distance.BetweenPoints(points[i], points[i + 2]) + 2
+            angle = Phaser.Math.Angle.Between(points[i].x, points[i].y, points[i + 2].x, points[i + 2].y)
+
+            for (let i = 0; i <= r; i = i + 1) { 
+                ax = Math.floor(x + i * Math.cos(angle))
+                ay = Math.floor(y + i * Math.sin(angle))
+    
+                duplicate = false
+                do_break = false
+    
+                // find base
+                for (j = ay; j >= 1; j--) {
+                    if (this.getPixel(ax, j).alpha > 150) {
+                        do_break = true;
+                    }
+                    if (do_break) {
+                        break;
+                    }
+                }   
+                base = j;
+                do_break = false;
+            
+                // find top
+                for (; j >= 1; j--) {
+                    if (this.getPixel(ax, j).alpha === 0) {
+                        do_break = true;
+                    }
+                    if (do_break) {
+                        break;
+                    }
+                }
+                top = j;
+                do_break = false
+    
+                // find ground
+                for (j = ay; j <= this.height; j++) {
+                    if (this.getPixel(ax, j).alpha > 150) {
+                        do_break = true;
+                    }
+                    if (do_break) {
+                        break;
+                    }
+                }
+                ground = j;
+                do_break = false;
+                
+                if (base !== 0 && top !== 0 && base !== top && base !== ground) {
+                    this.matrix.forEach((ele, index) => {
+                        if (ele.x === ax) {
+                            duplicate = true
+                            duplicateIndex = index
+                        } 
+                    })
+    
+                    if (duplicate) {
+                        this.matrix[duplicateIndex].x = ax
+                        this.matrix[duplicateIndex].base = base
+                        this.matrix[duplicateIndex].top = top
+                        this.matrix[duplicateIndex].ground = ground
+                    }
+                    else {
+                        this.matrix.push({x: ax, base, top, ground})
+                    }
+                }
+            }
+    
+            //console.log(this.matrix)
+            this.animate = true
+        }
+    }
+
+
+
     getNeighbouringPoints = (x, y, count = 5) => {
         return this.getSlope(x, y, count, true)
     }
@@ -243,7 +326,7 @@ export class Terrain extends Textures.CanvasTexture {
         var pos = [{x: x, y: y + 1}, {x: x - 1, y: y + 1}, {x: x - 1, y: y}, {x: x - 1, y: y - 1}, {x: x, y: y - 1}, {x: x + 1, y: y + 1}, {x: x + 1, y: y}, {x: x + 1, y: y - 1}]
         var checkPos = [{x: x - 1, y: y + 1}, {x: x - 1, y: y}, {x: x - 1, y: y - 1}, {x: x, y: y - 1}, {x: x + 1, y: y - 1}, {x: x, y: y + 1}, {x: x + 1, y: y + 1}, {x: x + 1, y: y}]
         var k = null
-
+        
         for (let index = 0; index < pos.length; index++) {
             if (this.getPixel(pos[index].x, pos[index].y).alpha > 0) {
                 if (this.getPixel(checkPos[index].x, checkPos[index].y).alpha === 0) {

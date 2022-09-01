@@ -56,3 +56,10 @@ piledriver.width = w
 const piledriverctx = piledriver.getContext('2d')
 piledriverctx.fillStyle = 'rgba(10,150,200,1)'
 piledriverctx.fillRect(0, 0, piledriver.width, piledriver.height)
+
+export const dirtmover = document.createElement('canvas')
+dirtmover.height = h
+dirtmover.width = w
+const dirtmoverctx = dirtmover.getContext('2d')
+dirtmoverctx.fillStyle = 'rgba(200,50,200,1)'
+dirtmoverctx.fillRect(0, 0, dirtmover.width, dirtmover.height)
