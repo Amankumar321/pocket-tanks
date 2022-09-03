@@ -17,7 +17,7 @@ export class Blast {
         this.canvas = document.createElement('canvas')
         this.canvas.width = scene.renderer.width
         this.canvas.height = scene.renderer.height
-        this.textureId = Math.random().toString(36).slice(2, 7)
+        this.textureId = Math.random().toString(32).slice(2, 7)
         scene.textures.addCanvas(this.textureId, this.canvas)
         this.image = this.scene.add.image(this.canvas.width/2, this.canvas.height/2, this.textureId)
         

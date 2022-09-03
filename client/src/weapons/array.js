@@ -29,6 +29,24 @@ weaponArray[piledriver.id] = piledriver
 const dirtmover = new Allweapons.dirtmover()
 weaponArray[dirtmover.id] = dirtmover
 
+const crazyivan = new Allweapons.crazyivan()
+weaponArray[crazyivan.id] = crazyivan
+
+const spider = new Allweapons.spider()
+weaponArray[spider.id] = spider
+
+const sniperrifle = new Allweapons.sniperrifle()
+weaponArray[sniperrifle.id] = sniperrifle
+
+const magicwall = new Allweapons.magicwall()
+weaponArray[magicwall.id] = magicwall
+
+const dirtslinger = new Allweapons.dirtslinger()
+weaponArray[dirtslinger.id] = dirtslinger
+
+const zapper = new Allweapons.zapper()
+weaponArray[zapper.id] = zapper
+
 // const pineapple = new Allweapons.pineapple()
 // weaponArray[pineapple.id] = pineapple
 

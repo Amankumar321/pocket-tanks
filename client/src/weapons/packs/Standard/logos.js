@@ -63,3 +63,45 @@ dirtmover.width = w
 const dirtmoverctx = dirtmover.getContext('2d')
 dirtmoverctx.fillStyle = 'rgba(200,50,200,1)'
 dirtmoverctx.fillRect(0, 0, dirtmover.width, dirtmover.height)
+
+export const crazyivan = document.createElement('canvas')
+crazyivan.height = h
+crazyivan.width = w
+const crazyivanctx = crazyivan.getContext('2d')
+crazyivanctx.fillStyle = 'rgba(120,150,200,1)'
+crazyivanctx.fillRect(0, 0, crazyivan.width, crazyivan.height)
+
+export const spider = document.createElement('canvas')
+spider.height = h
+spider.width = w
+const spiderctx = spider.getContext('2d')
+spiderctx.fillStyle = 'rgba(20,250,100,1)'
+spiderctx.fillRect(0, 0, spider.width, spider.height)
+
+export const sniperrifle = document.createElement('canvas')
+sniperrifle.height = h
+sniperrifle.width = w
+const sniperriflectx = sniperrifle.getContext('2d')
+sniperriflectx.fillStyle = 'rgba(20,50,190,1)'
+sniperriflectx.fillRect(0, 0, sniperrifle.width, sniperrifle.height)
+
+export const magicwall = document.createElement('canvas')
+magicwall.height = h
+magicwall.width = w
+const magicwallctx = magicwall.getContext('2d')
+magicwallctx.fillStyle = 'rgba(150,50,20,1)'
+magicwallctx.fillRect(0, 0, magicwall.width, magicwall.height)
+
+export const dirtslinger = document.createElement('canvas')
+dirtslinger.height = h
+dirtslinger.width = w
+const dirtslingerctx = dirtslinger.getContext('2d')
+dirtslingerctx.fillStyle = 'rgba(180,50,250,1)'
+dirtslingerctx.fillRect(0, 0, dirtslinger.width, dirtslinger.height)
+
+export const zapper = document.createElement('canvas')
+zapper.height = h
+zapper.width = w
+const zapperctx = zapper.getContext('2d')
+zapperctx.fillStyle = 'rgba(80,250,250,1)'
+zapperctx.fillRect(0, 0, zapper.width, zapper.height)

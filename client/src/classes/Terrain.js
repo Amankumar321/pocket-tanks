@@ -128,7 +128,7 @@ export class Terrain extends Textures.CanvasTexture {
             do_break = false;
         
             // find top
-            for (; j >= 1; j--) {
+            for (; j >= -200; j--) {
                 if (this.getPixel(i, j).alpha === 0) {
                     do_break = true;
                 }
@@ -196,7 +196,7 @@ export class Terrain extends Textures.CanvasTexture {
     
                 // find base
                 for (j = ay; j >= 1; j--) {
-                    if (this.getPixel(ax, j).alpha > 150) {
+                    if (this.getPixel(ax, j).alpha > 100) {
                         do_break = true;
                     }
                     if (do_break) {
@@ -207,7 +207,7 @@ export class Terrain extends Textures.CanvasTexture {
                 do_break = false;
             
                 // find top
-                for (; j >= 1; j--) {
+                for (; j >= -200; j--) {
                     if (this.getPixel(ax, j).alpha === 0) {
                         do_break = true;
                     }
@@ -220,7 +220,7 @@ export class Terrain extends Textures.CanvasTexture {
     
                 // find ground
                 for (j = ay; j <= this.height; j++) {
-                    if (this.getPixel(ax, j).alpha > 150) {
+                    if (this.getPixel(ax, j).alpha > 100) {
                         do_break = true;
                     }
                     if (do_break) {
