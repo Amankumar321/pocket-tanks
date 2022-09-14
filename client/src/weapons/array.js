@@ -47,6 +47,9 @@ weaponArray[dirtslinger.id] = dirtslinger
 const zapper = new Allweapons.zapper()
 weaponArray[zapper.id] = zapper
 
+const napalm = new Allweapons.napalm()
+weaponArray[napalm.id] = napalm
+
 // const pineapple = new Allweapons.pineapple()
 // weaponArray[pineapple.id] = pineapple
 

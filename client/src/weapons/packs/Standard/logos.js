@@ -105,3 +105,10 @@ zapper.width = w
 const zapperctx = zapper.getContext('2d')
 zapperctx.fillStyle = 'rgba(80,250,250,1)'
 zapperctx.fillRect(0, 0, zapper.width, zapper.height)
+
+export const napalm = document.createElement('canvas')
+napalm.height = h
+napalm.width = w
+const napalmctx = napalm.getContext('2d')
+napalmctx.fillStyle = 'rgba(120,250,0,1)'
+napalmctx.fillRect(0, 0, napalm.width, napalm.height)
