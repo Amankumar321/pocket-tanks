@@ -149,6 +149,8 @@ export class Weapon {
 
 
     defaultUpdateScore = (x, y, blastRadius, factor) => {
+        if (isNaN(factor)) return
+
         var tank1 = this.scene.tank1
         var tank2 = this.scene.tank2
         var dist1 = Math.sqrt(Math.pow((tank1.centre.x - x), 2) + Math.pow((tank1.centre.y - y), 2)) 
@@ -157,7 +159,7 @@ export class Weapon {
         if (tank1 === this.tank) {
             var pointReduce = dist1 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist1) * factor)
             var pointIncrease = dist2 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist2) * factor)
-
+            
             this.tank.updateScore(pointIncrease)
             this.tank.updateScore(-pointReduce)
         }
@@ -173,7 +175,8 @@ export class Weapon {
     
     
     constantUpdateScore = (points) => {
-        this.tank.updateScore(points)
+        if (isNaN(points)) return
+            this.tank.updateScore(points)
     }
 
 

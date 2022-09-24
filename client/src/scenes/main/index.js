@@ -1,4 +1,4 @@
-import { Scene, GameObjects, BlendModes, Textures, Display } from 'phaser';
+import Phaser ,{ Scene, GameObjects, BlendModes, Textures, Display } from 'phaser';
 import { HUD } from '../../classes/HUD';
 import { Tank } from '../../classes/Tank';
 import { Terrain } from '../../classes/Terrain';

@@ -50,6 +50,18 @@ weaponArray[zapper.id] = zapper
 const napalm = new Allweapons.napalm()
 weaponArray[napalm.id] = napalm
 
+const hailstorm = new Allweapons.hailstorm()
+weaponArray[hailstorm.id] = hailstorm
+
+const groundhog = new Allweapons.groundhog()
+weaponArray[groundhog.id] = groundhog
+
+const worm = new Allweapons.worm()
+weaponArray[worm.id] = worm
+
+const homingworm = new Allweapons.homingworm()
+weaponArray[homingworm.id] = homingworm
+
 // const pineapple = new Allweapons.pineapple()
 // weaponArray[pineapple.id] = pineapple
 

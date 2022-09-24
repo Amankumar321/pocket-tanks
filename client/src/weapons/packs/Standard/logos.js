@@ -112,3 +112,31 @@ napalm.width = w
 const napalmctx = napalm.getContext('2d')
 napalmctx.fillStyle = 'rgba(120,250,0,1)'
 napalmctx.fillRect(0, 0, napalm.width, napalm.height)
+
+export const hailstorm = document.createElement('canvas')
+hailstorm.height = h
+hailstorm.width = w
+const hailstormctx = hailstorm.getContext('2d')
+hailstormctx.fillStyle = 'rgba(20,50,220,1)'
+hailstormctx.fillRect(0, 0, hailstorm.width, hailstorm.height)
+
+export const groundhog = document.createElement('canvas')
+groundhog.height = h
+groundhog.width = w
+const groundhogctx = groundhog.getContext('2d')
+groundhogctx.fillStyle = 'rgba(200,50,20,1)'
+groundhogctx.fillRect(0, 0, groundhog.width, groundhog.height)
+
+export const worm = document.createElement('canvas')
+worm.height = h
+worm.width = w
+const wormctx = worm.getContext('2d')
+wormctx.fillStyle = 'rgba(100,100,255,1)'
+wormctx.fillRect(0, 0, worm.width, worm.height)
+
+export const homingworm = document.createElement('canvas')
+homingworm.height = h
+homingworm.width = w
+const homingwormctx = homingworm.getContext('2d')
+homingwormctx.fillStyle = 'rgba(150,100,50,1)'
+homingwormctx.fillRect(0, 0, homingworm.width, homingworm.height)
