@@ -62,20 +62,20 @@ weaponArray[worm.id] = worm
 const homingworm = new Allweapons.homingworm()
 weaponArray[homingworm.id] = homingworm
 
-// const pineapple = new Allweapons.pineapple()
-// weaponArray[pineapple.id] = pineapple
+const skipper = new Allweapons.skipper()
+weaponArray[skipper.id] = skipper
 
-// const groundhog = new Allweapons.groundhog()
-// weaponArray[groundhog.id] = groundhog
+const chainreaction = new Allweapons.chainreaction()
+weaponArray[chainreaction.id] = chainreaction
 
-// const superstar = new Allweapons.superstar()
-// weaponArray[superstar.id] = superstar
+const pineapple = new Allweapons.pineapple()
+weaponArray[pineapple.id] = pineapple
 
-// const earthmover = new Allweapons.earthmover()
-// weaponArray[earthmover.id] = earthmover
+const firecracker = new Allweapons.firecracker()
+weaponArray[firecracker.id] = firecracker
 
-// const island = new Allweapons.island()
-// weaponArray[island.id] = island
+const homingmissile = new Allweapons.homingmissile()
+weaponArray[homingmissile.id] = homingmissile
 
-// const bouncydirt = new Allweapons.bouncydirt()
-// weaponArray[bouncydirt.id] = bouncydirt
+const dirtball = new Allweapons.dirtball()
+weaponArray[dirtball.id] = dirtball

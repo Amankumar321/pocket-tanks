@@ -169,7 +169,7 @@ export class Terrain extends Textures.CanvasTexture {
                     this.matrix.push({x: i, base, top, ground})
             }
         }
-        console.log(this.matrix)
+        //console.log(this.matrix)
         this.animate = true
     }
 

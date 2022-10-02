@@ -140,3 +140,45 @@ homingworm.width = w
 const homingwormctx = homingworm.getContext('2d')
 homingwormctx.fillStyle = 'rgba(150,100,50,1)'
 homingwormctx.fillRect(0, 0, homingworm.width, homingworm.height)
+
+export const skipper = document.createElement('canvas')
+skipper.height = h
+skipper.width = w
+const skipperctx = skipper.getContext('2d')
+skipperctx.fillStyle = 'rgba(250,250,50,1)'
+skipperctx.fillRect(0, 0, skipper.width, skipper.height)
+
+export const chainreaction = document.createElement('canvas')
+chainreaction.height = h
+chainreaction.width = w
+const chainreactionctx = chainreaction.getContext('2d')
+chainreactionctx.fillStyle = 'rgba(250,50,50,1)'
+chainreactionctx.fillRect(0, 0, chainreaction.width, chainreaction.height)
+
+export const pineapple = document.createElement('canvas')
+pineapple.height = h
+pineapple.width = w
+const pineapplectx = pineapple.getContext('2d')
+pineapplectx.fillStyle = 'rgba(200,200,200,1)'
+pineapplectx.fillRect(0, 0, pineapple.width, pineapple.height)
+
+export const firecracker = document.createElement('canvas')
+firecracker.height = h
+firecracker.width = w
+const firecrackerctx = firecracker.getContext('2d')
+firecrackerctx.fillStyle = 'rgba(200,100,100,1)'
+firecrackerctx.fillRect(0, 0, firecracker.width, firecracker.height)
+
+export const homingmissile = document.createElement('canvas')
+homingmissile.height = h
+homingmissile.width = w
+const homingmissilectx = homingmissile.getContext('2d')
+homingmissilectx.fillStyle = 'rgba(100,0,200,1)'
+homingmissilectx.fillRect(0, 0, homingmissile.width, homingmissile.height)
+
+export const dirtball = document.createElement('canvas')
+dirtball.height = h
+dirtball.width = w
+const dirtballctx = dirtball.getContext('2d')
+dirtballctx.fillStyle = 'rgba(250,0,200,1)'
+dirtballctx.fillRect(0, 0, dirtball.width, dirtball.height)

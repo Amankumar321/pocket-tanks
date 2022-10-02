@@ -13,6 +13,8 @@ export class Blast {
         this.type = type 
         this.data = data
         this.scene = scene
+        this.count = 0
+        this.optimized = (this.data.optimize === undefined) ? false : (this.data.optimize)
         
         this.canvas = document.createElement('canvas')
         this.canvas.width = scene.renderer.width
@@ -97,6 +99,10 @@ export class Blast {
 
 
     animateHole1 = () => {
+        if (this.count === 1 && this.optimized){
+            this.count = 0
+            return
+        }
         var ctx = this.terrain.canvas.getContext('2d')
         ctx.globalCompositeOperation = 'destination-out'
 
@@ -111,14 +117,7 @@ export class Blast {
         var canvas = this.canvas
         var ctx2 = canvas.getContext('2d')
 
-        ctx2.globalCompositeOperation = 'destination-out'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.outerRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
+        ctx2.clearRect(0, 0, canvas.width, canvas.height)
         
         ctx2.globalCompositeOperation = 'source-over'
 
@@ -144,6 +143,8 @@ export class Blast {
         ctx2.arc(this.x, this.y, this.maxRadius, 0, Math.PI * 2)
         ctx2.closePath()
         ctx2.fill()
+
+        this.count = 1
     }
 
 
