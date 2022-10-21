@@ -79,3 +79,15 @@ weaponArray[homingmissile.id] = homingmissile
 
 const dirtball = new Allweapons.dirtball()
 weaponArray[dirtball.id] = dirtball
+
+const tommygun = new Allweapons.tommygun()
+weaponArray[tommygun.id] = tommygun
+
+const mountainmover = new Allweapons.mountainmover()
+weaponArray[mountainmover.id] = mountainmover
+
+const scattershot = new Allweapons.scattershot()
+weaponArray[scattershot.id] = scattershot
+
+const cruiser = new Allweapons.cruiser()
+weaponArray[cruiser.id] = cruiser

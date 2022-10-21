@@ -182,3 +182,31 @@ dirtball.width = w
 const dirtballctx = dirtball.getContext('2d')
 dirtballctx.fillStyle = 'rgba(250,0,200,1)'
 dirtballctx.fillRect(0, 0, dirtball.width, dirtball.height)
+
+export const tommygun = document.createElement('canvas')
+tommygun.height = h
+tommygun.width = w
+const tommygunctx = tommygun.getContext('2d')
+tommygunctx.fillStyle = 'rgba(150,150,200,1)'
+tommygunctx.fillRect(0, 0, tommygun.width, tommygun.height)
+
+export const mountainmover = document.createElement('canvas')
+mountainmover.height = h
+mountainmover.width = w
+const mountainmoverctx = mountainmover.getContext('2d')
+mountainmoverctx.fillStyle = 'rgba(10,180,60,1)'
+mountainmoverctx.fillRect(0, 0, mountainmover.width, mountainmover.height)
+
+export const scattershot = document.createElement('canvas')
+scattershot.height = h
+scattershot.width = w
+const scattershotctx = scattershot.getContext('2d')
+scattershotctx.fillStyle = 'rgba(250,10,60,1)'
+scattershotctx.fillRect(0, 0, scattershot.width, scattershot.height)
+
+export const cruiser = document.createElement('canvas')
+cruiser.height = h
+cruiser.width = w
+const cruiserctx = cruiser.getContext('2d')
+cruiserctx.fillStyle = 'rgba(70,10,230,1)'
+cruiserctx.fillRect(0, 0, cruiser.width, cruiser.height)

@@ -1,4 +1,4 @@
-import Phaser, { Physics } from "phaser"
+import Phaser, { Physics, Scene } from "phaser"
 import { Weapon } from "../../../classes/Weapon"
 import * as Logos from "./logos"
 
@@ -1643,12 +1643,14 @@ export class spider {
         this.logoCanvas = Logos.spider
         this.particles = []
         this.dissipated = false
+        this.particleCount = 0
     }
 
     reset = () => {
         this.projectile = null
         this.particles = []
         this.dissipated = false
+        this.particleCount = 0
     }
 
     /**
@@ -1741,7 +1743,9 @@ export class spider {
         }
     }
 
-    createParticle = (weapon, delta, x, y, index) => {
+    createParticle = (weapon, delta, x, y) => {
+        this.particleCount++
+        var index = this.particleCount
         var canvas = document.createElement('canvas')
         var ctx = canvas.getContext('2d')
         
@@ -1767,9 +1771,9 @@ export class spider {
 
         ctx.fillRect(0, 0, canvas.width/2, canvas.height)
 
-        weapon.scene.textures.addCanvas('projectile-' + this.particles.length, canvas);
+        weapon.scene.textures.addCanvas('projectile-' + index, canvas);
 
-        var particle = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + this.particles.length)
+        var particle = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + index)
         particle.setDepth(3)
         particle.bounceCount = 3
         particle.canvas = canvas
@@ -1779,7 +1783,7 @@ export class spider {
         var v = new Phaser.Math.Vector2(1,1).setLength(50).setAngle(delta)
         particle.body.setVelocity(v.x, v.y)
 
-        weapon.scene.tweens.add({
+        particle.tween1 = weapon.scene.tweens.add({
             targets: particle.body.velocity,
             x: particle.body.velocity.x * 3,
             y: particle.body.velocity.y * 3,
@@ -1789,14 +1793,13 @@ export class spider {
             repeat: 0,
         })
 
-        weapon.scene.tweens.add({
+        particle.tween2 = weapon.scene.tweens.add({
             targets: particle,
             scaleX: 1,
             ease: 'Linear',
             duration: 2000,
             yoyo: false,
             repeat: 0,
-
         })
 
         this.particles.push(particle)
@@ -1862,8 +1865,8 @@ export class spider {
     }
 
     onTankHit = (weapon, obj, tank) => {
-        obj.body.setVelocity(0)
-        obj.body.setGravityY(0)
+        //obj.body.setVelocity(0)
+        //obj.body.setGravityY(0)
         this.blast(weapon, obj, true)
     }
 
@@ -1906,6 +1909,8 @@ export class spider {
             weapon.scene.textures.remove(obj.texture.key)
 
             this.particles = this.particles.filter(ele => {return ele !== obj})
+            obj.tween1.stop()
+            obj.tween2.stop()
 
             if (this.particles.length === 0)
                 weapon.turret.activeWeapon = null
@@ -3707,7 +3712,7 @@ export class homingworm {
 export class skipper {
     constructor() {
         this.id = 20
-        this.name = 'skipper'
+        this.name = 'Skipper'
         this.projectile = null
         this.logoCanvas = Logos.skipper
         this.bounce = 3
@@ -4729,6 +4734,9 @@ export class dirtball {
         var vec = new Phaser.Math.Vector2(1,1)
         var dist = {currentLength: 0}
         var points = []
+        var base, diff, finalDiff, pixel;
+        const projX = Math.floor(this.projectile.x)
+        const projY = Math.floor(this.projectile.y)
         
         weapon.scene.tweens.add({
             targets: dist,
@@ -4737,43 +4745,67 @@ export class dirtball {
             t: 1,
             onUpdate: () => {
                 vec.setLength(dist.currentLength)
-                for (let angle = -Math.PI/2; angle < Math.PI/2; angle = angle + 0.03) {
+                for (let angle = 0; angle < 2*Math.PI; angle = angle + 0.03) {
                     vec.setAngle(angle);
-                    x = this.projectile.x + vec.x
-                    y = this.projectile.y + vec.y
+                    x = Math.floor(projX + vec.x)
+                    y = Math.floor(projY + vec.y)
+                    if (x <= 0 || x >= weapon.terrain.width - 1) continue
+                    if (y < 0 || y >= weapon.terrain.height) continue
                     if (weapon.terrain.getPixel(x, y).alpha < 100) {
-                        weapon.terrain.setPixel(x, y, 230, 190, 130, 255)
-                        points.push({x: x, y: y})
-                    }
-                }
-                for (let angle = Math.PI * (3/2); angle > Math.PI/2; angle = angle - 0.03) {
-                    vec.setAngle(angle);
-                    x = this.projectile.x + vec.x
-                    y = this.projectile.y + vec.y
-                    if (weapon.terrain.getPixel(x, y).alpha < 100) {
-                        weapon.terrain.setPixel(x, y, 230, 190, 130, 255)
-                        points.push({x: x, y: y})
+                        weapon.terrain.setPixel(x, y, 180, 100, 50, 110 + 2*dist.currentLength)
+                        //points.push({x: x, y: y})
                     }
                 }
             },
             onComplete: () => {
                 weapon.terrain.update()
-                weapon.scene.tweens.add({
+                for (let i = 0; i < 140; i++) {
+                    for (let j = 0; j < 140; j++) {
+                        pixel = weapon.terrain.getPixel(projX - 70 + i, projY - 70 + j)
+                        if (pixel.alpha >= 100) {
+                            pixel = weapon.terrain.getPixel(projX - 70 + i, projY - 70 + j + 1)
+                            if (pixel.alpha < 100)
+                                points.push({x: projX - 70 + i, y: projY - 70 + j, toRemove: false})
+                        }
+                    }
+                }
+                
+                const tween = weapon.scene.tweens.add({
                     targets: points,
-                    duration: 100,
+                    duration: 30,
+                    loop: -1,
+                    length: 0,
                     t: 1,
-                    onUpdate: () => {
+                    onLoop: () => {
                         points.forEach(p => {
-                            if (weapon.terrain.getPixel(p.x, p.y + 1).alpha < 100) {
-                                weapon.terrain.setPixel(x, y, 0, 0, 0, 0)
-                                weapon.terrain.setPixel(x, y + 1, 230, 190, 130, 255)
+                            pixel = weapon.terrain.getPixel(p.x, p.y + 1)
+                            if (pixel.alpha < 100) {
+                                var count = -1
+                                pixel = weapon.terrain.getPixel(p.x, p.y)
+                                weapon.terrain.setPixel(p.x, p.y + 1, pixel.r, pixel.g, pixel.b, pixel.alpha)
+                                while (pixel.alpha !== 0) {
+                                    pixel = weapon.terrain.getPixel(p.x, p.y + count)
+                                    weapon.terrain.setPixel(p.x, p.y + count + 1, pixel.r, pixel.g, pixel.b, pixel.alpha)
+                                    count--
+                                }
+                                p.y++
+                            }
+                            else {
+                                p.toRemove = true
                             }
                         })
+                        points = points.filter(p => { return p.toRemove === false })
+                        weapon.terrain.update()
                     },
-                    onComplete: () => {
-                        weapon.turret.activeWeapon = null
-                    }
                 })
+
+                var myInterval = setInterval(() => {
+                    if (points.length === 0) {
+                        tween.stop(0)
+                        weapon.turret.activeWeapon = null
+                        clearInterval(myInterval)
+                    }
+                }, 500);
             }
         })
 
@@ -4782,6 +4814,815 @@ export class dirtball {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class tommygun {
+    constructor() {
+        this.id = 26
+        this.name = 'Tommy Gun'
+        this.particles = []
+        this.particleCount = 12
+        this.logoCanvas = Logos.tommygun
+    }
+
+    reset = () => {
+        this.particles = []
+    }
+
+    /**
+    * @param {Weapon} weapon 
+    */
+    create = (weapon) => {
+        this.reset()
+        for (let i = 0; i < this.particleCount; i++) {
+            this.makeTexture(weapon, i)
+        }
+    }
+
+    makeTexture = (weapon, index) => {
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        
+        canvas.height = 10
+        canvas.width = 40
+
+        ctx.fillStyle = 'rgba(200,220,255,1)'
+        ctx.beginPath()
+        ctx.arc(canvas.width/2, canvas.height/2, 1, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+
+        weapon.scene.textures.addCanvas('projectile-' + index, canvas);
+    }
+
+    shoot = (weapon) => {
+        const vOffset = [0, 12, -3, 4, -8, 6, 2, 0, -4, -13, 5, -1]
+        const aOffset = [0, -3, 4, 6, -1, 0, 2, 5, -3.5, 4.5, -1.5, 2]
+        var i = 0;
+
+        var myInterval = setInterval(() => {
+            var projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + i)
+            projectile.setDepth(3)
+            projectile.bounceCount = 3
+            projectile.canvas = projectile.texture.canvas
+            projectile.index = i
+            this.particles.push(projectile)
+            weapon.defaultShoot(projectile, weapon.tank.power * weapon.powerFactor + vOffset[i], undefined, undefined, weapon.tank.turret.rotation + Phaser.Math.DegToRad(aOffset[i]))
+            i++
+            if (i === this.particleCount) {
+                clearInterval(myInterval)
+            }
+        }, 100);
+    }
+
+    update = (weapon) => {
+        this.particles.forEach(obj => {
+            weapon.updateTail(obj, 24, 3, 2, {r: 180, g: 200, b: 255})
+        })
+        this.particles.forEach(obj => {
+            weapon.defaultUpdate(obj)
+        })
+    }
+
+    onTerrainHit = (weapon, obj) => {
+        var x = obj.x
+        var y = obj.y
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = Math.ceil(obj.body.speed / 20)
+        var bounce = false
+        
+        while (weapon.terrain.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+            x = x - Math.cos(obj.rotation)
+            y = y - Math.sin(obj.rotation)
+
+            maxCount--
+            if (maxCount === 0) {
+                x = initX
+                y = initY
+                return
+            }
+        }
+        
+        for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
+            for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
+                var pixel = weapon.terrain.getPixel(tempX, tempY)
+                if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
+                    bounce = true
+                    break
+                }
+            }
+            if (bounce) break
+        }
+
+        if (bounce && obj.bounceCount > 0) {
+            this.onBounceHit(weapon, obj)
+        }
+        
+        if (!bounce || obj.bounceCount <= 0) {
+            y = Math.min(y, weapon.terrain.height - 1)
+            obj.setPosition(x, y)
+            this.blast(weapon, obj)
+        }
+    }
+
+    onBaseHit = (weapon, obj) => {
+        this.onTerrainHit(weapon, obj)
+    }
+
+    onTankHit = (weapon, obj, tank) => {
+        //obj.body.setVelocity(0)
+        //obj.body.setGravityY(0)
+        this.blast(weapon, obj)
+    }
+
+    onOutOfBound = (weapon, obj) => {
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key)
+        this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
+        if (this.particles.length === 0) {
+            weapon.turret.activeWeapon = null
+        }
+    }
+
+    onBounceHit = (weapon, obj) => {
+        obj.bounceCount--
+        if (obj.bounceCount < 0) return
+        weapon.defaultBounce(obj)
+    }
+
+    blast = (weapon, obj) => {
+        var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(50,50,150,1)'}, {relativePosition: 0.6, color: 'rgba(50,50,255,1)'}, {relativePosition: 0.7, color: 'rgba(230,240,255,1)'}, {relativePosition: 1, color: 'rgba(230,240,255,1)'}]
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 16 - weapon.tank.hitRadius, {thickness: 12, gradient: grd, blowPower: 30}, true)
+        weapon.defaultUpdateScore(obj.x, obj.y, 16, 20/16)
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key)
+        this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
+        if (this.particles.length === 0) {
+            weapon.turret.activeWeapon = null
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+export class mountainmover {
+    constructor() {
+        this.id = 27
+        this.name = 'Mountain Mover'
+        this.logoCanvas = Logos.mountainmover
+    }
+
+    reset = () => {
+        this.projectile = null
+    }
+
+    /**
+    * @param {Weapon} weapon 
+    */
+    create = (weapon) => {
+        this.reset()
+        var canvas = document.createElement('canvas')
+        
+        weapon.scene.textures.addCanvas('projectile', canvas);
+        this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
+        this.projectile.canvas = canvas
+        this.projectile.setDepth(3)
+        this.projectile.bounceCount = 3
+    }
+
+    shoot = (weapon) => {
+        weapon.defaultShoot(this.projectile, 0, 0, undefined, undefined)
+        this.blast(weapon)
+    }
+
+    update = (weapon) => {
+        
+    }
+
+    onTerrainHit = (weapon, obj) => {
+        var x = obj.x
+        var y = obj.y
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = Math.ceil(obj.body.speed / 20);
+        var bounce = false
+
+        while (weapon.terrain.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+            x = x - Math.cos(obj.rotation)
+            y = y - Math.sin(obj.rotation)
+
+            maxCount--
+            if (maxCount === 0) {
+                x = initX
+                y = initY
+                return
+            }
+        }
+            
+        for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
+            for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
+                var pixel = weapon.terrain.getPixel(tempX, tempY)
+                if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
+                    bounce = true
+                    break
+                }
+            }
+            if (bounce) break
+        }
+        
+        if (bounce && obj.bounceCount > 0) {
+            this.onBounceHit(weapon, obj)
+        }
+        
+        if (!bounce || obj.bounceCount <= 0) {
+            this.projectile.setPosition(x, Math.min(y, weapon.terrain.height - 1))
+            this.blast(weapon)   
+        }
+        
+
+    }
+
+    onBaseHit = (weapon, obj) => {
+        this.onTerrainHit(weapon, obj)
+    }
+
+    onTankHit = (weapon, obj, tank) => {
+        this.blast(weapon)
+    }
+
+    onOutOfBound = (weapon, obj) => {
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key)
+        weapon.turret.activeWeapon = null
+    }
+
+    onBounceHit = (weapon, obj) => {
+        obj.bounceCount--
+        if (obj.bounceCount < 0) return
+        weapon.defaultBounce(obj)
+    }
+
+    blast = (weapon) => {
+        var grd1 = [{relativePosition: 0, color: 'rgba(100,100,100,1)'}, {relativePosition: 0.5, color: 'rgba(200,200,200,1)'}, {relativePosition: 1, color: 'rgba(250,250,250,1)'}]
+        //var grd = []
+        //grd.concat(grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1)
+        var circles = [grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1]
+
+        weapon.terrain.blast(3, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 160, {thickness: 10, circles: circles})
+        //weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 60, 1)
+        this.projectile.destroy()
+        weapon.scene.textures.remove('projectile')
+        setTimeout(() => {
+            weapon.turret.activeWeapon = null
+        }, 1000);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+export class scattershot {
+    constructor() {
+        this.id = 28
+        this.name = 'Scatter Shot'
+        this.particles = []
+        this.destroyed = false
+        this.projectile = null
+        this.maxParticles = 5
+        this.logoCanvas = Logos.scattershot
+    }
+
+    reset = () => {
+        this.particles = []
+        this.destroyed = false
+        this.projectile = null
+    }
+
+    /**
+    * @param {Weapon} weapon 
+    */
+    create = (weapon) => {
+        this.reset()
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        
+        canvas.height = 20
+        canvas.width = 80
+
+        ctx.fillStyle = 'rgba(255,0,100,1)'
+        ctx.globalAlpha = 1.0
+        
+        ctx.beginPath()
+        ctx.arc(canvas.width/2, canvas.height/2, 2, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+
+        weapon.scene.textures.addCanvas('projectile', canvas);
+        this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
+        this.projectile.canvas = canvas
+        this.projectile.setDepth(3)
+        this.projectile.bounceCount = 3
+    }
+
+    shoot = (weapon) => {
+        weapon.defaultShoot(this.projectile)
+    }
+
+    update = (weapon) => {
+        if (this.destroyed === false) {
+            weapon.updateTail(this.projectile, 20, 4, 4, {r: 255, g: 0, b: 100})
+            weapon.defaultUpdate(this.projectile)
+        }
+        else {
+            this.particles.forEach((particle) => {
+                weapon.updateTail(particle, 30, 4, 2, {r: 255, g: 0, b: 100})
+                weapon.defaultUpdate(particle)
+            })
+        }
+    }
+
+    onTerrainHit = (weapon, obj) => {
+        if (!this.destroyed) {
+            var x = obj.x
+            var y = obj.y
+            var prevX = x, prevY = y;
+            var initX = x, initY = y;
+            var maxCount = Math.ceil(obj.body.speed / 20);
+            var bounce = false
+
+            while (weapon.terrain.getPixel(x, y).alpha !== 0) {
+                prevX = x
+                prevY = y
+                x = x - Math.cos(obj.rotation)
+                y = y - Math.sin(obj.rotation)
+
+                maxCount--
+                if (maxCount === 0) {
+                    x = initX
+                    y = initY
+                    return
+                }
+            }
+
+            for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
+                for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
+                    var pixel = weapon.terrain.getPixel(tempX, tempY)
+                    if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
+                        bounce = true
+                        break
+                    }
+                }
+                if (bounce) break
+            }
+            
+            if (bounce && obj.bounceCount > 0) {
+                this.onBounceHit(weapon, obj)
+            }
+        
+            if (!bounce || obj.bounceCount <= 0) {
+                y = Math.min(y, weapon.terrain.height - 1)
+                obj.setPosition(x, y)
+                this.dissociate(weapon)
+                this.destroyed = true
+                obj.destroy()
+                weapon.scene.textures.remove('projectile')
+            }
+        }
+
+        else {
+            this.particleOnTerrainHit(weapon, obj)
+        }
+        //weapon.turret.activeWeapon = null
+    }
+
+    onBaseHit = (weapon, obj) => {
+        if (!this.destroyed) {
+            this.onTerrainHit(weapon, obj)
+        }
+        else {
+            this.particleOnTerrainHit(weapon, obj)
+        }
+    }
+
+    onTankHit = (weapon, obj, tank) => {
+        if (!this.destroyed) {
+            var x = this.projectile.x
+            var y = this.projectile.y
+            this.projectile.setVelocity(0, 0)
+            this.projectile.setGravityY(0)
+
+            this.projectile.setPosition(x, Math.min(y, weapon.terrain.height - 1))
+            
+            this.dissociate(weapon)
+            this.destroyed = true
+            
+            this.projectile.destroy()
+            weapon.scene.textures.remove('projectile')
+        }
+
+        else {
+            this.blast(weapon, obj, true)
+        }
+    }
+
+    onBounceHit = (weapon, obj) => {
+        obj.bounceCount--
+        if (obj.bounceCount < 0) return
+        weapon.defaultBounce(obj)
+    }
+
+    /**
+    * @param {Weapon} weapon 
+    */
+    dissociate = (weapon) => {
+        for (let index = 0; index < this.maxParticles; index++) {            
+            var canvas = document.createElement('canvas')
+            var ctx = canvas.getContext('2d')
+
+            canvas.height = 10
+            canvas.width = 20
+
+            ctx.fillStyle = 'rgba(255,240,30,1)'
+            ctx.globalAlpha = 1.0
+            
+            ctx.beginPath()
+            ctx.arc(canvas.width/2, canvas.height/2, 1, 0, Math.PI * 2)
+            ctx.closePath()
+            ctx.fill()
+            
+            weapon.scene.textures.addCanvas('projectile-' + index, canvas);
+            
+            var particle = weapon.scene.physics.add.sprite(this.projectile.x, this.projectile.y, 'projectile-' + index)
+            particle.canvas = canvas
+            particle.index = index
+            particle.setDepth(3)
+            particle.bounceCount = 3
+            this.particles.push(particle)
+
+            var spreadAngle = Math.PI/6
+            var angle = - (spreadAngle/2)
+            var delta = spreadAngle/Math.floor(this.maxParticles)
+            weapon.defaultShoot(particle, 250, 300, {x: this.projectile.x, y: this.projectile.y}, angle + index * delta)
+
+        }
+    }
+
+    particleOnTerrainHit = (weapon, obj) => {
+        var x = obj.x
+        var y = obj.y
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = Math.ceil(obj.body.speed / 20);
+        var bounce = false
+
+        while (weapon.terrain.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+            x = x - Math.cos(obj.rotation)
+            y = y - Math.sin(obj.rotation)
+
+            maxCount--
+            if (maxCount === 0) {
+                x = initX
+                y = initY
+                return
+            }
+        }
+ 
+        for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
+            for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
+                var pixel = weapon.terrain.getPixel(tempX, tempY)
+                if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
+                    bounce = true
+                    break
+                }
+            }
+            if (bounce) break
+        }
+        
+        if (bounce && obj.bounceCount > 0) {
+            this.onBounceHit(weapon, obj)
+        }
+
+        if (!bounce || obj.bounceCount <= 0) {
+            y = Math.min(y, weapon.terrain.height - 1)
+            obj.setPosition(x, y)
+            this.blast(weapon, obj, true)
+        }
+    }
+
+    onOutOfBound = (weapon, obj) => {
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key)
+        if (obj === this.projectile) {
+            weapon.turret.activeWeapon = null
+        }
+        else {
+            this.particles = this.particles.filter((ele) => {
+                return (ele.index !== obj.index) 
+            })
+            
+            if (this.particles.length === 0) {
+                weapon.turret.activeWeapon = null
+            }
+        }
+    }
+
+    blast = (weapon, obj, blowTank) => {
+        var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,0)'}, {relativePosition: 0.4, color: 'rgba(100,0,0,1)'}, {relativePosition: 1, color: 'rgba(255,0,0,1)'}]
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36, {thickness: 14, gradient: grd, blowPower: 30}, true)
+        weapon.defaultUpdateScore(obj.x, obj.y, 36, 10/36)
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key);
+        this.particles = this.particles.filter((ele) => {
+            return (ele.index !== obj.index) 
+        })
+        
+        if (this.particles.length === 0) {
+            weapon.turret.activeWeapon = null
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class cruiser {
+    constructor() {
+        this.id = 29
+        this.name = 'Cruiser'
+        this.projectile = null
+        this.logoCanvas = Logos.cruiser
+        this.rolling = false
+        this.rollingRight = false
+        this.destroyed = false
+        this.tail = null
+    }
+
+    reset = () => {
+        this.projectile = null
+        this.rolling = false
+        this.rollingRight = false
+        this.destroyed = false
+        this.tail = null
+    }
+
+    /**
+    * @param {Weapon} weapon 
+    */
+    create = (weapon) => {
+        this.reset()
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        
+        canvas.height = 20
+        canvas.width = 80
+
+        ctx.fillStyle = 'rgba(240,240,240,1)'
+        ctx.beginPath()
+        ctx.arc(canvas.width/2, canvas.height/2, 2, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+
+        weapon.scene.textures.addCanvas('projectile', canvas);
+
+        this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
+        this.projectile.setDepth(3)
+        this.projectile.bounceCount = 0
+        this.projectile.canvas = canvas
+    }
+
+    shoot = (weapon) => {
+        weapon.defaultShoot(this.projectile)
+    }
+
+    update = (weapon) => {
+        if (this.rolling === false) {
+            weapon.updateTail(this.projectile, 12, 5, 4, {r: 240, g: 240, b: 240})
+            weapon.defaultUpdate(this.projectile)
+        }
+        else {
+            this.roll(weapon)
+        }
+    }
+
+    onTerrainHit = (weapon, obj) => {
+        var x = obj.x
+        var y = obj.y
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = Math.ceil(obj.body.speed / 20)
+        var bounce = false
+        
+        while (weapon.terrain.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+            x = x - Math.cos(obj.rotation)
+            y = y - Math.sin(obj.rotation)
+
+            maxCount--
+            if (maxCount === 0) {
+                x = initX
+                y = initY
+                return
+            }
+        }
+        
+        for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
+            for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
+                var pixel = weapon.terrain.getPixel(tempX, tempY)
+                if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
+                    bounce = true
+                    break
+                }
+            }
+            if (bounce) break
+        }
+
+        if (bounce && obj.bounceCount > 0) {
+            this.onBounceHit(weapon, obj)
+        }
+        
+        if (!bounce || obj.bounceCount <= 0) {
+            y = Math.min(y, weapon.terrain.height - 1)
+            if (this.projectile.body.velocity.x > 0) {
+                this.rollingRight = true
+            }
+            obj.stop()
+            obj.setVelocity(0)
+            obj.setAcceleration(0)
+            obj.setGravity(0)
+            var base = weapon.terrain.getSurfaceUp(obj.x, obj.y)
+            obj.setPosition(base.x, base.y)
+            this.rolling = true
+            this.makeRollingTexture(weapon)
+            
+            setTimeout(() => {
+                this.blast(weapon, true)
+            }, 2000);
+        }
+    }
+
+    onBaseHit = (weapon, obj) => {
+        this.onTerrainHit(weapon, obj)
+    }
+
+    onTankHit = (weapon, obj, tank) => {
+        this.blast(weapon, true)
+    }
+
+    onOutOfBound = (weapon, obj) => {
+        obj.destroy()
+        weapon.scene.textures.remove(obj.texture.key)
+        weapon.turret.activeWeapon = null
+        this.destroyed = true
+        if (this.tail !== null) {
+            this.tail.destroy()
+        }
+    }
+
+    onBounceHit = (weapon, obj) => {
+        obj.bounceCount--
+        if (obj.bounceCount < 0) return
+        weapon.defaultBounce(obj)
+    }
+
+    blast = (weapon, blowTank = false) => {
+        if (this.destroyed === true) return
+        this.destroyed = true
+        var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,20)'}, {relativePosition: 0.4, color: 'rgba(100,0,40,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 100}, blowTank)
+        weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 80, 60/80)
+        this.projectile.destroy()
+        weapon.scene.textures.remove('projectile')
+        weapon.turret.activeWeapon = null
+        if (this.tail !== null) {
+            this.tail.destroy()
+        }
+    }
+
+    roll = (weapon) => {
+        var next, base, delta
+        var base = weapon.terrain.getSurfaceUp(this.projectile.x, this.projectile.y)
+        this.projectile.setPosition(base.x, base.y)
+
+        if (this.rollingRight === true) {
+            next = weapon.terrain.getRightGround(this.projectile.x, this.projectile.y)
+            delta = Math.PI/8
+            if (next !== null)
+                this.projectile.setPosition(next.x, next.y)
+        }
+        else {
+            next = weapon.terrain.getLeftGround(this.projectile.x, this.projectile.y)
+            delta = -Math.PI/8
+            if (next !== null)
+                this.projectile.setPosition(next.x, next.y)
+        }
+
+        this.tail.setPosition(this.projectile.x, this.projectile.y)
+        var alpha = weapon.terrain.getSlope(this.projectile.x, this.projectile.y)
+        var correction = (this.rollingRight === true) ? 0 : Math.PI
+        this.tail.setRotation(alpha + correction)
+        this.projectile.setRotation(this.projectile.rotation + delta)
+
+        var x = this.projectile.x
+        var y = this.projectile.y
+        if (x <= 0 || x >= weapon.scene.terrain.width - 1) {
+            this.onOutOfBound(weapon, this.projectile)
+        }
+        
+        var tank1 = weapon.scene.tank1
+        var tank2 = weapon.scene.tank2
+        var dist1 = Math.sqrt(Math.pow((tank1.x - x), 2) + Math.pow((tank1.y - y), 2)) 
+        var dist2 = Math.sqrt(Math.pow((tank2.x - x), 2) + Math.pow((tank2.y - y), 2))
+        
+        if (dist1 < tank1.hitRadius) {
+            this.blast(weapon, true)
+        }
+
+        else if (dist2 < tank2.hitRadius) {
+            this.blast(weapon, true)
+        }
+    }
+
+    makeRollingTexture = (weapon) => {
+        var canvas = this.projectile.texture.canvas
+        var ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        ctx.fillStyle = 'rgba(240,240,240,1)'
+        ctx.beginPath()
+        ctx.arc(canvas.width/2 + 2, canvas.height/2, 1.2, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        ctx.beginPath()
+        ctx.arc(canvas.width/2 - 2, canvas.height/2, 1.2, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+
+        canvas = document.createElement('canvas')
+        ctx = canvas.getContext('2d')
+        canvas.width = 40
+        canvas.height = 20
+
+        var grd = ctx.createLinearGradient(canvas.width, canvas.height/2, 0, canvas.width/2)
+        grd.addColorStop(0, 'rgba(240,240,240,1)')
+        grd.addColorStop(1, 'rgba(240,240,240,0)')
+
+        ctx.fillStyle = grd
+        ctx.beginPath()
+        ctx.ellipse(canvas.width/2 - 8, canvas.height/2, 8, 2, 0, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        
+        weapon.scene.textures.addCanvas('cruiser-tail', canvas)
+        this.tail = weapon.scene.add.sprite(0, 0, 'cruiser-tail')
+    }
+}
 
 
 

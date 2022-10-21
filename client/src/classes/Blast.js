@@ -48,6 +48,11 @@ export class Blast {
             this.circles = this.data.circles
             this.thickness = this.data.thickness
         }
+        if (this.type === 3) {
+            this.circles = this.data.circles
+            this.thickness = this.data.thickness
+            this.variableRadius = this.maxRadius
+        }
     }
 
 
@@ -57,6 +62,9 @@ export class Blast {
         }
         if (this.type === 2) {
             this.updateType2()
+        }
+        if (this.type === 3) {
+            this.updateType3()
         }
     }
 
@@ -230,5 +238,92 @@ export class Blast {
         ctx2.arc(this.x, this.y, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
         ctx2.closePath()
         ctx2.fill()
+    }
+
+
+    updateType3 = () => {
+        this.outerRadius++
+        if (this.outerRadius < 2*this.maxRadius) {
+            this.animateHole3()
+        }
+
+        else {
+            this.innerRadius = this.maxRadius
+            this.terrain.fixTerrain(this.x, this.y, this.maxRadius)
+            this.toRemove = true
+            this.image.destroy(true)
+            this.scene.textures.remove(this.textureId)
+        }
+    }
+
+
+    animateHole3 = () => {
+        var ctx = this.terrain.canvas.getContext('2d')
+        ctx.globalCompositeOperation = 'destination-out'
+
+        ctx.fillStyle = 'rgba(0,0,0,1)'
+        
+        ctx.beginPath()
+        ctx.arc(this.x, this.y, Math.min(this.outerRadius, this.maxRadius), 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        this.terrain.update()
+
+        var canvas = this.canvas
+        var ctx2 = canvas.getContext('2d')
+
+        ctx2.globalCompositeOperation = 'destination-out'
+
+        ctx2.fillStyle = 'rgba(0,0,0,1)'
+        
+        ctx2.beginPath()
+        ctx2.arc(this.x, this.y, this.outerRadius, 0, Math.PI * 2)
+        ctx2.closePath()
+        ctx2.fill()
+        
+        ctx2.globalCompositeOperation = 'source-over'
+
+        for (var i = 0; i < this.circles.length; i++) {
+            this.innerRadius = Math.max(this.outerRadius - this.thickness * (i + 1), 0)
+    
+            var grd = ctx2.createRadialGradient(this.x, this.y, this.innerRadius, this.x, this.y, Math.min(this.outerRadius, this.innerRadius + this.thickness))
+            var gradient = this.circles[i]
+
+            gradient.forEach((ele) => {
+                grd.addColorStop(ele.relativePosition, ele.color)
+            });
+      
+            ctx2.fillStyle = grd
+            ctx2.beginPath()
+            ctx2.arc(this.x, this.y, Math.min(this.maxRadius, this.outerRadius, this.innerRadius + this.thickness), 0, Math.PI * 2)
+            ctx2.closePath()
+            ctx2.fill()
+
+            if (this.innerRadius === 0) {
+                break
+            }
+        }
+   
+        ctx2.globalCompositeOperation = 'destination-in'
+
+        ctx2.fillStyle = 'rgba(0,0,0,1)'
+        
+        ctx2.beginPath()
+        ctx2.arc(this.x, this.y, Math.max(this.variableRadius, 0), 0, Math.PI * 2)
+        ctx2.closePath()
+        ctx2.fill()
+
+        ctx2.globalCompositeOperation = 'destination-out'
+
+        ctx2.fillStyle = 'rgba(0,0,0,1)'
+        
+        ctx2.beginPath()
+        ctx2.arc(this.x, this.y, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
+        ctx2.closePath()
+        ctx2.fill()
+
+        if (this.outerRadius >= this.maxRadius) {
+            this.variableRadius--
+        }
     }
 }

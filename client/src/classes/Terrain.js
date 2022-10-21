@@ -346,11 +346,49 @@ export class Terrain extends Textures.CanvasTexture {
         //if (this.getPixel(x - 1 * Math.sin(angle), y + 1 * Math.cos(angle)).alpha === 0) return null
 
         var newX = x, newY = y, prevX = x, prevY = y
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 60; i++) {
             prevX = newX
             prevY = newY
             newX = x + i * Math.cos(angle)
             newY = y + i * Math.sin(angle)
+            if (this.getPixel(newX, newY).alpha === 0) {
+                //this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
+                return {x: prevX, y: prevY}
+            }
+            //this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
+        }
+
+        return null
+    }
+
+
+
+    getBase = (x, y) => {
+        var newX = x, newY = y, prevX = x, prevY = y
+        for (let i = 0; i < 1000; i++) {
+            prevX = newX
+            prevY = newY
+            newX = prevX
+            newY = prevY + 1
+            if (this.getPixel(newX, newY).alpha > 0) {
+                //this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
+                return {x: prevX, y: prevY}
+            }
+            //this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
+        }
+
+        return null
+    }
+
+
+
+    getSurfaceUp = (x, y) => {
+        //if (this.getPixel(x - 1 * Math.sin(angle), y + 1 * Math.cos(angle)).alpha === 0) return null
+
+        var newX = x, newY = y, prevX = x, prevY = y
+        for (let i = 0; i < 60; i++) {
+            prevY = newY
+            newY = prevY - 1
             if (this.getPixel(newX, newY).alpha === 0) {
                 //this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
                 return {x: prevX, y: prevY}
