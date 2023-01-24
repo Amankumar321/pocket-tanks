@@ -121,3 +121,4 @@ const strokeText = (txt, thickness) => {
 
     txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
 }
+

@@ -62,6 +62,7 @@ export const createPowerDisplay = (hud) => {
     canvas.width = w
 
     drawPowerDisplay(ctx, canvas.width, canvas.height)
+    if (hud.scene.textures.exists('power-display')) hud.scene.textures.remove('power-display')
     hud.scene.textures.addCanvas('power-display', canvas);
 
     canvas = document.createElement('canvas');
@@ -69,6 +70,7 @@ export const createPowerDisplay = (hud) => {
     canvas.height = 30 
     canvas.width = 30
     drawArrow(ctx, canvas.width, canvas.height, 0)
+    if (hud.scene.textures.exists('power-display-right')) hud.scene.textures.remove('power-display-right')
     hud.scene.textures.addCanvas('power-display-right', canvas);
 
     canvas = document.createElement('canvas');
@@ -76,6 +78,7 @@ export const createPowerDisplay = (hud) => {
     canvas.height = 30 
     canvas.width = 30
     drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    if (hud.scene.textures.exists('power-display-left')) hud.scene.textures.remove('power-display-left')
     hud.scene.textures.addCanvas('power-display-left', canvas);
     
     var powerBtn = hud.scene.add.image(0, 0, 'power-display')
@@ -84,6 +87,7 @@ export const createPowerDisplay = (hud) => {
     powerBtn.setInteractive();
 
     powerBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         hud.scene.input.mouse.requestPointerLock()
         powerBtn.setData('active', true)
         hud.scene.input.on('pointerdown', () => {
@@ -102,6 +106,7 @@ export const createPowerDisplay = (hud) => {
     powerRightBtn.setInteractive().setOrigin(1,0);
 
     powerRightBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.setPower(hud.scene.tank1.power + 1)
         }
@@ -115,6 +120,7 @@ export const createPowerDisplay = (hud) => {
     powerLeftBtn.setInteractive().setOrigin(0,0);
 
     powerLeftBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.setPower(hud.scene.tank1.power - 1)
         }
@@ -128,6 +134,8 @@ export const createPowerDisplay = (hud) => {
     canvas.height = h * 3/12
     canvas.width = w * 19/20
     drawPowerMeter(ctx, canvas.width, canvas.height, 0)
+
+    if (hud.scene.textures.exists('power-display-meter')) hud.scene.textures.remove('power-display-meter')
     hud.scene.textures.addCanvas('power-display-meter', canvas);
     hud.powerMeter = hud.scene.add.image(0, -h/4, 'power-display-meter')
     powerDisplay.add(hud.powerMeter)

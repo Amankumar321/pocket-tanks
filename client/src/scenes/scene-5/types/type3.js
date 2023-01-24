@@ -35,14 +35,58 @@ export const type3 = (scene) => {
     a.setOrigin(0.5).setFontSize(30)
     b.setOrigin(0.5).setFontSize(30)
 
-    var rect1 = scene.add.rectangle(screenCenterX / 2 - 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    var rect1 = scene.add.rectangle(screenCenterX / 2 - 150, screenCenterY, scene.renderer.width/4 - 80, scene.renderer.height/2 + 20)
     rect1.setStrokeStyle(4, scene.player1.color)
     
     var rect2 = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width/3 - 100, scene.renderer.height/2)
     //rect2.setStrokeStyle(6, 0xFFFFFF)
 
-    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 150, screenCenterY, scene.renderer.width/4 - 80, scene.renderer.height/2 + 20)
     rect3.setStrokeStyle(4, scene.player2.color)
+
+    var canvas = document.createElement('canvas')
+    canvas.width = 50
+    canvas.height = 50
+    var w = 50
+    var h = 50
+    var ctx = canvas.getContext('2d')
+
+    ctx.fillStyle = "rgba(240,240,240,1)"
+    ctx.moveTo(0, h/2)
+    ctx.lineTo(w * (3/5), 0)
+    ctx.lineTo(w/2, h * (1/3))
+    ctx.lineTo(w, h * (1/3))
+    ctx.lineTo(w, h * (2/3))
+    ctx.lineTo(w/2, h * (2/3))
+    ctx.lineTo(w * (3/5), h)
+    ctx.lineTo(0, h/2)
+    ctx.closePath()
+    ctx.fill()
+    
+    scene.textures.addCanvas('arrow-left', canvas)
+    var arrowleft = scene.add.image((screenCenterX / 2 - 300 + screenCenterX)/2, screenCenterY, 'arrow-left')
+    arrowleft.setDepth(10)
+
+    canvas = document.createElement('canvas')
+    canvas.width = 50
+    canvas.height = 50
+    ctx = canvas.getContext('2d')
+
+    ctx.fillStyle = "rgba(240,240,240,1)"
+    ctx.moveTo(w, h/2)
+    ctx.lineTo(w * (2/5), 0)
+    ctx.lineTo(w/2, h * (1/3))
+    ctx.lineTo(0, h * (1/3))
+    ctx.lineTo(0, h * (2/3))
+    ctx.lineTo(w/2, h * (2/3))
+    ctx.lineTo(w * (2/5), h)
+    ctx.lineTo(w, h/2)
+    ctx.closePath()
+    ctx.fill()
+    
+    scene.textures.addCanvas('arrow-right', canvas)
+    var arrowright = scene.add.image((screenCenterX * 3/2 + 300 + screenCenterX)/2, screenCenterY, 'arrow-right')
+    arrowright.setDepth(10)
 
     scene.player1.weapons = []
     scene.player2.weapons = []
@@ -51,6 +95,28 @@ export const type3 = (scene) => {
     var pickableArray = []
     var remainingArray = []
 
+    if (turn === 1) {
+        arrowright.setVisible(false)
+    }
+    else {
+        arrowleft.setVisible(false)
+    }
+
+    scene.tweens.add({
+        targets: arrowleft,
+        x: arrowleft.x - 5,
+        repeat: -1,
+        yoyo: true,
+        duration: 300,
+    })
+
+    scene.tweens.add({
+        targets: arrowright,
+        x: arrowright.x + 5,
+        repeat: -1,
+        yoyo: true,
+        duration: 300
+    })
 
     socket.on('opponentWeaponPick', ({arrayIndex}) => {
         var oppPick = pickableArray[arrayIndex]
@@ -58,8 +124,14 @@ export const type3 = (scene) => {
         var y = rect3.y - rect3.height/2 + 10 + scene.player2.weapons.length * 40
         oppPick.setPosition(x, y)
         oppPick.removeInteractive()
-        scene.player2.weapons.push({id: oppPick.weaponIndex, name: oppPick.text})
+        scene.player2.weapons.push({id: oppPick.weaponIndex, name: oppPick.text, type: oppPick.type})
         turn = 1
+        arrowright.setVisible(false)
+        if (scene.player1.weapons.length < totalWeapons/2)
+            arrowleft.setVisible(true)
+        if (scene.player1.weapons.length + scene.player2.weapons.length === totalWeapons) {
+            g.setColor('rgba(255,255,0,1)')
+        }
     })
 
     const pickWeapon = (pickable) => {
@@ -69,9 +141,15 @@ export const type3 = (scene) => {
             pickable.setPosition(x, y)
             pickable.removeInteractive()
             remainingArray = remainingArray.filter((ele) => { return ele !== pickable.arrayIndex })
-            scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text})
+            scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text, type: pickable.type})
             socket.emit('weaponPick', {arrayIndex: pickable.arrayIndex})
             turn = 2
+            arrowleft.setVisible(false)
+            if (scene.player2.weapons.length < totalWeapons/2)
+                arrowright.setVisible(true)
+            if (scene.player1.weapons.length + scene.player2.weapons.length === totalWeapons) {
+                g.setColor('rgba(255,255,0,1)')
+            }
         }
     }
 
@@ -79,7 +157,7 @@ export const type3 = (scene) => {
     socket.once('setWeaponArray', ({randomArray}) => {
         for (let index = 0; index < randomArray.length/2; index++) {
             var randomWeaponIndex = randomArray[index]
-            var pickable = scene.add.container(rect2.x - rect2.width/2 - 50, rect2.y - rect2.height/2 + 10 + index * 40)
+            var pickable = scene.add.container(rect2.x - rect2.width/2 - 80, rect2.y - rect2.height/2 + 10 + index * 40)
             var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
             var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
             var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
@@ -93,6 +171,7 @@ export const type3 = (scene) => {
             txt.setFontFamily('"Andale Mono"')
             pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
             pickable.arrayIndex = index
+            pickable.type = weaponArray[randomWeaponIndex].type
 
             rect.setInteractive()
             rect.on('pointerdown', () => {
@@ -102,7 +181,7 @@ export const type3 = (scene) => {
 
         for (let index = 0; index < randomArray.length/2; index++) {
             var randomWeaponIndex = randomArray[index + randomArray.length/2]
-            var pickable = scene.add.container(rect2.x - rect2.width/2 + 280, rect2.y - rect2.height/2 + 10 + index * 40)
+            var pickable = scene.add.container(rect2.x - rect2.width/2 + 180, rect2.y - rect2.height/2 + 10 + index * 40)
             var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
             var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
             var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
@@ -116,6 +195,7 @@ export const type3 = (scene) => {
             txt.setFontFamily('"Andale Mono"')
             pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
             pickable.arrayIndex = index + totalWeapons/2
+            pickable.type = weaponArray[randomWeaponIndex].type
     
             rect.setInteractive()
             rect.on('pointerdown', () => {
@@ -138,7 +218,7 @@ export const type3 = (scene) => {
     const g = scene.add.text(screenCenterX, 700, 'CONTINUE').setFontSize(50).setOrigin(0.5);
     g.setFontFamily('"Days One"')
     g.setOrigin(0.5)
-    g.setColor('rgba(255,255,0,1)')
+    g.setColor('rgba(200,200,200,1)')
     strokeText(g, 6)
 
     const m = scene.add.text(screenCenterX, screenCenterY - 35, 'OPPONENT LEFT')
@@ -168,11 +248,12 @@ export const type3 = (scene) => {
 
     g.setInteractive()
     g.on('pointerdown', () => {
-        socket.emit('ready', {})
-        g.setText('WAITING...')
-        g.disableInteractive()
+        if (scene.player1.weapons.length + scene.player2.weapons.length === totalWeapons) {
+            socket.emit('ready', {})
+            g.setText('WAITING...')
+            g.disableInteractive()
+        }
     })
-
 }
 
 

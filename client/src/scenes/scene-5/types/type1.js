@@ -29,14 +29,59 @@ export const type1 = (scene) => {
     a.setOrigin(0.5).setFontSize(30)
     b.setOrigin(0.5).setFontSize(30)
 
-    var rect1 = scene.add.rectangle(screenCenterX / 2 - 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    var rect1 = scene.add.rectangle(screenCenterX / 2 - 150, screenCenterY, scene.renderer.width/4 - 80, scene.renderer.height/2 + 20)
     rect1.setStrokeStyle(4, scene.player1.color)
     
     var rect2 = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width/3 - 100, scene.renderer.height/2)
     //rect2.setStrokeStyle(6, 0xFFFFFF)
 
-    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 150, screenCenterY, scene.renderer.width/4 - 100, scene.renderer.height/2)
+    var rect3 = scene.add.rectangle(screenCenterX * 3/2 + 150, screenCenterY, scene.renderer.width/4 - 80, scene.renderer.height/2 + 20)
     rect3.setStrokeStyle(4, scene.cpu1.color)
+
+    var canvas = document.createElement('canvas')
+    canvas.width = 50
+    canvas.height = 50
+    var w = 50
+    var h = 50
+    var ctx = canvas.getContext('2d')
+
+    ctx.fillStyle = "rgba(240,240,240,1)"
+    ctx.moveTo(0, h/2)
+    ctx.lineTo(w * (3/5), 0)
+    ctx.lineTo(w/2, h * (1/3))
+    ctx.lineTo(w, h * (1/3))
+    ctx.lineTo(w, h * (2/3))
+    ctx.lineTo(w/2, h * (2/3))
+    ctx.lineTo(w * (3/5), h)
+    ctx.lineTo(0, h/2)
+    ctx.closePath()
+    ctx.fill()
+    
+    scene.textures.addCanvas('arrow-left', canvas)
+    var arrowleft = scene.add.image((screenCenterX / 2 - 300 + screenCenterX)/2, screenCenterY, 'arrow-left')
+    arrowleft.setDepth(10)
+
+    canvas = document.createElement('canvas')
+    canvas.width = 50
+    canvas.height = 50
+    ctx = canvas.getContext('2d')
+
+    ctx.fillStyle = "rgba(240,240,240,1)"
+    ctx.moveTo(w, h/2)
+    ctx.lineTo(w * (2/5), 0)
+    ctx.lineTo(w/2, h * (1/3))
+    ctx.lineTo(0, h * (1/3))
+    ctx.lineTo(0, h * (2/3))
+    ctx.lineTo(w/2, h * (2/3))
+    ctx.lineTo(w * (2/5), h)
+    ctx.lineTo(w, h/2)
+    ctx.closePath()
+    ctx.fill()
+    
+    scene.textures.addCanvas('arrow-right', canvas)
+    var arrowright = scene.add.image((screenCenterX * 3/2 + 300 + screenCenterX)/2, screenCenterY, 'arrow-right')
+    arrowright.setDepth(10)
+    arrowright.setVisible(false)
 
     scene.player1.weapons = []
     scene.cpu1.weapons = []
@@ -45,6 +90,21 @@ export const type1 = (scene) => {
     var pickableArray = []
     var remainingArray = []
 
+    scene.tweens.add({
+        targets: arrowleft,
+        x: arrowleft.x - 5,
+        repeat: -1,
+        yoyo: true,
+        duration: 300,
+    })
+
+    scene.tweens.add({
+        targets: arrowright,
+        x: arrowright.x + 5,
+        repeat: -1,
+        yoyo: true,
+        duration: 300
+    })
 
     const pickWeapon = (pickable) => {
         if (turn === 1) {
@@ -53,8 +113,15 @@ export const type1 = (scene) => {
             pickable.setPosition(x, y)
             pickable.removeInteractive()
             remainingArray = remainingArray.filter((ele) => { return ele !== pickable.arrayIndex })
-            scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text})
+            scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text, type: pickable.type})
             turn = 2
+            arrowleft.setVisible(false)
+            if (remainingArray.length > 0)
+                arrowright.setVisible(true)
+            if (remainingArray.length === 0) {
+                g.setText('CONTINUE')
+                g.setColor('rgba(255,255,0,1)')
+            }
 
             //CPU pick
             setTimeout(() => {
@@ -66,15 +133,22 @@ export const type1 = (scene) => {
                 cpuPick.setPosition(x, y)
                 cpuPick.removeInteractive()
                 remainingArray = remainingArray.filter((ele) => { return ele !== cpuPick.arrayIndex })
-                scene.cpu1.weapons.push({id: cpuPick.weaponIndex, name: cpuPick.text})
+                scene.cpu1.weapons.push({id: cpuPick.weaponIndex, name: cpuPick.text, type: cpuPick.type})
                 turn = 1
+                if (remainingArray.length > 0)
+                    arrowleft.setVisible(true)
+                arrowright.setVisible(false)
+                if (remainingArray.length === 0) {
+                    g.setText('CONTINUE')
+                    g.setColor('rgba(255,255,0,1)')
+                }
             }, 1000);
         }
     }
 
     for (let index = 0; index < totalWeapons/2; index++) {
-        var randomWeaponIndex = Math.floor(Math.random() * weaponArray.length)
-        var pickable = scene.add.container(rect2.x - rect2.width/2 - 50, rect2.y - rect2.height/2 + 10 + index * 40)
+        var randomWeaponIndex =  Math.floor(Math.random() * weaponArray.length)
+        var pickable = scene.add.container(rect2.x - rect2.width/2 - 80, rect2.y - rect2.height/2 + 10 + index * 40)
         var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
         var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
         var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
@@ -88,6 +162,7 @@ export const type1 = (scene) => {
         txt.setFontFamily('"Andale Mono"')
         pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
         pickable.arrayIndex = index
+        pickable.type = weaponArray[randomWeaponIndex].type
         remainingArray.push(index)
 
         rect.setInteractive()
@@ -97,8 +172,8 @@ export const type1 = (scene) => {
     }
 
     for (let index = 0; index < totalWeapons/2; index++) {
-        var randomWeaponIndex = Math.floor(Math.random() * weaponArray.length)
-        var pickable = scene.add.container(rect2.x - rect2.width/2 + 280, rect2.y - rect2.height/2 + 10 + index * 40)
+        var randomWeaponIndex =  Math.floor(Math.random() * weaponArray.length)
+        var pickable = scene.add.container(rect2.x - rect2.width/2 + 180, rect2.y - rect2.height/2 + 10 + index * 40)
         var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
         var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
         var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
@@ -112,6 +187,7 @@ export const type1 = (scene) => {
         txt.setFontFamily('"Andale Mono"')
         pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
         pickable.arrayIndex = index + totalWeapons/2
+        pickable.type = weaponArray[randomWeaponIndex].type
         remainingArray.push(index + totalWeapons/2)
 
         rect.setInteractive()
@@ -120,16 +196,71 @@ export const type1 = (scene) => {
         })
     }
 
+    const randomPick = () => {
+        if (remainingArray.length === 0) return
 
-    const g = scene.add.text(screenCenterX, 700, 'CONTINUE').setFontSize(50).setOrigin(0.5);
+        if (turn === 1) {
+            setTimeout(() => {
+                var randomIndex = Math.floor(Math.random() * remainingArray.length)
+                var pick = pickableArray[remainingArray[randomIndex]]
+        
+                var x = rect1.x - rect1.width/2 + 10
+                var y = rect1.y - rect1.height/2 + 10 + scene.player1.weapons.length * 40
+                pick.setPosition(x, y)
+                pick.removeInteractive()
+                remainingArray = remainingArray.filter((ele) => { return ele !== pick.arrayIndex })
+                scene.player1.weapons.push({id: pick.weaponIndex, name: pick.text, type: pick.type})
+                turn = 2
+                if (remainingArray.length > 0)
+                    arrowright.setVisible(true)
+                arrowleft.setVisible(false)
+                if (remainingArray.length === 0) {
+                    g.setText('CONTINUE')
+                    g.setColor('rgba(255,255,0,1)')
+                }
+
+                randomPick()
+            }, 100);
+        }
+        else if (turn === 2) {
+            setTimeout(() => {
+                var randomIndex = Math.floor(Math.random() * remainingArray.length)
+                var cpuPick = pickableArray[remainingArray[randomIndex]]
+        
+                var x = rect3.x - rect3.width/2 + 10
+                var y = rect3.y - rect3.height/2 + 10 + scene.cpu1.weapons.length * 40
+                cpuPick.setPosition(x, y)
+                cpuPick.removeInteractive()
+                remainingArray = remainingArray.filter((ele) => { return ele !== cpuPick.arrayIndex })
+                scene.cpu1.weapons.push({id: cpuPick.weaponIndex, name: cpuPick.text, type: cpuPick.type})
+                turn = 1
+                if (remainingArray.length > 0)
+                    arrowleft.setVisible(true)
+                arrowright.setVisible(false)
+                if (remainingArray.length === 0) {
+                    g.setText('CONTINUE')
+                    g.setColor('rgba(255,255,0,1)')
+                }
+                
+                randomPick()
+            }, 100);
+        }
+    }
+
+    const g = scene.add.text(screenCenterX, 700, 'RANDOM').setFontSize(50).setOrigin(0.5);
     g.setFontFamily('"Days One"')
     g.setOrigin(0.5)
-    g.setColor('rgba(255,255,0,1)')
+    g.setColor('rgba(240,240,240,1)')
     strokeText(g, 6)
 
     g.setInteractive()
     g.on('pointerdown', () => {
-        scene.scene.start('main-scene', {gameType: 1, player1: scene.player1, cpu1: scene.cpu1})
+        if (remainingArray.length === 0)
+            scene.scene.start('main-scene', {gameType: 1, player1: scene.player1, cpu1: scene.cpu1})
+        else if (turn === 1) {
+            g.setInteractive(false)
+            randomPick()
+        }
     })
 }
 

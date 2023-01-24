@@ -33,6 +33,7 @@ export const type3 = (scene) => {
             scene.terrain.setPath(path)
             scene.tank1.setPosition(playerPos.x, playerPos.y)
             scene.tank2.setPosition(hostPos.x, hostPos.y)
+            scene.showTurnPointer()
         })
         
         socket.emit('getTerrainPath', {})

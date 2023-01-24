@@ -92,6 +92,7 @@ export const createAngleDisplay = (hud) => {
     canvas.width = w
 
     drawAngleDisplay(ctx, canvas.width, canvas.height)
+    if (hud.scene.textures.exists('angle-display')) hud.scene.textures.remove('angle-display')
     hud.scene.textures.addCanvas('angle-display', canvas);
 
     canvas = document.createElement('canvas');
@@ -99,6 +100,7 @@ export const createAngleDisplay = (hud) => {
     canvas.height = 30 
     canvas.width = 30
     drawArrow(ctx, canvas.width, canvas.height, 0)
+    if (hud.scene.textures.exists('angle-display-right')) hud.scene.textures.remove('angle-display-right')
     hud.scene.textures.addCanvas('angle-display-right', canvas);
 
     canvas = document.createElement('canvas');
@@ -106,6 +108,7 @@ export const createAngleDisplay = (hud) => {
     canvas.height = 30 
     canvas.width = 30
     drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    if (hud.scene.textures.exists('angle-display-left')) hud.scene.textures.remove('angle-display-left')
     hud.scene.textures.addCanvas('angle-display-left', canvas);
 
     canvas = document.createElement('canvas');
@@ -113,6 +116,7 @@ export const createAngleDisplay = (hud) => {
     canvas.height = 30 
     canvas.width = 30
     drawCrossair(ctx, canvas.width, canvas.height, Math.PI)
+    if (hud.scene.textures.exists('angle-aim-display')) hud.scene.textures.remove('angle-aim-display')
     hud.scene.textures.addCanvas('angle-aim-display', canvas);
 
     const crossAirRadius = 80
@@ -126,6 +130,7 @@ export const createAngleDisplay = (hud) => {
     angleBtn.setInteractive();
 
     angleBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.input.mouse.requestPointerLock()
             hud.crossAir.setVisible(true)
@@ -225,6 +230,7 @@ export const createAngleDisplay = (hud) => {
     angleRightBtn.setInteractive().setOrigin(1,1);
 
     angleRightBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.turret.relativeRotation += Math.PI/180
         }
@@ -238,6 +244,7 @@ export const createAngleDisplay = (hud) => {
     angleLeftBtn.setInteractive().setOrigin(0,1);
 
     angleLeftBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.turret.relativeRotation -= Math.PI/180
         }

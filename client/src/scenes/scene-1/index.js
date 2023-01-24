@@ -1,6 +1,7 @@
 import { Scene, GameObjects, BlendModes, Textures } from 'phaser';
 import { WeaponShopScroll } from '../../classes/WeaponShopScroll';
 import WebFontFile from '../../classes/WebFontFile';
+import Phaser from 'phaser';
 
 export class Scene1 extends Scene {
     constructor() {
@@ -13,7 +14,8 @@ export class Scene1 extends Scene {
 
 
     preload = () => {
-        //this.load.image('cover', 'assets/images/c.png')
+        this.load.image('cover', 'assets/images/c.png')
+        this.load.audio('intro', ['assets/sounds/intro.mp3'])
         this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400', 'Russo One']))
     }
 
@@ -36,16 +38,26 @@ export class Scene1 extends Scene {
         //const a = this.add.text(screenCenterX, screenCenterY - 200, 'Pocket');
         //const b = this.add.text(screenCenterX, screenCenterY - 50, 'Tanks');
 
-       //this.add.image(screenCenterX, screenCenterY - 100, 'cover')
+        var cover = this.physics.add.image(screenCenterX, screenCenterY - 500, 'cover')
+
+        this.tweens.add({
+            targets: cover,
+            y: cover.y + 400,
+            ease: 'Bounce.Out',
+            duration: 2200
+        })
 
         //a.setOrigin(0.5).setFontSize(200)
         //b.setOrigin(0.5).setFontSize(200)
-        
         this.createPlayBtn()
+        this.sound.stopAll()
+        var intro = this.sound.add('intro', {loop: true})
+        intro.play()
 
-        var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
-        fullscreen.setInteractive({draggable: true})
-        fullscreen.on('pointerdown', this.toggleFullscreen)
+        // var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
+        // fullscreen.setInteractive({draggable: true})
+        // fullscreen.on('pointerdown', this.toggleFullscreen)
+        // fullscreen.setVisible(false)
         //fullscreen.on('dragend', () => {alert()})
         //this.k = new WeaponShopScroll(this)
         //this.k.reset([{name: 'abd', id: 1}, {name: 'd', id: 2}, {name: 'ad', id: 3}, {name: 'sd', id: 4}, {name: 'td', id: 5}])
@@ -114,7 +126,7 @@ export class Scene1 extends Scene {
 
         ctx.fillRect(r, margin2, width, height - margin2*2)
 
-        var playtxt = this.add.text(screenCenterX, screenCenterY * 5/3, 'play', {font: '600 Cabin'})
+        var playtxt = this.add.text(screenCenterX, screenCenterY * 5/3 - 50, 'play', {font: '600 Cabin'})
         playtxt.setDepth(20)
         playtxt.setColor('rgba(240,240,240,1)')
         playtxt.setStroke('rgba(155,155,155,1)', 4)
@@ -122,7 +134,7 @@ export class Scene1 extends Scene {
         playtxt.setOrigin(0.5, 0.55)
 
         this.textures.addCanvas('play-btn', canvas)
-        this.playbtn = this.add.image(screenCenterX, screenCenterY * 5/3, 'play-btn')
+        this.playbtn = this.add.image(screenCenterX, screenCenterY * 5/3 - 50, 'play-btn')
 
         this.playbtn.setInteractive()
         this.playbtn.on('pointerdown', () => {

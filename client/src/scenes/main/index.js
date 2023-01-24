@@ -23,6 +23,8 @@ export class MainScene extends Scene {
         this.pointsLayer = null
         this.cpuHandler = null
         this.sceneData = null
+        this.turnPointer = null
+        this.winnerBlastInterval = null
         this.gameOver = false
     }
 
@@ -37,11 +39,8 @@ export class MainScene extends Scene {
 
 
     preload = () => {
-        this.load.baseURL = 'assets/images/';
-        this.load.image('wall', 'wall.png');
-        this.textures.each((texture) => {
-            this.textures.remove(texture)
-        })
+        this.load.audio('background', ['assets/sounds/background.mp3'])
+        this.load.image('wall', 'assets/images/wall.png');
     }
 
 
@@ -52,6 +51,10 @@ export class MainScene extends Scene {
         this.fps = this.add.text(screenCenterX, 30, this.game.loop.actualFps)
         this.fps.setOrigin(0.5)
 
+        if (this.winnerBlastInterval !== null) {
+            clearInterval(this.winnerBlastInterval)
+            this.winnerBlastInterval = null
+        }
         this.createBackground()
         this.createBlastLayer()
         this.createPointsLayer()
@@ -72,8 +75,14 @@ export class MainScene extends Scene {
         else if (this.sceneData.gameType === 4) {
             this.handleType4()
         }
+        
+        this.showTurnPointer()
 
         this.createHUD()
+
+        this.sound.stopAll()
+        var bg = this.sound.add('background', {loop: true})
+        bg.play()
     }
 
 
@@ -119,6 +128,7 @@ export class MainScene extends Scene {
         ctx.fillStyle = grd
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+        if (this.textures.exists('background')) this.textures.remove('background')
         this.background = this.textures.addCanvas('background', canvas)
         this.add.image(canvas.width/2, canvas.height/2, 'background').setDepth(-2)
     }
@@ -132,6 +142,7 @@ export class MainScene extends Scene {
         canvas.height = this.renderer.height
         canvas.width = this.renderer.width
 
+        if (this.textures.exists('blast-layer')) this.textures.remove('blast-layer')
         this.textures.addCanvas('blast-layer', canvas)
         this.blastLayer = this.add.image(canvas.width/2, canvas.height/2, 'blast-layer').setDepth(3)
     }
@@ -144,6 +155,7 @@ export class MainScene extends Scene {
         canvas.height = this.renderer.height
         canvas.width = this.renderer.width
 
+        if (this.textures.exists('points-layer')) this.textures.remove('points-layer')
         this.blastLayer = this.textures.addCanvas('points-layer', canvas)
         this.add.image(canvas.width/2, canvas.height/2, 'points-layer').setDepth(4)
     }
@@ -176,7 +188,6 @@ export class MainScene extends Scene {
     }
 
 
-
     checkSwitchTurn = () => {
         if (this.terrain.animate === true) return
         if (this.terrain.blastArray.length !== 0) return
@@ -198,6 +209,7 @@ export class MainScene extends Scene {
             this.tank2.active = true
             this.HUD.reset()
             console.log('turn 2')
+            this.showTurnPointer()
             if (this.sceneData.gameType === 1) {
                 this.cpuHandler.play()
             }
@@ -207,12 +219,68 @@ export class MainScene extends Scene {
             this.tank1.active = true
             this.HUD.reset()
             console.log('turn 1')
+            this.showTurnPointer()
+        }
+    }
+
+
+
+    showTurnPointer = () => {
+        var tank = null
+        if (this.activeTank === 1) tank = this.tank1
+        if (this.activeTank === 2) tank = this.tank2
+
+        if (tank !== null) {
+            this.hideTurnPointer()
+            var canvas = document.createElement('canvas')
+            canvas.width = 18
+            canvas.height = 20
+            var w = 18
+            var h = 20
+            var ctx = canvas.getContext('2d')
+
+            ctx.fillStyle = tank.color
+            ctx.moveTo(w/3, 0)
+            ctx.lineTo(w * (2/3), 0)
+            ctx.lineTo(w * (2/3), h * (1/2))
+            ctx.lineTo(w, h * (1/2))
+            ctx.lineTo(w/2, h)
+            ctx.lineTo(0, h * (1/2))
+            ctx.lineTo(w * (1/3), h * (1/2))
+            ctx.lineTo(w/3, 0)
+            ctx.closePath()
+            ctx.fill()
+            
+            if (this.textures.exists('turn-pointer')) this.textures.remove('turn-pointer')
+            this.textures.addCanvas('turn-pointer', canvas)
+            this.turnPointer = this.add.image(tank.x, tank.y - 45, 'turn-pointer')
+            this.turnPointer.setDepth(10)
+
+            this.tweens.add({
+                targets: this.turnPointer,
+                y: this.turnPointer.y - 10,
+                repeat: -1,
+                yoyo: true,
+                duration: 300,
+            })
+
+            this.turnPointer.setVisible(true)
+        }
+    }
+
+
+
+    hideTurnPointer = () => {
+        if (this.turnPointer !== null) {
+            this.turnPointer.setVisible(false)
+            this.turnPointer = null
         }
     }
 
 
 
     showGameOver = () => {
+        this.showWinner()
         const socket = window.socket
         this.gameOver = true
 
@@ -228,10 +296,10 @@ export class MainScene extends Scene {
         var y = this.add.text(screenCenterX, screenCenterY + 50, '/')
         var b = this.add.text(screenCenterX + 80, screenCenterY + 50, 'NO')
 
-        x.setFontSize(50).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
-        a.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
-        b.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
-        y.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
+        x.setFontSize(50).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(100)
+        a.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(100)
+        b.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(100)
+        y.setFontSize(40).setOrigin(0.5).setVisible(false).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(100)
 
         strokeText(x, 4)
         strokeText(a, 4)
@@ -269,6 +337,80 @@ export class MainScene extends Scene {
             b.setVisible(true)
             y.setVisible(true)
         }, 2000);
+    }
+
+
+
+    showWinner = () => {
+        var tank = null
+
+        if (this.tank1.score > this.tank2.score) {
+            tank = this.tank1
+        }
+        else if (this.tank1.score < this.tank2.score) {
+            tank = this.tank2
+        }
+        else return
+
+        var height = 60
+        var w1 = this.add.text(tank.x - 38, tank.y - height - 11, 'W')
+        var i1 = this.add.text(tank.x - 19, tank.y - height - 7, 'i')
+        var n1 = this.add.text(tank.x - 6, tank.y - height - 1, 'n')
+        var n2 = this.add.text(tank.x + 11, tank.y - height + 7, 'n')
+        var e1 = this.add.text(tank.x + 28, tank.y - height + 11, 'e')
+        var r1 = this.add.text(tank.x + 42, tank.y - height + 7, 'r')
+
+        var letters = [w1, i1, n1, n2, e1, r1]
+
+        letters.forEach((l, i) => {
+            l.setFontSize(30).setOrigin(0.5).setColor('rgba(240,240,240,1)').setFontFamily('Arial').setDepth(10)
+            if (i < 4) l.movement = 1
+            else l.movement = -1
+
+            this.tweens.add({
+                targets: l,
+                loop: -1,
+                onLoop: () => {
+                    if (l.movement === 1 && l.y > tank.y - height + 12) {
+                        l.movement = -1
+                    }
+                    else if (l.movement === - 1 && l.y < tank.y - height - 12) {
+                        l.movement = 1
+                    }
+                    l.y = l.y + 0.8 * l.movement
+                }
+            })
+        })
+
+        this.winnerBlastInterval = setInterval(() => {
+            var fillColor = Math.floor(Math.random() * 0xffffff)
+            var vec = new Phaser.Math.Vector2(1,1)
+            var posX = tank.x + (0.5 - Math.random()) * 120
+            var posY = tank.y + (0.5 - Math.random()) * 60 - height
+
+            for (let index = 0; index < 100; index++) {
+                var particle = this.add.circle(posX, posY, 1, fillColor, 255) 
+
+                vec.setAngle(Math.PI * 2 * Math.random())
+                vec.setLength(Math.pow(Math.random(), 2) * 60)
+
+                var t = Math.random() * 1000 + 800
+                this.tweens.add({
+                    targets: particle,
+                    duration: t,
+                    ease: 'Quad.easeOut',
+                    x: particle.x + vec.x,
+                    y: particle.y + vec.y
+                })    
+                this.tweens.add({
+                    targets: particle,
+                    duration: t,
+                    ease: 'Quad.easeOut',
+                    alpha: 0,
+                    onComplete: () => { particle.destroy(true) }
+                })
+            }
+        }, 300);
     }
 
 

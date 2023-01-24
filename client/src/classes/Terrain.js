@@ -15,6 +15,7 @@ export class Terrain extends Textures.CanvasTexture {
         var canvas = document.createElement('canvas');
         canvas.height = height * 2/3
         canvas.width = width
+        if (scene.textures.exists('terrain')) scene.textures.remove('terrain')
         scene.textures.addCanvas('terrain', canvas);
         scene.add.image(width/2, height/3, 'terrain');
 
@@ -355,6 +356,7 @@ export class Terrain extends Textures.CanvasTexture {
                 //this.scene.blastLayer.setPixel(newX, newY, 0, 0, 0, 255)
                 return {x: prevX, y: prevY}
             }
+            //this.setPixel(newX, newY, 255,0,0,255)
             //this.scene.blastLayer.setPixel(newX, newY, 255, 0, 0, 255)
         }
 

@@ -1,4 +1,5 @@
 import { Display } from "phaser";
+import { usernameArray } from "../../../utils/usernames";
 
 /**
 * @param {Phaser.Scene} scene
@@ -12,7 +13,7 @@ export const type2 = (scene) => {
     const a = scene.add.text(screenCenterX, 100, 'PLAYER 2').setFontSize(50);
 
     const b = scene.add.text(screenCenterX, 200, 'NAME :  ').setFontSize(50);
-    const c = scene.add.text(screenCenterX, 200, 'Champion').setFontSize(50);
+    const c = scene.add.text(screenCenterX, 200, usernameArray[Math.floor(Math.random()*usernameArray.length)]).setFontSize(50);
     const d = scene.add.text(screenCenterX + 50, 200, '_').setFontSize(50);
 
     const e = scene.add.text(screenCenterX, 300, 'COLOR :  ').setFontSize(50);
@@ -46,8 +47,10 @@ export const type2 = (scene) => {
 
         }
         else {
-            c.setText(c.text + e.key)
-            d.setX(c.x + c.width)
+            if (isAlphaNumeric(e.key) && c.text.length < 16) {
+                c.setText(c.text + e.key)
+                d.setX(c.x + c.width)
+            }
         }
     })
 
@@ -121,3 +124,18 @@ const strokeText = (txt, thickness) => {
 
     txt.setStroke('rgba(' + r + ',' + g + ',' + b + ',' + a + ')', thickness)
 }
+
+const isAlphaNumeric = (str) => {
+    if (str.length !== 1) return
+    var code, i, len;
+  
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123)) { // lower alpha (a-z)
+        return false;
+      }
+    }
+    return true;
+};

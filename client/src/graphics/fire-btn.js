@@ -29,6 +29,7 @@ export const createFireButton = (hud) => {
 
     drawFireBtn(ctx, canvas.width, canvas.height)
 
+    if (hud.scene.textures.exists('fireButton')) hud.scene.textures.remove('fireButton')
     hud.scene.textures.addCanvas('fireButton', canvas);
     
     hud.fireButton = hud.scene.add.image(hud.width/2, hud.height * 9/12, 'fireButton')
@@ -36,6 +37,7 @@ export const createFireButton = (hud) => {
     hud.fireButton.setInteractive();
 
     hud.fireButton.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             if (hud.scene.sceneData.gameType === 3)
                 socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power, rotation: hud.scene.tank1.turret.relativeRotation})

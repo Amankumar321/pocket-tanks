@@ -14,6 +14,7 @@ export class Tank extends GameObjects.Sprite {
         canvas.height = 24 // tank height
         canvas.width = 36  // tank width
     
+        if (scene.textures.exists('tank' + id)) scene.textures.remove('tank' + id)
         scene.textures.addCanvas('tank' + id, canvas);
         //scene.add.sprite(0, 0, 'tank');
         super(scene, 0, 0, 'tank' + id)
@@ -33,6 +34,7 @@ export class Tank extends GameObjects.Sprite {
         this.settled = true
         this.color = null
         this.centre = {x: 0, y: 0}
+        this.top = {x: 0, y: 0}
         this.leftSteps = 0
         this.rightSteps = 0
         this.movesRemaining = 4
@@ -58,7 +60,7 @@ export class Tank extends GameObjects.Sprite {
         this.name = name
 
         this.randomPos()
-
+    
         ctx.beginPath();
         ctx.moveTo(this.canvas.width/6, this.canvas.height/2)
         ctx.lineTo(0, this.canvas.height/4)
@@ -70,6 +72,8 @@ export class Tank extends GameObjects.Sprite {
         ctx.lineTo(this.canvas.width * (5/6), this.canvas.height/2)
         ctx.closePath()
         ctx.fill()
+
+        //this.setBlendMode(Phaser.BlendModes.MULTIPLY)
 
         this.selectedWeapon = this.weapons.length >= 1 ? 0 : null
         this.scene.physics.world.enable(this)
@@ -86,6 +90,8 @@ export class Tank extends GameObjects.Sprite {
             this.scene.HUD.weaponScrollDisplay.reset(this)
             this.shoot()
         })
+
+        this.texture.update()
     }
 
 
@@ -100,6 +106,12 @@ export class Tank extends GameObjects.Sprite {
             }
         }
         this.setPosition(initX, initY)
+        this.prevPos.x = initX
+        this.prevPos.y = initY
+        var rotation = this.terrain.getSlope(initX, initY)
+        if (rotation !== undefined) {
+            this.setRotation(rotation)
+        }
     }
 
 
@@ -107,29 +119,63 @@ export class Tank extends GameObjects.Sprite {
     update = () => {
         // position
         if (this.terrain.getPixel(this.x, this.y).alpha > 0) {
-            if (this.body.speed !== 0) {
-                var angle = Phaser.Math.Angle.Between(this.x, this.y, this.prevPos.x, this.prevPos.y)
-                var pos = this.terrain.getSurface(this.x, this.y, angle)
-                if (pos !== null) {
-                    this.setPosition(pos.x, pos.y)
-                    this.setRotation(this.terrain.getSlope(pos.x, pos.y))
+            if (this.y >= 0) {
+                if (this.body.speed > 0) {
+                    var angle = 0
+                    if (this.body.velocity.x !== 0) {
+                        angle = Math.atan(this.body.velocity.y / this.body.velocity.x)
+                        if (this.body.velocity.x < 0) {
+                            angle = this.rotation + Math.PI
+                        }
+                    }
+                    else {
+                        if (this.body.velocity.y < 0) {
+                            angle = -Math.PI/2
+                        }
+                        if (this.body.velocity.y > 0) {
+                            angle = Math.PI/2
+                        }
+                    }
+
+                    this.body.stop()
+                    this.body.setGravity(0)
+                    this.body.setVelocity(0, 0)
+
+                    var pos = null, newX = this.x, newY = this.y, prevX, prevY;
+                    for (let i = 0; i < 10; i++) {
+                        prevX = newX
+                        prevY = newY
+                        newX = this.x + i * Math.cos(angle + Math.PI)
+                        newY = this.y + i * Math.sin(angle + Math.PI)
+                        if (this.terrain.getPixel(newX, newY).alpha === 0) {
+                            pos = {x: newX, y: newY}
+                            break
+                        }
+                    }
+
+                    if (pos !== null) {
+                        this.setPosition(pos.x, pos.y)
+                        var rotation = this.terrain.getSlope(pos.x, pos.y)
+                        if (rotation !== undefined) {
+                            this.setRotation(rotation)
+                            this.settled = true
+                        }
+                    }
                 }
-                this.body.stop()
-                this.body.setGravity(0)     
-            }
-            if (this.isInsideTerrain()) {
-                var angle = Phaser.Math.Angle.Between(this.x, this.y, this.prevPos.x, this.prevPos.y)
-                var pos = this.terrain.getSurface(this.x, this.y, angle)
-                if (pos !== null) {
-                    this.setPosition(pos.x, pos.y)
-                    this.setRotation(this.terrain.getSlope(pos.x, pos.y))
+                if(this.isInsideTerrain()) {
+                    if (this.x !== this.prevPos.x || this.y !== this.prevPos.y) {
+                        this.setPosition(this.prevPos.x, this.prevPos.y)
+                        var rotation = this.terrain.getSlope(this.prevPos.x, this.prevPos.y)
+                        if (rotation !== undefined) {
+                            this.setRotation(rotation)
+                            this.settled = true
+                        }
+                    }
                 }
             }
-            var rotation = this.terrain.getSlope(this.x, this.y)
-            if (rotation !== undefined) {
-                this.setRotation(rotation)
+            else {
+                this.y = this.y + 1
             }
-            this.settled = true
         }
         else if (this.y >= this.terrain.height) {
             this.y = this.terrain.height
@@ -137,8 +183,15 @@ export class Tank extends GameObjects.Sprite {
             this.settled = true
         }
         else {
-            this.y = this.y + 1;
-            this.settled = false
+            this.setPosition(this.x, this.y + 1);
+            if (this.terrain.getPixel(this.x, this.y).alpha > 0) {
+                var rotation = this.terrain.getSlope(this.x, this.y)
+                if (rotation !== undefined) {
+                    this.setRotation(rotation)
+                    this.settled = true
+                }
+            }
+            else this.settled = false
         }
 
         this.turret.update()
@@ -147,6 +200,8 @@ export class Tank extends GameObjects.Sprite {
         // find centre
         this.centre.x = this.x + this.height/4 * Math.sin(this.rotation)
         this.centre.y = this.y - this.height/4 * Math.cos(this.rotation)
+        this.top.x = this.x + this.height/2 * Math.sin(this.rotation)
+        this.top.y = this.y - this.height/2 * Math.cos(this.rotation)
 
         // movement
         if (this.keyA?.isDown) {
@@ -210,6 +265,8 @@ export class Tank extends GameObjects.Sprite {
 
     moveLeft = () => {
         if (!this.active) return
+        if (this.isInsideTerrain()) return
+        this.scene.hideTurnPointer()
 
         var nextPos;
         nextPos = this.groundLeft(this.x, this.y);
@@ -218,10 +275,14 @@ export class Tank extends GameObjects.Sprite {
         }
         else if (this.x - (this.canvas.width/2) * Math.cos(this.rotation) <= 0) {
             this.x = (this.canvas.width/2) * Math.cos(this.rotation)
-            this.body.setVelocityX(-this.body.velocity.x)
+            //this.body.setVelocityX(-this.body.velocity.x)
         }
         else {
             this.setPosition(nextPos.x, nextPos.y)
+            var rotation = this.terrain.getSlope(nextPos.x, nextPos.y)
+            if (rotation !== undefined) {
+                this.setRotation(rotation)
+            }
             //this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
@@ -230,6 +291,8 @@ export class Tank extends GameObjects.Sprite {
 
     moveRight = () => {
         if (!this.active) return
+        if (this.isInsideTerrain()) return
+        this.scene.hideTurnPointer()
 
         var nextPos;
         nextPos = this.groundRight(this.x, this.y);
@@ -238,10 +301,14 @@ export class Tank extends GameObjects.Sprite {
         }
         else if (this.x + (this.canvas.width/2) * Math.cos(this.rotation) >= this.terrain.width) {
             this.x = this.terrain.width - (this.canvas.width/2) * Math.cos(this.rotation)
-            this.body.setVelocityX(-this.body.velocity.x)
+            //this.body.setVelocityX(-this.body.velocity.x)
         }
         else {
             this.setPosition(nextPos.x, nextPos.y)
+            var rotation = this.terrain.getSlope(nextPos.x, nextPos.y)
+            if (rotation !== undefined) {
+                this.setRotation(rotation)
+            }
             //this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
@@ -272,12 +339,12 @@ export class Tank extends GameObjects.Sprite {
         if (!this.active) return
         this.active = false
         this.turret.shoot(this.weapons[this.selectedWeapon]?.id)
+        this.scene.hideTurnPointer()
 
         if (this.scene.sceneData.gameType !== 4) {
             this.weapons.splice(this.selectedWeapon, 1)
-            this.selectedWeapon = this.weapons.length >= 1 ? 0 : null
         }
-
+        this.selectedWeapon = this.weapons.length >= 1 ? Math.min(this.selectedWeapon, this.weapons.length - 1) : null
     }
 
 
@@ -295,5 +362,45 @@ export class Tank extends GameObjects.Sprite {
         if (power < 0)
             power = 0
         this.power = power
+    }
+
+
+
+    isPointInside = (x, y) => {
+        var w = this.width
+
+        var polygon = new Phaser.Geom.Polygon([
+            //this.x - Math.cos(this.rotation) * w/3, this.y - Math.sin(this.rotation) * w/3,
+            //this.centre.x - Math.cos(this.rotation) * w/2, this.centre.y - Math.sin(this.rotation) * w/2,
+            //this.centre.x - Math.cos(this.rotation) * w/3, this.centre.y - Math.sin(this.rotation) * w/3,
+            this.x - Math.cos(this.rotation) * w/4, this.y - Math.sin(this.rotation) * w/4,
+            this.top.x - Math.cos(this.rotation) * w/4, this.top.y - Math.sin(this.rotation) * w/4,
+            this.top.x + Math.cos(this.rotation) * w/4, this.top.y + Math.sin(this.rotation) * w/4,
+            this.x + Math.cos(this.rotation) * w/4, this.y + Math.sin(this.rotation) * w/4,
+            //this.centre.x + Math.cos(this.rotation) * w/3, this.centre.y + Math.sin(this.rotation) * w/3,
+            //this.centre.x + Math.cos(this.rotation) * w/2, this.centre.y + Math.sin(this.rotation) * w/2,
+            //this.x + Math.cos(this.rotation) * w/3, this.y + Math.sin(this.rotation) * w/3,
+        ])
+
+        var pointInside = false
+
+        if (Phaser.Geom.Polygon.ContainsPoint(polygon, {x: x, y: y})) {
+            pointInside = true
+        }
+ 
+        return pointInside
+    }
+
+
+
+    pauseInsideTerrainCheck = () => {
+        this.pauseCheck = true
+    }
+
+
+
+
+    resumeInsideTerrainCheck = () => {
+        this.pauseCheck = false
     }
 }

@@ -66,12 +66,19 @@ export class Weapon {
     defaultUpdate = (obj) => {
         var x = obj.x
         var y = obj.y
-        /// oppTank = this.scene.tank1 === this.tank ? this.scene.tank2: this.scene.tank1
+        
         var tank1 = this.scene.tank1
         var tank2 = this.scene.tank2
-        var dist1 = Math.sqrt(Math.pow((tank1.centre.x - x), 2) + Math.pow((tank1.centre.y - y), 2)) 
-        var dist2 = Math.sqrt(Math.pow((tank2.centre.x - x), 2) + Math.pow((tank2.centre.y - y), 2))
-        var point = this.terrain.getPixel(x, y)
+
+        var hitTank1 = false
+        var hitTank2 = false
+
+        if (tank1.isPointInside(x, y)) {
+            hitTank1 = true
+        }
+        if (tank2.isPointInside(x, y)) {
+            hitTank2 = true
+        }
 
         if (obj.body.velocity.x !== 0) {
             obj.setRotation(Math.atan(obj.body.velocity.y / obj.body.velocity.x))
@@ -101,11 +108,11 @@ export class Weapon {
             this.weaponHandler.onBaseHit(this, obj)
         }
 
-        else if (dist1 < tank1.hitRadius) {
+        else if (hitTank1 === true) {
             this.weaponHandler.onTankHit(this, obj, tank1)
         }
 
-        else if (dist2 < tank2.hitRadius) {
+        else if (hitTank2 === true) {
             this.weaponHandler.onTankHit(this, obj, tank2)
         }
 
@@ -153,8 +160,34 @@ export class Weapon {
 
         var tank1 = this.scene.tank1
         var tank2 = this.scene.tank2
-        var dist1 = Math.sqrt(Math.pow((tank1.centre.x - x), 2) + Math.pow((tank1.centre.y - y), 2)) 
-        var dist2 = Math.sqrt(Math.pow((tank2.centre.x - x), 2) + Math.pow((tank2.centre.y - y), 2))
+
+        var hitTank1 = false
+        var hitTank2 = false
+
+        if (tank1.isPointInside(x, y)) {
+            hitTank1 = true
+        }
+        if (tank2.isPointInside(x, y)) {
+            hitTank2 = true
+        }
+
+        if (hitTank1 && tank1 === this.tank) {
+            this.tank.updateScore(-Math.floor(blastRadius * factor))
+        }
+        else if (hitTank1 && tank1 !== this.tank) {
+            this.tank.updateScore(Math.ceil(blastRadius * factor))
+        }
+        if (hitTank2 && tank2 === this.tank) {
+            this.tank.updateScore(-Math.floor(blastRadius * factor))
+        }
+        else if (hitTank2 && tank2 !== this.tank) {
+            this.tank.updateScore(Math.ceil(blastRadius * factor))
+        }
+
+        if (hitTank1 || hitTank2) return
+
+        var dist1 = Phaser.Math.Distance.Between(x, y, this.scene.tank1.centre.x, this.scene.tank1.centre.y)
+        var dist2 = Phaser.Math.Distance.Between(x, y, this.scene.tank2.centre.x, this.scene.tank2.centre.y)
 
         if (tank1 === this.tank) {
             var pointReduce = dist1 - blastRadius > 0 ? 0 : Math.ceil((blastRadius - dist1) * factor)
@@ -250,7 +283,7 @@ export class Weapon {
         var y = obj.y
         var initX = x, initY = y;
         var prevX = x, prevY = y;
-        var limit = Math.ceil(obj.body.speed / 50)
+        var limit = Math.ceil(obj.body.speed / 10)
         var vx = obj.body.velocity.x
         var vy = obj.body.velocity.y
         var v = new Phaser.Math.Vector2(vx, vy)
@@ -273,11 +306,20 @@ export class Weapon {
             }
 
             var slope = this.terrain.getSlope(prevX, prevY)
+            if (isNaN(slope) === true) {
+                if (obj.body.velocity.x > 0) {
+                    slope = Math.PI/2
+                }
+                else {
+                    slope = -Math.PI/2
+                }
+            }
             var perpendicular = slope + Math.PI/2
             var alpha = perpendicular - rotation
             var f = factor
             
             v.rotate(2 * alpha - Math.PI)
+            
             obj.setVelocity(v.x * f, v.y * f)
         }
     }

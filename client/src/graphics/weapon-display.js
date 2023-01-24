@@ -75,6 +75,7 @@ export const createWeaponDisplay = (hud) => {
     canvas.width = w
 
     drawWeaponBox(ctx, canvas.width, canvas.height)
+    if (hud.scene.textures.exists('weapon-box')) hud.scene.textures.remove('weapon-box')
     hud.scene.textures.addCanvas('weapon-box', canvas);
 
     hud.weaponBox = hud.scene.add.image(0, 0, 'weapon-box')
@@ -85,6 +86,7 @@ export const createWeaponDisplay = (hud) => {
     var weaponDisplay = hud.scene.add.container(0, h/8)
     var key = Math.random().toString(32).slice(3,7)
     var logoCanvas = hud.scene.activeTank === 1 ? weaponArray[hud.scene.tank1.selectedWeapon].logoCanvas : weaponArray[hud.scene.tank2.selectedWeapon].logoCanvas
+    if (hud.scene.textures.exists(key)) hud.scene.textures.remove(key)
     hud.scene.textures.addCanvas(key, logoCanvas)
     var margin = (innerH - logoCanvas.height * ((innerH/logoCanvas.height) * 0.9))/2
     var weaponLogo = hud.scene.add.image(-(w - w/12)/2 + margin, 0, key)
@@ -123,6 +125,7 @@ const createWeaponScrollDisplay = (hud, weaponLogo) => {
     canvas.width = w
 
     drawWeaponScrollBox(ctx, canvas.width, canvas.height)
+    if (hud.scene.textures.exists('weapon-scroll-box')) hud.scene.textures.remove('weapon-scroll-box')
     hud.scene.textures.addCanvas('weapon-scroll-box', canvas);
 
     hud.weaponScrollDisplay.scrollBox = hud.scene.add.image(0, 0, 'weapon-scroll-box')

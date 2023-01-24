@@ -20,6 +20,7 @@ export class HUD extends Textures.CanvasTexture {
         var canvas = document.createElement('canvas');
         canvas.height = height
         canvas.width = width
+        if (scene.textures.exists('hud')) scene.textures.remove('hud')
         scene.textures.addCanvas('hud', canvas);
         scene.add.image(width/2, height/2, 'hud').setDepth(4);
 
@@ -105,6 +106,7 @@ export class HUD extends Textures.CanvasTexture {
         ctx.fillStyle = 'rgba(0,0,0,0.6)'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
     
+        if (this.scene.textures.exists('hud-overlay')) this.scene.textures.remove('hud-overlay')
         this.scene.textures.addCanvas('hud-overlay', canvas);
         
         this.overlay = this.scene.add.image(this.width/2, this.height * 5/6, 'hud-overlay')

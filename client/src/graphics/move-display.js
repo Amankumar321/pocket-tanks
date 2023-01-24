@@ -66,6 +66,7 @@ export const createMoveDisplay = (hud) => {
     canvas.width = w
 
     drawMoveDisplay(ctx, canvas.width, canvas.height)
+    if (hud.scene.textures.exists('move-display')) hud.scene.textures.remove('move-display')
     hud.scene.textures.addCanvas('move-display', canvas);
 
     canvas = document.createElement('canvas');
@@ -73,6 +74,7 @@ export const createMoveDisplay = (hud) => {
     canvas.height = h
     canvas.width = w
     drawArrow(ctx, canvas.width, canvas.height, 0)
+    if (hud.scene.textures.exists('move-display-right')) hud.scene.textures.remove('move-display-right')
     hud.scene.textures.addCanvas('move-display-right', canvas);
 
     canvas = document.createElement('canvas');
@@ -80,6 +82,7 @@ export const createMoveDisplay = (hud) => {
     canvas.height = h
     canvas.width = w
     drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    if (hud.scene.textures.exists('move-display-left')) hud.scene.textures.remove('move-display-left')
     hud.scene.textures.addCanvas('move-display-left', canvas);
     
     var moveBtn = hud.scene.add.image(0, 0, 'move-display')
@@ -87,20 +90,12 @@ export const createMoveDisplay = (hud) => {
     moveDisplay.setDepth(6)
     moveBtn.setInteractive();
 
-    moveBtn.on('pointerdown', () => {
-        if (hud.scene.activeTank === 1) {
-            
-        }
-        else if (hud.scene.activeTank === 2) {
-            
-        }
-    })
-
     var moveRightBtn = hud.scene.add.image(w/2, 0, 'move-display-right')
     moveDisplay.add(moveRightBtn)
     moveRightBtn.setInteractive().setOrigin(0, 0.5);
 
     moveRightBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepRight()
         }
@@ -114,6 +109,7 @@ export const createMoveDisplay = (hud) => {
     moveLeftBtn.setInteractive().setOrigin(1,0.5);
 
     moveLeftBtn.on('pointerdown', () => {
+        hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepLeft()
         }

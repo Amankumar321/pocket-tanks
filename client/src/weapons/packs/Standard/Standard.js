@@ -7,6 +7,7 @@ import * as Logos from "./logos"
 export class singleshot {
     constructor() {
         this.id = 0
+        this.type = 0
         this.name = 'Single Shot'
         this.projectile = null
         this.logoCanvas = Logos.singleshot
@@ -55,7 +56,7 @@ export class singleshot {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -65,10 +66,10 @@ export class singleshot {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -99,10 +100,10 @@ export class singleshot {
     }
 
     onTankHit = (weapon, obj, tank) => {
-        obj.body.setVelocity(0)
-        obj.body.setGravityY(0)
+        //obj.body.setVelocity(0)
+        //obj.body.setGravityY(0)
         //obj.setPosition(tank.x, tank.y)
-        this.blast(weapon, true)
+        this.blast(weapon, true, tank)
     }
 
     onOutOfBound = (weapon, obj) => {
@@ -141,6 +142,7 @@ export class singleshot {
 export class bigshot {
     constructor() {
         this.id = 1
+        this.type = 0
         this.name = 'Big Shot'
         this.projectile = null
         this.logoCanvas = Logos.bigshot
@@ -189,7 +191,7 @@ export class bigshot {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -199,10 +201,10 @@ export class bigshot {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -273,6 +275,7 @@ export class bigshot {
 export class threeshot {
     constructor() {
         this.id = 2
+        this.type = 0
         this.name = '3 Shot'
         this.projectile1 = null
         this.projectile2 = null
@@ -343,7 +346,7 @@ export class threeshot {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -353,10 +356,10 @@ export class threeshot {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -432,6 +435,7 @@ export class threeshot {
 export class fiveshot {
     constructor() {
         this.id = 3
+        this.type = 0
         this.name = '5 Shot'
         this.projectile1 = null
         this.projectile2 = null
@@ -510,7 +514,7 @@ export class fiveshot {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -520,10 +524,10 @@ export class fiveshot {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -599,17 +603,20 @@ export class fiveshot {
 export class jackhammer {
     constructor() {
         this.id = 4
+        this.type = 0
         this.name = 'Jackhammer'
         this.projectile = null
         this.logoCanvas = Logos.jackhammer
         this.jumpCount = 4
         this.projectileDiameter = 7
+        this.frameCount = 0
         this.canvas = null
     }
 
     reset = () => {
         this.projectile = null
         this.jumpCount = 4
+        this.frameCount = 0
         this.projectileDiameter = 7
         this.canvas = null
     }
@@ -652,6 +659,7 @@ export class jackhammer {
     }
 
     update = (weapon) => {
+        this.frameCount--
         weapon.updateTail(this.projectile, 18, 6, this.projectileDiameter, {r: 100, g: 200, b: 250})
         weapon.defaultUpdate(this.projectile)
     }
@@ -661,7 +669,7 @@ export class jackhammer {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -671,10 +679,10 @@ export class jackhammer {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -708,7 +716,7 @@ export class jackhammer {
         //obj.body.setVelocity(0)
         //obj.body.setGravityY(0)
         //obj.setPosition(tank.x, tank.y)
-        this.blast(weapon)
+        //this.blast(weapon)
     }
 
     onOutOfBound = (weapon, obj) => {
@@ -724,19 +732,22 @@ export class jackhammer {
     }
 
     blast = (weapon, blowTank = false) => {
-        var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd}, blowTank)
-        weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 36, 10/36)
-        if (this.jumpCount <= 0) {
-            this.projectile.destroy()
-            weapon.scene.textures.remove('projectile')
-            weapon.turret.activeWeapon = null
-        }
-        else {
-            this.jumpCount--
-            this.projectileDiameter--
-            this.projectile.setVelocity(0, -200)
-            this.drawProjectile(this.projectileDiameter)
+        if (this.frameCount <= 0) {
+            this.frameCount = 10
+            var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd}, blowTank)
+            weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 36, 10/36)
+            if (this.jumpCount <= 0) {
+                this.projectile.destroy()
+                weapon.scene.textures.remove('projectile')
+                weapon.turret.activeWeapon = null
+            }
+            else {
+                this.jumpCount--
+                this.projectileDiameter--
+                this.projectile.setVelocity(0, -200)
+                this.drawProjectile(this.projectileDiameter)
+            }
         }
     }
 }
@@ -751,6 +762,7 @@ export class jackhammer {
 export class heatseeker {
     constructor() {
         this.id = 5
+        this.type = 0
         this.name = 'Heatseeker'
         this.projectile = null
         this.logoCanvas = Logos.heatseeker
@@ -849,7 +861,7 @@ export class heatseeker {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -859,10 +871,10 @@ export class heatseeker {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -932,6 +944,7 @@ export class heatseeker {
 export class tracer {
     constructor() {
         this.id = 6
+        this.type = 0
         this.name = 'Tracer'
         this.projectile1 = null
         this.projectile2 = null
@@ -939,7 +952,7 @@ export class tracer {
         this.projectile4 = null
         this.projectile5 = null
         this.projectiles = []
-        this.logoCanvas = Logos.fiveshot
+        this.logoCanvas = Logos.tracer
     }
 
     reset = () => {
@@ -976,6 +989,7 @@ export class tracer {
             projectile.bounceCount = 3
             projectile.canvas = canvas
             projectile.index = index
+            projectile.settled = false
             projectile.relativeAngle = -10 + (index - 1) * 5
             return projectile
         }
@@ -1007,11 +1021,12 @@ export class tracer {
     }
 
     onTerrainHit = (weapon, obj) => {
+        if (obj.settled) return
         var x = obj.x
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -1021,10 +1036,10 @@ export class tracer {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -1074,6 +1089,8 @@ export class tracer {
     }
 
     blast = (weapon, obj) => {
+        if (obj.settled) return
+        obj.settled = true
         obj.body.stop()
         obj.setGravity(0)
     
@@ -1104,6 +1121,7 @@ export class tracer {
 export class piledriver {
     constructor() {
         this.id = 7
+        this.type = 0
         this.name = 'Pile Driver'
         this.projectile = null
         this.logoCanvas = Logos.piledriver
@@ -1156,7 +1174,7 @@ export class piledriver {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -1166,10 +1184,10 @@ export class piledriver {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -1262,6 +1280,7 @@ export class piledriver {
 export class dirtmover {
     constructor() {
         this.id = 8
+        this.type = 2
         this.name = 'Dirt Mover'
         this.projectile = null
         this.logoCanvas = Logos.dirtmover
@@ -1401,9 +1420,12 @@ export class dirtmover {
 
 
 
+
+
 export class crazyivan {
     constructor() {
         this.id = 9
+        this.type = 0
         this.name = 'Crazy Ivan'
         this.projectile = null
         this.logoCanvas = Logos.crazyivan
@@ -1455,7 +1477,7 @@ export class crazyivan {
         }
         else {
             this.particles.forEach(e => {
-                this.updateParticleMotion(weapon, e)
+                //this.updateParticleMotion(weapon, e)
                 weapon.updateTail(e, 14, 4, 2, {r: 220, g: 200, b: 255}, true)
                 weapon.defaultUpdate(e)
             })
@@ -1504,26 +1526,36 @@ export class crazyivan {
         var v = this.projectile.body.velocity.clone().setLength(200).rotate(delta)
         particle.body.setVelocity(v.x, v.y)
         particle.setGravityY(300)
+        particle.index = index
+        particle.movement = index
+
+        weapon.scene.tweens.add({
+            targets: particle,
+            loop: 2,
+            t: 1,
+            duration: 300,
+            onLoop: () => {
+                if (particle.body !== undefined) {
+                    particle.movement++
+                    if (particle.movement % 3 == 0) {
+                        this.updateParticleMotion(weapon, particle, particle.movement, particle.index)
+                    }
+                }
+            }
+        });
 
         this.particles.push(particle)
     }
     
-    updateParticleMotion = (weapon, particle) => {
+    updateParticleMotion = (weapon, particle, move, index) => {
         var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
+        var x = move * Math.PI/(index + 1) + index * Math.PI / 3
+
+        particle.body.velocity.setAngle(x - Math.floor(x / Math.PI) * Math.PI)
         var targetAngle = Phaser.Math.Angle.Between(oppTank.x, oppTank.y, particle.x, particle.y) + Math.PI;
         var diff = Phaser.Math.Angle.Wrap(targetAngle - particle.body.velocity.angle())
-        var k = Phaser.Math.Distance.Between(particle.x, particle.y, oppTank.x, oppTank.y)
-
-        particle.body.velocity.rotate(diff/100)
-    
-        if (k > 100 && k < 105) {
-            particle.body.velocity.rotate(diff * 2)
-            particle.body.velocity.setAngle(Phaser.Math.Clamp(particle.body.velocity.angle(), 0, Math.PI))
-        }
-        
-        if (k > 40 && k < 45) {
-            particle.body.velocity.rotate(diff * 3)
-            particle.body.velocity.setAngle(Phaser.Math.Clamp(particle.body.velocity.angle(), 0, Math.PI))
+        if (Phaser.Math.Distance.BetweenPoints(particle, oppTank) > 200) {
+            particle.body.velocity.rotate(diff * (0.6 + (move % 3) * 0.4))
         }
     }
 
@@ -1532,7 +1564,7 @@ export class crazyivan {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -1542,10 +1574,10 @@ export class crazyivan {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -1605,7 +1637,7 @@ export class crazyivan {
 
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,0.4)'}, {relativePosition: 0.4, color: 'rgba(120,120,0,1)'}, {relativePosition: 1, color: 'rgba(255,255,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 18, gradient: grd, blowPower: 50}, blowTank)
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 18, gradient: grd, blowPower: 50, optimize: true}, blowTank)
         weapon.defaultUpdateScore(obj.x, obj.y, 36, 20/36)
         obj.destroy()
         weapon.scene.textures.remove(obj.texture.key)
@@ -1638,6 +1670,7 @@ export class crazyivan {
 export class spider {
     constructor() {
         this.id = 10
+        this.type = 0
         this.name = 'Spider'
         this.projectile = null
         this.logoCanvas = Logos.spider
@@ -1831,10 +1864,10 @@ export class spider {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -1903,7 +1936,7 @@ export class spider {
             weapon.turret.activeWeapon = null
         }
         else {
-            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 28 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 30}, blowTank)
+            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 28 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 30, optimize: true}, blowTank)
             weapon.defaultUpdateScore(obj.x, obj.y, 28, 20/28)
             obj.destroy()
             weapon.scene.textures.remove(obj.texture.key)
@@ -1930,6 +1963,7 @@ export class spider {
 export class sniperrifle {
     constructor() {
         this.id = 11
+        this.type = 0
         this.name = 'Sniper Rifle'
         this.projectile = null
         this.logoCanvas = Logos.sniperrifle
@@ -1978,7 +2012,7 @@ export class sniperrifle {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -1988,10 +2022,10 @@ export class sniperrifle {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -2013,7 +2047,7 @@ export class sniperrifle {
         if (!bounce || obj.bounceCount <= 0) {
             y = Math.min(y, weapon.terrain.height - 1)
             obj.setPosition(x, y)
-            this.blast(weapon, obj, true)
+            this.blast(weapon, obj, false)
         }
     }
 
@@ -2041,7 +2075,7 @@ export class sniperrifle {
 
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 1, color: 'rgba(220,220,220,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 1, {thickness: 0, gradient: grd, blowPower: 300}, blowTank)
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 1, {thickness: 0, gradient: grd, blowPower: 300}, true)
         var vec = new Phaser.Math.Vector2(1,1)
 
         for (let index = 0; index < 200; index++) {
@@ -2085,6 +2119,7 @@ export class sniperrifle {
 export class magicwall {
     constructor() {
         this.id = 12
+        this.type = 0
         this.name = 'Magic Wall'
         this.projectile = null
         this.logoCanvas = Logos.magicwall
@@ -2137,7 +2172,7 @@ export class magicwall {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -2147,10 +2182,10 @@ export class magicwall {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -2277,6 +2312,7 @@ export class magicwall {
 export class dirtslinger {
     constructor() {
         this.id = 13
+        this.type = 0
         this.name = 'Dirt Slinger'
         this.projectile = null
         this.logoCanvas = Logos.dirtslinger
@@ -2331,7 +2367,7 @@ export class dirtslinger {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -2341,10 +2377,10 @@ export class dirtslinger {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -2415,19 +2451,36 @@ export class dirtslinger {
             onUpdate: () => {
                 vec1.set(shape.w/2, shape.h)
                 vec2.set(-shape.w/2, shape.h)
-                ctx.beginPath()
-                ctx.moveTo(x, y)
-                ctx.lineTo(x + vec1.length() * Math.cos(vec1.angle()), y - vec1.length() * Math.sin(vec1.angle()))
-                ctx.lineTo(x + vec2.length() * Math.cos(vec2.angle()), y -  vec2.length() * Math.sin(vec2.angle())) 
-                ctx.closePath()
-                ctx.fill()
+                // ctx.beginPath()
+                // ctx.moveTo(x, y)
+                // ctx.lineTo(x + vec1.length() * Math.cos(vec1.angle()), y - vec1.length() * Math.sin(vec1.angle()))
+                // ctx.lineTo(x + vec2.length() * Math.cos(vec2.angle()), y -  vec2.length() * Math.sin(vec2.angle())) 
+                // ctx.closePath()
+                // ctx.fill()
+                var x1 = x + vec1.length() * Math.cos(vec1.angle())
+                var y1 = y - vec1.length() * Math.sin(vec1.angle())
+                var x2 = x + vec2.length() * Math.cos(vec2.angle())
+                var y2 = y - vec2.length() * Math.sin(vec2.angle())
+                var f = shape.h / h
+                y1 = Math.max(y1, 0)
+                y2 = Math.max(y2, 0)
+                var points = new Phaser.Geom.Line(x1, y1, x2, y2).getPoints(0, 1)
+                console.log(points)
+                points.forEach(p => {
+                    weapon.terrain.setPixel(p.x, p.y, 120 + 110 * f, 50 + 140 * f, 20 + 110 * f, 200)
+                })
             },
             onComplete: () => {
+                var midAngle = (vec1.angle() + vec2.angle()) / 2
                 weapon.terrain.update()
-                var p1 = {x: x, y: y + 4}
-                var p2 = {x: x + vec1.length() * Math.cos(vec1.angle()) + 4, y: y - vec1.length() * Math.sin(vec1.angle()) - 4}
-                var p3 = {x: x + vec2.length() * Math.cos(vec2.angle()) - 4, y: y - vec2.length() * Math.sin(vec2.angle()) - 4}
-                var p4 = {x: x, y: y + 4}
+                // var p1 = {x: x, y: y + 4}
+                // var p2 = {x: x + vec1.length() * Math.cos(vec1.angle()) + 4, y: y - vec1.length() * Math.sin(vec1.angle()) - 4}
+                // var p3 = {x: x + vec2.length() * Math.cos(vec2.angle()) - 4, y: y - vec2.length() * Math.sin(vec2.angle()) - 4}
+                // var p4 = {x: x, y: y + 4}
+                var p1 = {x: x, y: y + 2}
+                var p2 = {x: x - vec1.length() * Math.cos(vec1.angle()) - 2, y: y - vec1.length() * Math.sin(vec1.angle()) + 2}
+                var p3 = {x: x - vec2.length() * Math.cos(vec2.angle()) + 2, y: y - vec2.length() * Math.sin(vec2.angle()) + 2}
+                var p4 = {x: x, y: y + 2}
                 weapon.terrain.fixTerrainShape([p1, p2, p3, p4, p1])
                 weapon.turret.activeWeapon = null
             }
@@ -2451,6 +2504,7 @@ export class dirtslinger {
 export class zapper {
     constructor() {
         this.id = 14
+        this.type = 0
         this.name = 'Zapper'
         this.projectile = null
         this.logoCanvas = Logos.zapper
@@ -2555,7 +2609,7 @@ export class zapper {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -2565,10 +2619,10 @@ export class zapper {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -2641,6 +2695,7 @@ export class zapper {
 export class napalm {
     constructor() {
         this.id = 15
+        this.type = 0
         this.name = 'Napalm'
         this.projectile = null
         this.logoCanvas = Logos.napalm
@@ -2703,7 +2758,7 @@ export class napalm {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -2713,10 +2768,10 @@ export class napalm {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -2755,7 +2810,7 @@ export class napalm {
             y = y + Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 return
             }
         }
@@ -2763,6 +2818,8 @@ export class napalm {
         if (x >= weapon.terrain.width - 1 || x <= 0) {
             return
         }
+
+        if (y <= 0) return
 
         this.dissipated = true
         this.blast(weapon, this.projectile)
@@ -2783,7 +2840,8 @@ export class napalm {
             weapon.turret.activeWeapon = null
         }
         else {
-            obj.smokeEmitter.remove()
+            if (obj.smokeEmitter !== null)
+                obj.smokeEmitter.remove()
             this.particles = this.particles.filter(p => { return p === obj })
             if (this.particles.length === 0)
                 weapon.turret.activeWeapon = null
@@ -2817,7 +2875,8 @@ export class napalm {
                 var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
                 this.particles.forEach(ele => {
                     temp = Phaser.Math.Distance.BetweenPoints(ele, weapon.tank)
-                    points1 += (temp < weapon.tank.hitRadius*2) ? weapon.tank.hitRadius*2/(temp + 1) : 0
+                    var k = Math.ceil((weapon.tank.hitRadius*2 - temp) * 0.5 / weapon.tank.hitRadius*2)
+                    points1 += (temp < weapon.tank.hitRadius*2) ? Math.min(k, 5) : 0
                 })
                 setTimeout(() => {
                     weapon.constantUpdateScore(Math.floor(-points1)) 
@@ -2825,7 +2884,8 @@ export class napalm {
 
                 this.particles.forEach(ele => {
                     temp = Phaser.Math.Distance.BetweenPoints(ele, oppTank)
-                    points2 += (temp < weapon.tank.hitRadius*2) ? weapon.tank.hitRadius*2/(temp + 1) : 0
+                    var k = Math.ceil((weapon.tank.hitRadius*2 - temp) * 0.5 / weapon.tank.hitRadius*2)
+                    points2 += (temp < weapon.tank.hitRadius*2) ? Math.min(k, 5) : 0
                 })
                 setTimeout(() => {
                     weapon.constantUpdateScore(Math.floor(points2)) 
@@ -2870,11 +2930,13 @@ export class napalm {
                 loop: 7,
                 alpha: 0,
                 onComplete: () => {
-                    p.destroy(true)
-                    p.smokeEmitter.remove()
-                    this.particles = this.particles.filter(particle => { return particle === p })
-                    if (this.particles.length === 0)
-                        weapon.turret.activeWeapon = null
+                    if (p.active === true) {
+                        p.destroy(true)
+                        p.smokeEmitter.remove()
+                        this.particles = this.particles.filter(particle => { return particle === p })
+                        if (this.particles.length === 0)
+                            weapon.turret.activeWeapon = null
+                    }
                 }
             })
             
@@ -2950,6 +3012,7 @@ export class napalm {
 export class hailstorm {
     constructor() {
         this.id = 16
+        this.type = 0
         this.name = 'Hail Storm'
         this.projectile = null
         this.ballsArray = []
@@ -3001,7 +3064,7 @@ export class hailstorm {
             var y = this.projectile.y
             var prevX = x, prevY = y;
             var initX = x, initY = y;
-            var maxCount = Math.ceil(obj.body.speed / 20);
+            var maxCount = Math.ceil(obj.body.speed / 10);
             var bounce = false
 
             while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -3011,10 +3074,10 @@ export class hailstorm {
                 y = y - Math.sin(this.projectile.rotation)
 
                 maxCount--
-                if (maxCount === 0) {
+                if (maxCount <= 0) {
                     x = initX
                     y = initY
-                    return
+                    break
                 }
             }
 
@@ -3110,14 +3173,23 @@ export class hailstorm {
             this.ballsArray.push(ball)
         }
 
+        var base = weapon.terrain.getBase(this.projectile.x, this.projectile.y)
+        this.originalSlope = weapon.terrain.getSlope(base.x, base.y)
+        if (isNaN(this.originalSlope) === true) {
+            if (this.projectile.body.velocity.x > 0) {
+                this.originalSlope = -Math.PI/2
+            }
+            else {
+                this.originalSlope = Math.PI/2
+            }
+        }
         this.projectile.destroy()
         weapon.scene.textures.remove(this.projectile.texture.key)
         this.projectile = null
+        this.weapon = weapon
 
         this.timer = weapon.scene.time.addEvent({delay: 100, callback: this.spawnBall, callbackScope: this, repeat: this.ballsCount});
 
-        weapon.scene.physics.add.collider(this.ballsArray, this.ballsArray)
-        
         weapon.scene.tweens.add({
             targets: this.ballsArray,
             loop: 15,
@@ -3130,9 +3202,9 @@ export class hailstorm {
                 var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
                 this.ballsArray.forEach(ele => {
                     if (ele.visible) {
-                        temp = Phaser.Math.Distance.BetweenPoints(ele, weapon.tank)
-                        if (temp !== NaN) 
-                            points1 += (temp < weapon.tank.hitRadius*2) ? weapon.tank.hitRadius*1.2/(temp + 1) : 0
+                        if (weapon.tank.isPointInside(ele.x, ele.y)) {
+                            points1 += 0.5
+                        }
                     }
                 })
                 setTimeout(() => {
@@ -3141,13 +3213,13 @@ export class hailstorm {
 
                 this.ballsArray.forEach(ele => {
                     if (ele.visible) {
-                        temp = Phaser.Math.Distance.BetweenPoints(ele, oppTank)
-                        if (temp !== NaN) 
-                            points2 += (temp < weapon.tank.hitRadius*2) ? weapon.tank.hitRadius*1.2/(temp + 1) : 0
+                        if (oppTank.isPointInside(ele.x, ele.y)) {
+                            points2 += 0.5
+                        }
                     }
                 })
                 setTimeout(() => {
-                    weapon.constantUpdateScore(Math.floor(points2)) 
+                    weapon.constantUpdateScore(Math.ceil(points2)) 
                 }, 600*Math.random()); 
             }
         })
@@ -3158,7 +3230,7 @@ export class hailstorm {
     }
 
     spawnBall = () => {
-        var velocities = [5, -10, 3, -8, -16, 9, 3, -7, 4, -2, 6, 17, -3, 12, 8, 6, -19, -4, -7, 14, -2, 6, 7, -13, 2, 18, 12, -7, 5, 8, -1]
+        var deviate = [5, -1, 3, -8, -6, 9, 3, -7, 4, -2, 6, 7, -3, 2, 8, 6, -9, -4, -8, 4, -2, 6, 7, -3, 2, 8, 2, -7, 5, 8, -1]
         var idx;
 
         var found = this.ballsArray.find((ball, index) => {
@@ -3169,9 +3241,14 @@ export class hailstorm {
         if (found) {
             found.visible = true
             found.setGravityY(150)
-            found.setVelocityY(-36)
+            var perpendicular = this.originalSlope - Math.PI/2
+            var vec1, vec2, vec3;
+            vec1 = new Phaser.Math.Vector2(20 * Math.cos(perpendicular), 20 * Math.sin(perpendicular))
+            vec2 = new Phaser.Math.Vector2(deviate[idx] * Math.cos(this.originalSlope), (deviate[idx] * Math.sin(this.originalSlope)))
+            vec3 = vec1.add(vec2)
+            found.setVelocity(vec3.x, vec3.y)
             found.setDragX(0.8)
-            found.setVelocityX(velocities[idx])
+            this.weapon.scene.physics.add.collider(this.ballsArray.filter((ball, i) => { return i < idx}), found)
         }
     }
 
@@ -3199,58 +3276,69 @@ export class hailstorm {
     
     ballUpdate = (weapon, ball) => {
         if (ball.visible === false) return
-        
-        var rotation = 0
-        if (ball.body.velocity.x !== 0) {
-            rotation = Math.atan(ball.body.velocity.y / ball.body.velocity.x)
-    
-            if (ball.body.velocity.x < 0) {
-                rotation = rotation + Math.PI
-            }
-        }
-        else {
-            if (ball.body.velocity.y < 0) {
-                rotation = -Math.PI/2
-            }
-            if (ball.body.velocity.y >= 0) {
-                rotation = Math.PI/2
-            }
-        }
 
+        var rotation = ball.body.velocity.angle()
+
+        var ballX = ball.x
+        var ballY = ball.y
         var x = ball.x + this.ballRadius/2 * Math.cos(rotation)
         var y = ball.y + this.ballRadius/2 * Math.sin(rotation)
-        var initX = x, initY = y;
         var prevX, prevY;
         var limit = 10
         
-
         if (weapon.terrain.getPixel(x, y).alpha !== 0) {
             while (weapon.terrain.getPixel(x, y).alpha !== 0) {
                 prevX = x
                 prevY = y
                 ball.x = ball.x - Math.cos(rotation)
                 ball.y = ball.y - Math.sin(rotation)
-                x = ball.x + this.ballRadius * Math.cos(rotation)
-                y = ball.y + this.ballRadius * Math.sin(rotation)
+                x = ball.x + this.ballRadius/2 * Math.cos(rotation)
+                y = ball.y + this.ballRadius/2 * Math.sin(rotation)
                 
                 limit--
                 if (limit === 0) {
-                    ball.x = initX
-                    ball.y = initY
+                    ball.x = ballX
+                    ball.y = ballY
                     break
                 }
             }
-            
-            var points = weapon.terrain.getNeighbouringPoints(prevX, prevY, 7)
-            var angle = weapon.terrain.getSlope(prevX, prevY, 7) + Math.PI/2
-            
-            ball.setVelocityX(ball.body.velocity.x - Math.cos(angle) * 22)
-            ball.setVelocityY((-32 + 6 * Math.random())* Math.sin(angle))
 
-            if (ball.x <= 0 || ball.x >= weapon.scene.terrain.width - 1) {
+            if (ball.x <= this.ballRadius || ball.x >= weapon.scene.terrain.width - this.ballRadius - 1) {
                 this.outOfBoundCount++
                 ball.setVisible(false)
+                return
             }
+            
+            var angle = weapon.terrain.getSlope(prevX, prevY, 7)
+            if (isNaN(angle) === true) {
+                if (ball.body.velocity.x > 0) {
+                    angle = -Math.PI/2
+                }
+                else {
+                    angle = Math.PI/2
+                }
+            }
+            if (weapon.terrain.getPixel(ball.x, ball.y).alpha !== 0) {
+                ball.setVelocityX(0)
+                ball.setVelocityY(0)
+                ball.setGravityY(0)
+            }
+            else {
+                var perpendicular = angle - Math.PI/2
+                var vec1;
+                var diff = rotation - angle
+                var reflect = angle - diff
+                var k = 10 * Math.abs(Math.cos(perpendicular))
+                var vec1 = new Phaser.Math.Vector2(k * Math.cos(perpendicular), k * Math.sin(perpendicular))
+                // var vec2 = new Phaser.Math.Vector2()
+                //vec2.set(k * Math.cos(perpendicular), k * Math.sin(perpendicular))
+                ball.body.velocity.setLength(36)
+                ball.body.velocity.setAngle(reflect)
+                ball.body.velocity.add(vec1)
+            }
+        }
+        else {
+            ball.setGravityY(150)
         }
     }
 }
@@ -3270,6 +3358,7 @@ export class hailstorm {
 export class groundhog {
     constructor() {
         this.id = 17
+        this.type = 3
         this.name = 'Ground Hog'
         this.projectile = null
         this.insideTerrain = false
@@ -3412,6 +3501,7 @@ export class groundhog {
 export class worm {
     constructor() {
         this.id = 18
+        this.type = 1
         this.name = 'Worm'
         this.projectile = null
         this.insideTerrain = false
@@ -3556,6 +3646,7 @@ export class worm {
 export class homingworm {
     constructor() {
         this.id = 19
+        this.type = 1
         this.name = 'Homing Worm'
         this.projectile = null
         this.insideTerrain = false
@@ -3712,15 +3803,17 @@ export class homingworm {
 export class skipper {
     constructor() {
         this.id = 20
+        this.type = 0
         this.name = 'Skipper'
         this.projectile = null
         this.logoCanvas = Logos.skipper
-        this.bounce = 3
+        this.bounce = 4
+        this.bounceWait = 0
     }
 
     reset = () => {
         this.projectile = null
-        this.bounce = 3
+        this.bounce = 4
     }
 
     /**
@@ -3744,7 +3837,7 @@ export class skipper {
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
         this.projectile.setDepth(3)
-        this.projectile.bounceCount = 3
+        this.projectile.bounceCount = 0
         this.projectile.canvas = canvas
     }
 
@@ -3753,6 +3846,7 @@ export class skipper {
     }
 
     update = (weapon) => {
+        this.bounceWait--
         weapon.updateTail(this.projectile, 13, 5, 4, {r: 100, g: 200, b: 250}, false)
         weapon.defaultUpdate(this.projectile)
     }
@@ -3762,7 +3856,7 @@ export class skipper {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -3772,10 +3866,10 @@ export class skipper {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -3795,12 +3889,23 @@ export class skipper {
         }
 
         if (this.bounce > 0) {
-            this.skipperBounce(weapon, obj)
-            this.bounce--
-            bounce = true
+            if (this.bounceWait <= 0) {
+                if (weapon.terrain.getPixel(x, y).alpha === 0) {
+                    this.skipperBounce(weapon, obj)
+                    this.bounce--
+                    this.bounceWait = 10
+                    bounce = true
+                }
+                else {
+                    bounce = false
+                }
+            }  
+            else {
+                bounce = true
+            }
         }
-        
-        if (!bounce || obj.bounceCount <= 0) {
+
+        if (!bounce || (obj.bounceCount <= 0 && this.bounce <= 0)) {
             y = Math.min(y, weapon.terrain.height - 1)
             obj.setPosition(x, y)
             this.blast(weapon, true)
@@ -3812,8 +3917,8 @@ export class skipper {
     }
 
     onTankHit = (weapon, obj, tank) => {
-        obj.body.setVelocity(0)
-        obj.body.setGravityY(0)
+        //obj.body.setVelocity(0)
+        //obj.body.setGravityY(0)
         //obj.setPosition(tank.x, tank.y)
         this.blast(weapon, true)
     }
@@ -3825,7 +3930,7 @@ export class skipper {
     }
 
     skipperBounce = (weapon, obj) => {
-        if (this.bounce < 0) return
+        if (this.bounce <= 0) return
             weapon.defaultBounce(obj)
     }
 
@@ -3861,6 +3966,7 @@ export class skipper {
 export class chainreaction {
     constructor() {
         this.id = 21
+        this.type = 0
         this.name = 'Chain Reaction'
         this.projectile = null
         this.logoCanvas = Logos.chainreaction
@@ -3946,7 +4052,7 @@ export class chainreaction {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -3956,10 +4062,10 @@ export class chainreaction {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4066,6 +4172,7 @@ export class chainreaction {
 export class pineapple {
     constructor() {
         this.id = 22
+        this.type = 0
         this.name = 'Pineapple'
         this.projectile = null
         this.logoCanvas = Logos.pineapple
@@ -4171,7 +4278,7 @@ export class pineapple {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -4181,10 +4288,10 @@ export class pineapple {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4280,6 +4387,7 @@ export class pineapple {
 export class firecracker {
     constructor() {
         this.id = 23
+        this.type = 0
         this.name = 'Firecracker'
         this.projectile = null
         this.logoCanvas = Logos.firecracker
@@ -4328,7 +4436,7 @@ export class firecracker {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -4338,10 +4446,10 @@ export class firecracker {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4408,7 +4516,6 @@ export class firecracker {
         const createBlast = () => {
             offx = -7*i + arrLeftX[i]
             offy = arrLeftY[i]
-            console.log(i)
             weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 24 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50, optimize: true}, false)
             weapon.defaultUpdateScore(this.projectile.x + offx, this.projectile.y + offy, 24, 5/24)
             offx = 7*i + arrRightX[i]
@@ -4444,6 +4551,7 @@ export class firecracker {
 export class homingmissile {
     constructor() {
         this.id = 24
+        this.type = 0
         this.name = 'Homing Missile'
         this.projectile = null
         this.logoCanvas = Logos.homingmissile
@@ -4522,7 +4630,7 @@ export class homingmissile {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -4532,10 +4640,10 @@ export class homingmissile {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4613,6 +4721,7 @@ export class homingmissile {
 export class dirtball {
     constructor() {
         this.id = 25
+        this.type = 0
         this.name = 'Dirtball'
         this.projectile = null
         this.logoCanvas = Logos.dirtball
@@ -4667,7 +4776,7 @@ export class dirtball {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -4677,10 +4786,10 @@ export class dirtball {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4831,13 +4940,16 @@ export class dirtball {
 export class tommygun {
     constructor() {
         this.id = 26
+        this.type = 0
         this.name = 'Tommy Gun'
         this.particles = []
         this.particleCount = 12
         this.logoCanvas = Logos.tommygun
+        this.allShot = false
     }
 
     reset = () => {
+        this.allShot = false
         this.particles = []
     }
 
@@ -4882,6 +4994,7 @@ export class tommygun {
             weapon.defaultShoot(projectile, weapon.tank.power * weapon.powerFactor + vOffset[i], undefined, undefined, weapon.tank.turret.rotation + Phaser.Math.DegToRad(aOffset[i]))
             i++
             if (i === this.particleCount) {
+                this.allShot = true
                 clearInterval(myInterval)
             }
         }, 100);
@@ -4901,7 +5014,7 @@ export class tommygun {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -4911,10 +5024,10 @@ export class tommygun {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -4954,7 +5067,7 @@ export class tommygun {
         obj.destroy()
         weapon.scene.textures.remove(obj.texture.key)
         this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
-        if (this.particles.length === 0) {
+        if (this.particles.length === 0 && this.allShot) {
             weapon.turret.activeWeapon = null
         }
     }
@@ -4972,7 +5085,7 @@ export class tommygun {
         obj.destroy()
         weapon.scene.textures.remove(obj.texture.key)
         this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
-        if (this.particles.length === 0) {
+        if (this.particles.length === 0 && this.allShot === true) {
             weapon.turret.activeWeapon = null
         }
     }
@@ -4992,6 +5105,7 @@ export class tommygun {
 export class mountainmover {
     constructor() {
         this.id = 27
+        this.type = 2
         this.name = 'Mountain Mover'
         this.logoCanvas = Logos.mountainmover
     }
@@ -5028,7 +5142,7 @@ export class mountainmover {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20);
+        var maxCount = Math.ceil(obj.body.speed / 10);
         var bounce = false
 
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -5038,10 +5152,10 @@ export class mountainmover {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
             
@@ -5118,6 +5232,7 @@ export class mountainmover {
 export class scattershot {
     constructor() {
         this.id = 28
+        this.type = 0
         this.name = 'Scatter Shot'
         this.particles = []
         this.destroyed = false
@@ -5181,7 +5296,7 @@ export class scattershot {
             var y = obj.y
             var prevX = x, prevY = y;
             var initX = x, initY = y;
-            var maxCount = Math.ceil(obj.body.speed / 20);
+            var maxCount = Math.ceil(obj.body.speed / 10);
             var bounce = false
 
             while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -5191,10 +5306,10 @@ export class scattershot {
                 y = y - Math.sin(obj.rotation)
 
                 maxCount--
-                if (maxCount === 0) {
+                if (maxCount <= 0) {
                     x = initX
                     y = initY
-                    return
+                    break
                 }
             }
 
@@ -5306,7 +5421,7 @@ export class scattershot {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20);
+        var maxCount = Math.ceil(obj.body.speed / 10);
         var bounce = false
 
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -5316,10 +5431,10 @@ export class scattershot {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
  
@@ -5394,6 +5509,7 @@ export class scattershot {
 export class cruiser {
     constructor() {
         this.id = 29
+        this.type = 0
         this.name = 'Cruiser'
         this.projectile = null
         this.logoCanvas = Logos.cruiser
@@ -5442,7 +5558,7 @@ export class cruiser {
 
     update = (weapon) => {
         if (this.rolling === false) {
-            weapon.updateTail(this.projectile, 12, 5, 4, {r: 240, g: 240, b: 240})
+            weapon.updateTail(this.projectile, 12, 5, 4, {r: 240, g: 240, b: 240}, true)
             weapon.defaultUpdate(this.projectile)
         }
         else {
@@ -5455,7 +5571,7 @@ export class cruiser {
         var y = obj.y
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed / 20)
+        var maxCount = Math.ceil(obj.body.speed / 10)
         var bounce = false
         
         while (weapon.terrain.getPixel(x, y).alpha !== 0) {
@@ -5465,10 +5581,10 @@ export class cruiser {
             y = y - Math.sin(obj.rotation)
 
             maxCount--
-            if (maxCount === 0) {
+            if (maxCount <= 0) {
                 x = initX
                 y = initY
-                return
+                break
             }
         }
         
@@ -5496,14 +5612,19 @@ export class cruiser {
             obj.setVelocity(0)
             obj.setAcceleration(0)
             obj.setGravity(0)
-            var base = weapon.terrain.getSurfaceUp(obj.x, obj.y)
-            obj.setPosition(base.x, base.y)
-            this.rolling = true
-            this.makeRollingTexture(weapon)
+            obj.setPosition(x, y)
             
-            setTimeout(() => {
+            if (weapon.terrain.getPixel(x, y).alpha !== 0) {
                 this.blast(weapon, true)
-            }, 2000);
+            }
+            else {
+                this.rolling = true
+                this.makeRollingTexture(weapon)
+                
+                setTimeout(() => {
+                    this.blast(weapon, true)
+                }, 2000);
+            }
         }
     }
 
@@ -5547,8 +5668,15 @@ export class cruiser {
 
     roll = (weapon) => {
         var next, base, delta
-        var base = weapon.terrain.getSurfaceUp(this.projectile.x, this.projectile.y)
-        this.projectile.setPosition(base.x, base.y)
+
+        if (this.rollingRight && weapon.terrain.getRightGround(this.projectile.x, this.projectile.y) == null) {
+            var base = weapon.terrain.getSurfaceUp(this.projectile.x, this.projectile.y)
+            this.projectile.setPosition(base.x, base.y)
+        }
+        else if (weapon.terrain.getLeftGround(this.projectile.x, this.projectile.y) == null) {
+            var base = weapon.terrain.getSurfaceUp(this.projectile.x, this.projectile.y)
+            this.projectile.setPosition(base.x, base.y)
+        }
 
         if (this.rollingRight === true) {
             next = weapon.terrain.getRightGround(this.projectile.x, this.projectile.y)

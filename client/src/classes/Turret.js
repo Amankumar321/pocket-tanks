@@ -11,6 +11,7 @@ export class Turret extends GameObjects.Sprite {
         canvas.height = 32 // turret height
         canvas.width = 2  // turret width
         
+        if (scene.textures.exists('turret' + id)) scene.textures.remove('turret' + id)
         scene.textures.addCanvas('turret' + id, canvas);
         super(scene, 0, 0, 'turret' + id)
         scene.add.existing(this)

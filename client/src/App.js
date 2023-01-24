@@ -16,8 +16,8 @@ const gameConfig = {
   physics: {
     default: 'arcade',
     arcade : {
-      debug: false
-  }  
+      debug:false
+    },
   },
   render: {
     antialiasGL: false,

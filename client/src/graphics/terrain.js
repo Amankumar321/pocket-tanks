@@ -58,7 +58,7 @@ const makePath = (width, height) => {
     var x, y, prevX, prevY, radius, angle, factor, path = [];
     x = -200
     y = height
-    y = height * Math.random() + height/10
+    y = height * Math.random() * Math.random() + height/10
     prevX = x
     prevY = y
     path.push({x, y})

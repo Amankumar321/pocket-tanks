@@ -54,6 +54,7 @@ export class ScrollList {
         
         this.selectedDisplay.setInteractive()
         this.selectedDisplay.on('pointerdown', () => {
+            this.scene.hideTurnPointer()
             this.scene.input.mouse.requestPointerLock()
             this.toShow = true
         })
@@ -91,7 +92,8 @@ export class ScrollList {
         // }
 
         var key = Math.random().toString(32).slice(3,7)
-        var logoCanvas = weaponArray[tank.selectedWeapon].logoCanvas
+        var logoCanvas = weaponArray[tank.weapons[tank.selectedWeapon].id].logoCanvas
+        if (this.scene.textures.exists(key)) this.scene.textures.remove(key)
         this.scene.textures.addCanvas(key, logoCanvas)
         this.weaponLogo.setTexture(key)
     }
@@ -113,6 +115,7 @@ export class ScrollList {
             container = this.scene.add.container(this.x, this.y)
             key = Math.random().toString(32).slice(3,7)
             logoCanvas = weaponArray[weapon.id].logoCanvas
+            if (this.scene.textures.exists(key)) this.scene.textures.remove(key)
             this.scene.textures.addCanvas(key, logoCanvas)
             margin = (this.tileHeight - logoCanvas.height * ((this.tileHeight/logoCanvas.height) * 0.9))/2
             weaponLogo = this.scene.add.image(-w/2 + margin, 0, key)
@@ -142,6 +145,11 @@ export class ScrollList {
         // this.scrollTiles.setY(this.sh * 5/6 - tank.selectedWeapon * this.tileHeight, this.tileHeight)
 
         this.scrollList.setDepth(32)
+        this.setActive(tank.selectedWeapon)
+
+
+        var y = this.y - (tank.selectedWeapon) * this.tileHeight
+        this.scrollList.setY(y, this.tileHeight)
         //this.scrollTiles.setDepth(30)
     }
 

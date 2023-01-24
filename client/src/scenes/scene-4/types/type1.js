@@ -87,7 +87,6 @@ const int2rgba = (colorInt) => {
 }
 
 const strokeText = (txt, thickness) => {
-    console.log(txt)
     var re = /rgba\((\d+),(\d+),(\d+),(\d+)\)/
     var match = new RegExp(re).exec(txt.style.color)
     var r, g, b, a, k = 0.7;
