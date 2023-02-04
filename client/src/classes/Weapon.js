@@ -67,8 +67,8 @@ export class Weapon {
         var x = obj.x
         var y = obj.y
         
-        var tank1 = this.scene.tank1
-        var tank2 = this.scene.tank2
+        var tank1 = this.tank
+        var tank2 = (this.tank === this.scene.tank1) ? this.scene.tank2 : this.scene.tank1
 
         var hitTank1 = false
         var hitTank2 = false
@@ -250,6 +250,8 @@ export class Weapon {
             ctx.lineTo(obj.x, obj.y)
             ctx.stroke()
 
+            this.terrain.pushMultiplayerPoints({type: 'dig', x1: obj.prevState.x, y1: obj.prevState.y, x2: obj.x, y2: obj.y, intensity, thickness})
+            
             obj.prevState.x = obj.x
             obj.prevState.y = obj.y
         }
@@ -279,31 +281,14 @@ export class Weapon {
             }
         }
 
-        var x = obj.x
-        var y = obj.y
-        var initX = x, initY = y;
-        var prevX = x, prevY = y;
-        var limit = Math.ceil(obj.body.speed / 10)
         var vx = obj.body.velocity.x
         var vy = obj.body.velocity.y
         var v = new Phaser.Math.Vector2(vx, vy)
 
         if (this.terrain.getPixel(x, y).alpha !== 0) {
-            while (this.terrain.getPixel(x, y).alpha !== 0) {
-                limit--
-                prevX = x
-                prevY = y
-                obj.x = obj.x - Math.cos(rotation)
-                obj.y = obj.y - Math.sin(rotation)
-                x = obj.x
-                y = obj.y
-                
-                if (limit < 0) {
-                    obj.x = initX
-                    obj.y = initY
-                    return
-                }
-            }
+            var [x, y, prevX, prevY] = this.retractInTerrain(obj)
+            obj.x = x
+            obj.y = y
 
             var slope = this.terrain.getSlope(prevX, prevY)
             if (isNaN(slope) === true) {
@@ -317,10 +302,98 @@ export class Weapon {
             var perpendicular = slope + Math.PI/2
             var alpha = perpendicular - rotation
             var f = factor
-            
+       
             v.rotate(2 * alpha - Math.PI)
-            
             obj.setVelocity(v.x * f, v.y * f)
+            obj.body.preUpdate(true, 0)
+        }
+    }
+
+
+
+
+    retractInTerrain = (obj) => {
+        var x = Math.floor(obj.x)
+        var y = Math.floor(obj.y)
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = Math.ceil(obj.body.speed)
+        var theta = Phaser.Math.Angle.Wrap(obj.body.velocity.angle() + Math.PI)
+        var sin = Math.sin(theta)
+        var cos = Math.cos(theta)
+
+        //new Phaser.Physics.Arcade.Body().gravity.
+        var accelarationX = obj.body.gravity.x
+        var accelarationY = obj.body.gravity.y
+        var t = 0.001
+        var v = obj.body.speed
+
+        while (this.terrain.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+
+            x = Math.floor(initX + v * cos * t + 1/2 * accelarationX * t * t)
+            y = Math.floor(initY + v * sin * t + 1/2 * accelarationY * t * t)
+            t = t + 0.001
+
+            maxCount--
+            if (maxCount <= 0) {
+                x = initX
+                y = initY
+                break
+            }
+        }
+
+        // x = Math.floor(x)
+        // y = Math.floor(y)
+        // prevX = Math.floor(prevX)
+        // prevY = Math.floor(prevY)
+
+        return [x, y, prevX, prevY]
+    }
+
+
+
+
+    fixCloseToTank = (obj, data) => {
+        var myTank = this.tank
+        var oppTank = (this.tank === this.scene.tank1) ? this.scene.tank1 : this.scene.tank2
+
+        if (data.oppTankDist !== undefined) {
+            var x = Math.floor(obj.x)
+            var y = Math.floor(obj.y)
+            var prevX = x, prevY = y;
+            var initX = x, initY = y;
+            var maxCount = Math.ceil(obj.body.speed)
+            var theta = Phaser.Math.Angle.Wrap(obj.body.velocity.angle() + Math.PI)
+            var sin = Math.sin(theta)
+            var cos = Math.cos(theta)
+
+            var accelarationX = obj.body.gravity.x
+            var accelarationY = obj.body.gravity.y
+            var t = 0.001
+            var v = obj.body.speed
+
+            while (Phaser.Math.Distance.Between(obj, oppTank.centre) < data.oppTankDist) {
+                prevX = x
+                prevY = y
+
+                x = Math.floor(initX + v * cos * t + 1/2 * accelarationX * t * t)
+                y = Math.floor(initY + v * sin * t + 1/2 * accelarationY * t * t)
+                t = t + 0.001
+
+                maxCount--
+                if (maxCount <= 0) {
+                    x = initX
+                    y = initY
+                    break
+                }
+            }
+            obj.setPosition(Math.floor(prevX), Math.floor(prevY))
+            //obj.setVelocity(0)
+            //obj.setGravity(0)
+            //obj.setAcceleration(0)
+            obj.body.preUpdate(true, 0)
         }
     }
 }

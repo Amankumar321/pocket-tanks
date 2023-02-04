@@ -1,5 +1,5 @@
-const w = 29
-const h = 29
+const w = 30
+const h = 30
 
 const drawBase = (ctx) => {
     var g = ctx.createLinearGradient(0, 0, w, h)

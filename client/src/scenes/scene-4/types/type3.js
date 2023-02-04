@@ -32,9 +32,9 @@ export const type3 = (scene) => {
     const updateRooms = () => {
         scene.roomList.forEach((room, index) => {
             if (index > 4) return
-            room.x = scene.add.rectangle(screenCenterX - 250, 150 + (index + 1) * 80, 50, 50, room.host.color, 255);
-            room.y = scene.add.text(screenCenterX - 200, 150 + (index + 1) * 80, room.host.name).setFontSize(26);
-            room.z = scene.add.text(screenCenterX + 200, 150 + (index + 1) * 80, 'Play').setFontSize(26);
+            room.x = scene.add.rectangle(screenCenterX - 300, 150 + (index + 1) * 80, 50, 50, room.host.color, 255);
+            room.y = scene.add.text(screenCenterX - 250, 150 + (index + 1) * 80, room.host.name).setFontSize(26);
+            room.z = scene.add.text(screenCenterX + 250, 150 + (index + 1) * 80, 'Play').setFontSize(26);
             room.z.setColor('rgba(240,240,240,1)')
             room.y.setColor('rgba(180,180,180,1)')
             room.x.setOrigin(0.5)

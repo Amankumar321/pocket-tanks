@@ -33,6 +33,14 @@ export const type3 = (scene) => {
             scene.terrain.setPath(path)
             scene.tank1.setPosition(playerPos.x, playerPos.y)
             scene.tank2.setPosition(hostPos.x, hostPos.y)
+            var rotation = scene.terrain.getSlope(playerPos.x, playerPos.y)
+            if (rotation !== undefined) {
+                scene.tank1.setRotation(rotation)
+            }
+            rotation = scene.terrain.getSlope(hostPos.x, hostPos.y)
+            if (rotation !== undefined) {
+                scene.tank2.setRotation(rotation)
+            }
             scene.showTurnPointer()
         })
         
@@ -57,9 +65,9 @@ export const type3 = (scene) => {
     const n = scene.add.text(screenCenterX, screenCenterY + 35, 'EXIT')
     const overlay = scene.add.rectangle(screenCenterX, screenCenterY, scene.renderer.width, scene.renderer.height, 0x000000)
 
-    m.setFontSize(50).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
-    n.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(20).setVisible(false)
-    overlay.setVisible(false).setAlpha(0.8).setDepth(19)
+    m.setFontSize(50).setOrigin(0.5).setVisible(false).setDepth(120).setVisible(false)
+    n.setFontSize(40).setOrigin(0.5).setVisible(false).setDepth(120).setVisible(false)
+    overlay.setVisible(false).setAlpha(0.8).setDepth(110)
     m.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
     n.setFontFamily('"Days One"').setColor('rgba(240,240,240,1)')
     strokeText(m, 4)

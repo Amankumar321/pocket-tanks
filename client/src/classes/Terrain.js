@@ -3,6 +3,7 @@ import { drawTerrain, setTerrain } from "../graphics/terrain";
 import { Blast } from "./Blast";
 import { Tank } from "./Tank";
 import Phaser from "phaser";
+import { weaponArray } from "../weapons/array";
 
 export class Terrain extends Textures.CanvasTexture {
     /**
@@ -30,6 +31,10 @@ export class Terrain extends Textures.CanvasTexture {
         this.animate = false
         this.blastArray = [];
         this.path = []
+        this.multiplayerPoints = []
+        this.previousSaved = null
+        this.frameCount = -1
+        this.allowSave = false
     }
 
 
@@ -39,7 +44,7 @@ export class Terrain extends Textures.CanvasTexture {
         var height = this.height
         var ctx = this.canvas.getContext('2d')
 
-        this.path = drawTerrain(ctx, width, height)
+        this.path = drawTerrain(ctx, width, height, this)
         this.update()
     }
 
@@ -51,13 +56,145 @@ export class Terrain extends Textures.CanvasTexture {
         var height = this.height
         var ctx = this.canvas.getContext('2d')
 
-        setTerrain(ctx, width, height, path)
+        setTerrain(ctx, width, height, path, this)
         this.update()
     }
 
 
 
-    updateTerrain = () => {  
+
+    save = () => {
+        this.update()
+        this.previousSaved = this.context.getImageData(0, 0, this.width, this.height)
+    }
+
+
+
+    restore = () => {
+        this.context.putImageData(this.previousSaved, 0, 0)
+    }
+
+
+
+    multiplayerCorrection = (data) => {
+        this.context.putImageData(this.previousSaved, 0, 0)
+        this.update()
+
+        var ctx = this.getContext()
+
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].type === 'blast') {
+                this.correctBlastTerrain(data[i], i, data, ctx)
+            }
+            else if (data[i].type === 'dig') {
+                this.correctDigTerrain(data[i], i, data, ctx)
+            }
+            else if (data[i].type === 'add') {
+                this.correctAddTerrain(data[i], i, data, ctx)
+            }
+        }
+    }
+
+
+    correctBlastTerrain = (e, index, data, ctx) => {
+        ctx.globalCompositeOperation = 'destination-out'
+        ctx.fillStyle = 'rgba(0,0,0,1)'
+        var frameDiff;
+
+        if (index < data.length - 1) frameDiff = data[index + 1].frameCount - data[index].frameCount
+        else frameDiff = 999999
+
+        ctx.beginPath()
+        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+        this.update()
+        
+        this.fixTerrain(e.x, e.y, e.radius)
+        
+        while (frameDiff > 0 && this.matrix.length > 0) {
+            this.matrix = this.matrix.filter((ele) => {
+                return (ele.base < ele.ground)
+            })
+    
+            this.matrix.forEach((ele) => {
+                try {
+                    var data = this.context.getImageData(ele.x, ele.top, 1, ele.base - ele.top)
+                    this.context.putImageData(data, ele.x, ele.top + 1)
+                    ele.top = ele.top + 1
+                    ele.base = ele.base + 1
+                } 
+                catch {}
+            })
+
+            frameDiff--
+        }
+
+        this.update()
+    }
+
+
+
+    correctDigTerrain = (e, index, data, ctx) => {
+        ctx.globalCompositeOperation = 'source-atop'
+        ctx.lineJoin = 'round'
+        ctx.strokeStyle = `rgba(0,0,0,${e.intensity})`
+        ctx.lineCap = 'round'
+        ctx.globalAlpha = 1
+        ctx.lineWidth = e.thickness
+
+        ctx.beginPath()
+        ctx.moveTo(e.x1, e.y1)
+        ctx.lineTo(e.x2, e.y2)
+        ctx.stroke()
+    }
+
+
+
+    correctAddTerrain = (e, index, data, ctx) => {
+        weaponArray[e.weaponId].correctMultiplayer(e, this)
+
+        var frameDiff;
+
+        if (index < data.length - 1) frameDiff = data[index + 1].frameCount - data[index].frameCount
+        else frameDiff = 999999
+                
+        while (frameDiff > 0 && this.matrix.length > 0) {
+            this.matrix = this.matrix.filter((ele) => {
+                return (ele.base < ele.ground)
+            })
+    
+            this.matrix.forEach((ele) => {
+                try {
+                    var data = this.context.getImageData(ele.x, ele.top, 1, ele.base - ele.top)
+                    this.context.putImageData(data, ele.x, ele.top + 1)
+                    ele.top = ele.top + 1
+                    ele.base = ele.base + 1
+                } 
+                catch {}
+            })
+
+            frameDiff--
+        }
+
+        this.update()
+    }
+
+
+
+    pushMultiplayerPoints = (data) => {
+        if (this.frameCount < 0) {
+            this.frameCount = 0
+            this.multiplayerPoints = []
+        }
+        data.frameCount = this.frameCount
+        this.multiplayerPoints.push(data)
+    }
+
+
+
+    updateTerrain = () => {
+        if (this.frameCount >= 0) this.frameCount++
         if (this.blastArray.length !== 0) {
             this.blastArray.forEach((hole) => {
                 hole.update()
@@ -70,6 +207,10 @@ export class Terrain extends Textures.CanvasTexture {
 
         if (this.matrix.length === 0) {
             this.animate = false
+            if (this.allowSave) {
+                this.save()
+                this.allowSave = false
+            }
             return
         }
         else {
@@ -101,6 +242,12 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     fixTerrain = (x, y, r) => {
+        if (this.frameCount < 0) {
+            this.frameCount = 0
+            this.multiplayerPoints = []
+        }
+        this.pushMultiplayerPoints({type: 'blast', x: x, y: y, radius: r})
+
         if (y > this.height) return;
         
         var radius = r
@@ -177,6 +324,11 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     fixTerrainShape = (points) => {
+        if (this.frameCount < 0) {
+            this.frameCount = 0
+            this.multiplayerPoints = []
+            this.addTerrain = []
+        }
         this.update()
         
         var r, x, y, angle;

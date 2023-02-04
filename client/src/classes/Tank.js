@@ -82,8 +82,13 @@ export class Tank extends GameObjects.Sprite {
         this.scene.physics.add.collider(this, this.scene.leftWall)
         this.scene.physics.add.collider(this, this.scene.rightWall)
 
-        socket.on('opponentShoot', ({selectedWeapon, power, rotation}) => {
+        socket.on('opponentShoot', ({selectedWeapon, power, rotation, rotation1, rotation2, position1, position2}) => {
             if (this.active === false) return
+            this.scene.tank1.setPosition(position2.x, position2.y)
+            this.scene.tank1.setRotation(rotation2)
+            this.scene.tank2.setPosition(position1.x, position1.y)
+            this.scene.tank2.setRotation(rotation1)
+
             this.selectedWeapon = selectedWeapon
             this.power = power
             this.turret.setRelativeRotation(rotation)

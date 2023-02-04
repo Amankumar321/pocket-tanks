@@ -1,5 +1,6 @@
 var rooms = []
 // room : {roomId, 
+//          active: bool,
 //          host: {name, color, socketId, pos, isReady, playAgain},
 //          player: {name, color, socketId, pos, isReady, playAgain},
 //          randomArray, 
@@ -21,7 +22,10 @@ const mainsocket = (io) => {
                     return (room.roomId !== client.roomId)
                 })
                 io.sockets.in(client.roomId).emit('opponentLeft', {})
-                io.emit('setRooms', {rooms: rooms})
+                var openrooms = rooms.filter((room) => { 
+                    return (room.active === false)
+                })
+                io.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
                 io.socketsLeave(client.roomId);
                 client.roomId = null
                 client.isHost = false
@@ -37,7 +41,10 @@ const mainsocket = (io) => {
                     return (room.roomId !== client.roomId)
                 })
                 io.sockets.in(client.roomId).emit('opponentLeft', {})
-                io.emit('setRooms', {rooms: rooms})
+                var openrooms = rooms.filter((room) => { 
+                    return (room.active === false)
+                })
+                io.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
                 io.socketsLeave(client.roomId);
                 client.roomId = null
                 client.isHost = false
@@ -53,7 +60,10 @@ const mainsocket = (io) => {
                     return (room.roomId !== client.roomId)
                 })
                 io.sockets.in(client.roomId).emit('opponentLeft', {})
-                io.emit('setRooms', {rooms: rooms})
+                var openrooms = rooms.filter((room) => { 
+                    return (room.active === false)
+                })
+                io.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
                 io.socketsLeave(client.roomId);
                 client.roomId = null
                 client.isHost = false
@@ -64,30 +74,40 @@ const mainsocket = (io) => {
 
         client.on('joinRoom', ({roomId, name, color}) => {
             if (client.roomId === roomId) return
+            var room = rooms.find(ele => { return ele.roomId === roomId })
+            if (room.active === true) return
+
             if (client.roomId !== null) {
                 client.leave(client.roomId)
                 rooms = rooms.filter((room) => { 
                     return (room.roomId !== client.roomId)
                 })
-                io.emit('setRooms', {rooms: rooms})
             }
-
+            
             client.join(roomId)
             client.roomId = roomId
             client.isHost = false
             client.name = name
             client.color = color
-
-            var room = rooms.find(ele => { return ele.roomId === client.roomId })
+            
             room.player = {name: name, color: color, socketId: client.id, isReady: false, playAgain: false}
+            room.active = true
+            
+            var openrooms = rooms.filter((room) => { 
+                return (room.active === false)
+            })
 
+            io.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
             io.sockets.in(client.roomId).emit('startPick', {host: room.host, player: room.player})
         })
         
 
 
         client.on('getRooms', () => {
-            client.emit('setRooms', {rooms: rooms})
+            var openrooms = rooms.filter((room) => { 
+                return (room.active === false)
+            })
+            client.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
         })
 
 
@@ -105,8 +125,11 @@ const mainsocket = (io) => {
             client.roomId = roomId
             client.isHost = true
             var host = {name: player.name, color: player.color, socketId: client.id, isReady: false, playAgain: false}
-            rooms.unshift({roomId: roomId, host: host})
-            io.emit('setRooms', {rooms: rooms})
+            rooms.unshift({roomId: roomId, host: host, active: false})
+            var openrooms = rooms.filter((room) => { 
+                return (room.active === false)
+            })
+            io.emit('setRooms', {rooms: openrooms.slice(0, Math.min(openrooms.length, 5))})
         })
 
 
@@ -147,13 +170,13 @@ const mainsocket = (io) => {
 
 
 
-        client.on('createWeaponArray', ({count}) => {
+        client.on('createWeaponArray', ({count, max}) => {
             var room = rooms.find(ele => { return ele.roomId === client.roomId })
 
             // weapon array
             var x, randomArray = []
             for (let index = 0; index < count; index++) {
-                x = Math.floor(Math.random() * count)
+                x = Math.floor(Math.random() * max)
                 randomArray.push(x)
             }
             room.randomArray = randomArray
@@ -162,8 +185,8 @@ const mainsocket = (io) => {
 
 
 
-        client.on('shoot', ({selectedWeapon, power, rotation}) => {
-            client.broadcast.emit('opponentShoot', {selectedWeapon, power, rotation})
+        client.on('shoot', ({selectedWeapon, power, rotation, rotation1, rotation2, position1, position2}) => {
+            client.broadcast.emit('opponentShoot', {selectedWeapon, power, rotation, rotation1, rotation2, position1, position2})
         })
 
         
@@ -180,7 +203,7 @@ const mainsocket = (io) => {
             room.host.pos = {...hostPos}
             room.player.pos = {...playerPos}
             client.broadcast.emit('setTerrainPath', {path: room.terrainPath, hostPos: room.host.pos, playerPos: room.player.pos})
-            console.log(room.terrainPath)
+            //console.log(room.terrainPath)
         })
 
 
@@ -189,8 +212,22 @@ const mainsocket = (io) => {
             var room = rooms.find(ele => { return ele.roomId === client.roomId })
             if (room.terrainPath !== undefined && rooms.terrainPath !== null) {
                 client.emit('setTerrainPath', {path: room.terrainPath})
-                console.log(room.terrainPath)
+                //console.log(room.terrainPath)
             }
+        })
+
+
+
+        client.on('giveTurn', ({terrainData, pos1, pos2, rotation1, rotation2}) => {
+            console.log(terrainData)
+            client.broadcast.emit('recieveTurn', {terrainData, pos1, pos2, rotation1, rotation2})
+        })
+
+
+
+
+        client.on('requestTurn', () => {
+            client.broadcast.emit('opponentRequestTurn', {})
         })
 
 

@@ -40,12 +40,16 @@ export const createFireButton = (hud) => {
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             if (hud.scene.sceneData.gameType === 3)
-                socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power, rotation: hud.scene.tank1.turret.relativeRotation})
+                socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power,
+                    rotation: hud.scene.tank1.turret.relativeRotation, rotation1: hud.scene.tank1.rotation, rotation2: hud.scene.tank2.rotation,
+                    position1: {x: hud.scene.tank1.x, y: hud.scene.tank1.y}, position2: {x: hud.scene.tank2.x, y: hud.scene.tank2.y}})
             hud.scene.tank1.shoot()
         }
         else if (hud.scene.activeTank === 2) {
             if (hud.scene.sceneData.gameType === 3)
-                socket.emit('shoot', {selectedWeapon: hud.scene.tank2.selectedWeapon, power: hud.scene.tank2.power, rotation: hud.scene.tank2.turret.relativeRotation})
+                socket.emit('shoot', {selectedWeapon: hud.scene.tank2.selectedWeapon, power: hud.scene.tank2.power,
+                    rotation: hud.scene.tank2.turret.relativeRotation, rotation1: hud.scene.tank1.rotation, rotation2: hud.scene.tank2.rotation,
+                    position1: {x: hud.scene.tank1.x, y: hud.scene.tank1.y}, position2: {x: hud.scene.tank2.x, y: hud.scene.tank2.y}})
             hud.scene.tank2.shoot()
         }
     })

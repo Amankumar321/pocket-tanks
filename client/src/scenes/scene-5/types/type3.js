@@ -10,7 +10,7 @@ import { Display } from "phaser";
 export const type3 = (scene) => {
     const socket = window.socket
     socket.removeAllListeners()
-    const totalWeapons = 4
+    const totalWeapons = 20
 
     scene.player1 = scene.sceneData.player1
     scene.player2 = scene.sceneData.player2
@@ -123,7 +123,7 @@ export const type3 = (scene) => {
         var x = rect3.x - rect3.width/2 + 10
         var y = rect3.y - rect3.height/2 + 10 + scene.player2.weapons.length * 40
         oppPick.setPosition(x, y)
-        oppPick.removeInteractive()
+        oppPick.rect.removeInteractive()
         scene.player2.weapons.push({id: oppPick.weaponIndex, name: oppPick.text, type: oppPick.type})
         turn = 1
         arrowright.setVisible(false)
@@ -139,7 +139,7 @@ export const type3 = (scene) => {
             var x = rect1.x - rect1.width/2 + 10
             var y = rect1.y - rect1.height/2 + 10 + scene.player1.weapons.length * 40
             pickable.setPosition(x, y)
-            pickable.removeInteractive()
+            pickable.rect.removeInteractive()
             remainingArray = remainingArray.filter((ele) => { return ele !== pickable.arrayIndex })
             scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text, type: pickable.type})
             socket.emit('weaponPick', {arrayIndex: pickable.arrayIndex})
@@ -165,6 +165,7 @@ export const type3 = (scene) => {
             pickable.add(txt)
             pickable.text = weaponArray[randomWeaponIndex].name
             pickable.add(rect)
+            pickable.rect = rect
             pickable.add(img)
             pickableArray.push(pickable)
             txt.setFontSize(20)
@@ -189,6 +190,7 @@ export const type3 = (scene) => {
             pickable.add(txt)
             pickable.text = weaponArray[randomWeaponIndex].name
             pickable.add(rect)
+            pickable.rect = rect
             pickable.add(img)
             pickableArray.push(pickable)
             txt.setFontSize(20)
@@ -205,7 +207,7 @@ export const type3 = (scene) => {
     })
 
     if (socket.id === scene.hostId) {
-        socket.emit('createWeaponArray', {count: totalWeapons})
+        socket.emit('createWeaponArray', {count: totalWeapons, max: weaponArray.length})
     }
 
     socket.emit('getWeaponArray', {})

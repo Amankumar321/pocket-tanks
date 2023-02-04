@@ -55,6 +55,12 @@ export class MainScene extends Scene {
             clearInterval(this.winnerBlastInterval)
             this.winnerBlastInterval = null
         }
+        this.events.once('terrain-finished', () => {
+            if (this.activeTank === 2) {
+                this.terrain.save()
+            }
+        })
+
         this.createBackground()
         this.createBlastLayer()
         this.createPointsLayer()
@@ -75,7 +81,7 @@ export class MainScene extends Scene {
         else if (this.sceneData.gameType === 4) {
             this.handleType4()
         }
-        
+
         this.showTurnPointer()
 
         this.createHUD()
@@ -83,6 +89,47 @@ export class MainScene extends Scene {
         this.sound.stopAll()
         var bg = this.sound.add('background', {loop: true})
         bg.play()
+
+        this.terrain.multiplayerPoints = []
+
+        var socket = window.socket
+        
+        socket.on('recieveTurn', ({terrainData, pos1, pos2, rotation1, rotation2}) => {
+            if (this.terrain.animate === true) return
+            if (this.terrain.blastArray.length !== 0) return
+            if (this.tank1.settled === false) return
+            if (this.tank2.settled === false) return
+
+            if (this.activeTank === 2 && this.tank2.active === false && this.tank2.turret.activeWeapon === null){
+                this.activeTank = 1
+                this.tank1.active = true
+                this.HUD.reset()
+                this.terrain.frameCount = -1
+                this.terrain.multiplayerCorrection(terrainData)
+
+                this.tank1.setPosition(pos2.x, pos2.y)
+                this.tank2.setPosition(pos1.x, pos1.y)
+                this.tank1.setRotation(rotation2)
+                this.tank2.setRotation(rotation1)
+                
+                this.terrain.multiplayerPoints = []
+                this.terrain.addPixels = []
+                console.log('turn 1')
+                this.showTurnPointer()
+            }
+        })
+
+        socket.on('opponentRequestTurn', () => {
+            if (this.terrain.animate === true) return
+            if (this.terrain.blastArray.length !== 0) return
+            if (this.tank1.settled === false) return
+            if (this.tank2.settled === false) return
+
+            if (this.activeTank === 2 && this.tank2.active === true && this.tank2.turret.activeWeapon === null) {
+                socket.emit('giveTurn', {terrainData: this.terrain.multiplayerPoints, pos1: {x: this.tank1.x, y: this.tank1.y}, pos2: {x: this.tank2.x, y: this.tank2.y}, rotation1: this.tank1.rotation, rotation2: this.tank2.rotation})
+                this.terrain.save()
+            }
+        })
     }
 
 
@@ -170,14 +217,16 @@ export class MainScene extends Scene {
 
     createTank1 = () => {
         this.tank1 = new Tank(this, 1);
-        this.tank1.setDepth(-1)
+        //this.tank1.setBlendMode(Phaser.BlendModes.SOFT_LIGHT)
+        this.tank1.setDepth(-2)
     }
 
 
 
     createTank2 = () => {
         this.tank2 = new Tank(this, 2)
-        this.tank2.setDepth(-1)
+        //this.tank2.setBlendMode(Phaser.BlendModes.SOFT_LIGHT)
+        this.tank2.setDepth(-2)
     }
 
 
@@ -194,6 +243,7 @@ export class MainScene extends Scene {
         if (this.tank1.settled === false) return
         if (this.tank2.settled === false) return
         if (this.gameOver === true) return
+        var socket
 
         if (this.tank1.weapons.length === 0 && this.tank2.weapons.length === 0) {
             if (this.tank1.turret.activeWeapon === null && this.tank2.turret.activeWeapon === null) {
@@ -208,6 +258,11 @@ export class MainScene extends Scene {
             this.activeTank = 2
             this.tank2.active = true
             this.HUD.reset()
+            if (this.sceneData.gameType === 3) {
+                socket = window.socket
+                socket.emit('giveTurn', {terrainData: this.terrain.multiplayerPoints, pos1: {x: this.tank1.x, y: this.tank1.y}, pos2: {x: this.tank2.x, y: this.tank2.y}, rotation1: this.tank1.rotation, rotation2: this.tank2.rotation})
+                this.terrain.save()
+            }
             console.log('turn 2')
             this.showTurnPointer()
             if (this.sceneData.gameType === 1) {
@@ -215,11 +270,17 @@ export class MainScene extends Scene {
             }
         }
         else if (this.activeTank === 2 && this.tank2.active === false && this.tank2.turret.activeWeapon === null){
-            this.activeTank = 1
-            this.tank1.active = true
-            this.HUD.reset()
-            console.log('turn 1')
-            this.showTurnPointer()
+            if (this.sceneData.gameType !== 3) {
+                this.activeTank = 1
+                this.tank1.active = true
+                this.HUD.reset()
+                console.log('turn 1')
+                this.showTurnPointer()
+            }
+            else {
+                socket = window.socket
+                socket.emit('requestTurn', {})
+            }
         }
     }
 

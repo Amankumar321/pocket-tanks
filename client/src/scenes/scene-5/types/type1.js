@@ -111,7 +111,7 @@ export const type1 = (scene) => {
             var x = rect1.x - rect1.width/2 + 10
             var y = rect1.y - rect1.height/2 + 10 + scene.player1.weapons.length * 40
             pickable.setPosition(x, y)
-            pickable.removeInteractive()
+            pickable.rect.removeInteractive()
             remainingArray = remainingArray.filter((ele) => { return ele !== pickable.arrayIndex })
             scene.player1.weapons.push({id: pickable.weaponIndex, name: pickable.text, type: pickable.type})
             turn = 2
@@ -131,7 +131,7 @@ export const type1 = (scene) => {
                 var x = rect3.x - rect3.width/2 + 10
                 var y = rect3.y - rect3.height/2 + 10 + scene.cpu1.weapons.length * 40
                 cpuPick.setPosition(x, y)
-                cpuPick.removeInteractive()
+                cpuPick.rect.removeInteractive()
                 remainingArray = remainingArray.filter((ele) => { return ele !== cpuPick.arrayIndex })
                 scene.cpu1.weapons.push({id: cpuPick.weaponIndex, name: cpuPick.text, type: cpuPick.type})
                 turn = 1
@@ -162,6 +162,7 @@ export const type1 = (scene) => {
         txt.setFontFamily('"Andale Mono"')
         pickable.weaponIndex =  weaponArray[randomWeaponIndex].id
         pickable.arrayIndex = index
+        pickable.rect = rect
         pickable.type = weaponArray[randomWeaponIndex].type
         remainingArray.push(index)
 
@@ -182,6 +183,7 @@ export const type1 = (scene) => {
         pickable.text = weaponArray[randomWeaponIndex].name
         pickable.add(rect)
         pickable.add(img)
+        pickable.rect = rect
         pickableArray.push(pickable)
         txt.setFontSize(20)
         txt.setFontFamily('"Andale Mono"')
@@ -197,7 +199,10 @@ export const type1 = (scene) => {
     }
 
     const randomPick = () => {
-        if (remainingArray.length === 0) return
+        if (remainingArray.length === 0) {
+            g.setInteractive()
+            return
+        }
 
         if (turn === 1) {
             setTimeout(() => {
@@ -207,7 +212,7 @@ export const type1 = (scene) => {
                 var x = rect1.x - rect1.width/2 + 10
                 var y = rect1.y - rect1.height/2 + 10 + scene.player1.weapons.length * 40
                 pick.setPosition(x, y)
-                pick.removeInteractive()
+                pick.rect.removeInteractive()
                 remainingArray = remainingArray.filter((ele) => { return ele !== pick.arrayIndex })
                 scene.player1.weapons.push({id: pick.weaponIndex, name: pick.text, type: pick.type})
                 turn = 2
@@ -230,7 +235,7 @@ export const type1 = (scene) => {
                 var x = rect3.x - rect3.width/2 + 10
                 var y = rect3.y - rect3.height/2 + 10 + scene.cpu1.weapons.length * 40
                 cpuPick.setPosition(x, y)
-                cpuPick.removeInteractive()
+                cpuPick.rect.removeInteractive()
                 remainingArray = remainingArray.filter((ele) => { return ele !== cpuPick.arrayIndex })
                 scene.cpu1.weapons.push({id: cpuPick.weaponIndex, name: cpuPick.text, type: cpuPick.type})
                 turn = 1
@@ -258,7 +263,7 @@ export const type1 = (scene) => {
         if (remainingArray.length === 0)
             scene.scene.start('main-scene', {gameType: 1, player1: scene.player1, cpu1: scene.cpu1})
         else if (turn === 1) {
-            g.setInteractive(false)
+            g.removeInteractive()
             randomPick()
         }
     })

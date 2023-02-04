@@ -1,6 +1,6 @@
 import { Terrain } from "../classes/Terrain";
 
-export const setTerrain = (ctx, width, height, path) => {
+export const setTerrain = (ctx, width, height, path, terrain) => {
     var img1 = new Image();
     img1.onload = start
     img1.src = "./assets/images/6.png";
@@ -20,7 +20,7 @@ export const setTerrain = (ctx, width, height, path) => {
         ctx.closePath()
         ctx.fill()
 
-        createLayers(ctx, path)
+        createLayers(ctx, path, terrain)
     }
 
     function makeDummyTerrain () {
@@ -46,9 +46,9 @@ export const setTerrain = (ctx, width, height, path) => {
  * @param {Terrain} terrain
  */
 
-export const drawTerrain = (ctx, width, height) => {
+export const drawTerrain = (ctx, width, height, terrain) => {
     var path = makePath(width, height)
-    setTerrain(ctx, width, height, path)
+    setTerrain(ctx, width, height, path, terrain)
     return path
 }
 
@@ -121,7 +121,7 @@ const getAngle = (x, y, width, height) => {
 
 
 
-const createLayers = (ctx, path) => {
+const createLayers = (ctx, path, terrain) => {
     ctx.lineJoin = 'round'
     var angle, img, pattern;
     img = [new Image(), new Image(), new Image(), new Image(), new Image()]
@@ -130,7 +130,7 @@ const createLayers = (ctx, path) => {
 
     //layers.reverse()
 
-    const makeLayer = (layer, index) => {
+    const makeLayer = (layer, index, terrain) => {
         ctx.beginPath()
 
         angle = Math.atan((path[1].y - path[0].y) / (path[1].x - path[0].x))
@@ -144,9 +144,9 @@ const createLayers = (ctx, path) => {
         ctx.lineTo(path[path.length - 1].x + 5000 * Math.cos(angle), path[path.length - 1].y + 5000 * Math.sin(angle))
 
         img[index] = new Image();
-        img[index].onload = start;
+        img[index].onload = () => {startLayers(terrain)};
         img[index].src = `./assets/images/${index + 1}.png`;
-        function start() {
+        function startLayers(terrain) {
             pattern[index] = ctx.createPattern(img[index], 'repeat');
             ctx.fillStyle = pattern[index]
             ctx.lineWidth = layer.width
@@ -154,14 +154,15 @@ const createLayers = (ctx, path) => {
             ctx.globalCompositeOperation = 'source-atop'
             ctx.stroke()
             if (index === 0) {
+                terrain.scene.events.emit('terrain-finished')
                 return
             }
 
-            makeLayer(layers[index - 1], index - 1)
+            makeLayer(layers[index - 1], index - 1, terrain)
         }
 
     }
-    makeLayer(layers[4], 4)
+    makeLayer(layers[4], 4, terrain)
 }
 
 
