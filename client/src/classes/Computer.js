@@ -172,7 +172,7 @@ export class Computer {
                 this.tank.selectedWeapon = randomIndex
                 this.tank.turret.setRotation(k.angle)
                 this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-                this.tank.power = Math.floor(k.v / this.powerFactor)
+                this.tank.setPower(k.v / this.powerFactor)
                 this.tank.shoot()
             }, 2000);
         }
@@ -184,7 +184,7 @@ export class Computer {
                 this.tank.selectedWeapon = randomIndex
                 this.tank.turret.setRotation(k.angle)
                 this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-                this.tank.power = Math.floor(k.v / this.powerFactor)
+                this.tank.setPower(k.v / this.powerFactor)
                 this.tank.shoot()
             }, 2000);
         }
@@ -193,7 +193,7 @@ export class Computer {
             this.tank.selectedWeapon = randomIndex
             this.tank.turret.setRotation(k.angle)
             this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-            this.tank.power = Math.floor(k.v / this.powerFactor)
+            this.tank.setPower(k.v / this.powerFactor)
             this.tank.shoot()
         }
     }
@@ -289,7 +289,7 @@ export class Computer {
         this.tank.selectedWeapon = randomIndex
         this.tank.turret.setRotation(k.angle)
         this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-        this.tank.power = Math.floor(k.v / this.powerFactor)
+        this.tank.setPower(k.v / this.powerFactor)
         this.tank.shoot()
     }
 
@@ -364,7 +364,7 @@ export class Computer {
         this.tank.selectedWeapon = randomIndex
         this.tank.turret.setRotation(k.angle)
         this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-        this.tank.power = Math.floor(k.v / this.powerFactor)
+        this.tank.setPower(k.v / this.powerFactor)
         this.tank.shoot()
     }
 
@@ -459,7 +459,7 @@ export class Computer {
         this.tank.selectedWeapon = randomIndex
         this.tank.turret.setRotation(k.angle)
         this.tank.turret.relativeRotation = k.angle - this.tank.rotation
-        this.tank.power = Math.floor(k.v / this.powerFactor)
+        this.tank.setPower(k.v / this.powerFactor)
         this.tank.shoot()
     }
 }

@@ -16,7 +16,38 @@ export class Scene1 extends Scene {
     preload = () => {
         this.load.image('cover', 'assets/images/c.png')
         this.load.audio('intro', ['assets/sounds/intro.mp3'])
+        this.load.audio('background', ['assets/sounds/background.mp3'])
+        this.load.image('wall', 'assets/images/wall.png');
         this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400', 'Russo One']))
+
+        var w = this.renderer.width
+        var h = this.renderer.height
+
+        var progressBar = this.add.graphics();
+        var progressBox = this.add.graphics();
+
+        var loadingText = this.make.text({x: w / 2, y: h / 2, text: 'Loading',
+            style: {
+                fill: '#cccccc',
+            }
+        });
+
+        loadingText.setOrigin(0.5, 1).setFontSize(36);
+
+        progressBox.lineStyle(2, 0xcccccc)
+        progressBox.strokeRect(w/2 - 160, h/2 + 15, 320, 40);
+
+        this.load.on('progress', function (value) {
+            progressBar.clear();
+            progressBar.fillStyle(0xeeeeee, 1);
+            progressBar.fillRect(w/2 - 150, h/2 + 20, 300 * value, 30);
+        });
+    
+        this.load.on('complete', function () {
+            progressBar.destroy(true)
+            progressBox.destroy(true)
+            loadingText.destroy(true)
+        });
     }
 
     toggleFullscreen = () => {
@@ -53,6 +84,8 @@ export class Scene1 extends Scene {
         this.sound.stopAll()
         var intro = this.sound.add('intro', {loop: true})
         intro.play()
+
+
 
         // var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
         // fullscreen.setInteractive({draggable: true})

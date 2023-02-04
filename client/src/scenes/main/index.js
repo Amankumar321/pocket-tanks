@@ -39,8 +39,8 @@ export class MainScene extends Scene {
 
 
     preload = () => {
-        this.load.audio('background', ['assets/sounds/background.mp3'])
-        this.load.image('wall', 'assets/images/wall.png');
+        // this.load.audio('background', ['assets/sounds/background.mp3'])
+        // this.load.image('wall', 'assets/images/wall.png');
     }
 
 
@@ -129,6 +129,11 @@ export class MainScene extends Scene {
                 socket.emit('giveTurn', {terrainData: this.terrain.multiplayerPoints, pos1: {x: this.tank1.x, y: this.tank1.y}, pos2: {x: this.tank2.x, y: this.tank2.y}, rotation1: this.tank1.rotation, rotation2: this.tank2.rotation})
                 this.terrain.save()
             }
+        })
+
+
+        this.input.keyboard.on('keydown-ESC', () => {
+            this.showExitMenu()
         })
     }
 
@@ -398,6 +403,44 @@ export class MainScene extends Scene {
             b.setVisible(true)
             y.setVisible(true)
         }, 2000);
+    }
+
+
+
+    showExitMenu = () => {
+        const screenCenterX = this.terrain.width/2
+        const screenCenterY = this.terrain.height/2
+
+        var x = this.add.text(screenCenterX, screenCenterY, 'EXIT GAME ?')
+        var a = this.add.text(screenCenterX - 80, screenCenterY + 50, 'YES')
+        var y = this.add.text(screenCenterX, screenCenterY + 50, '/')
+        var b = this.add.text(screenCenterX + 80, screenCenterY + 50, 'NO')
+
+        x.setFontSize(50).setOrigin(0.5).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(130)
+        a.setFontSize(40).setOrigin(0.5).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(130)
+        b.setFontSize(40).setOrigin(0.5).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(130)
+        y.setFontSize(40).setOrigin(0.5).setFontFamily('"Days One"').setColor('rgba(240,240,240,1)').setDepth(130)
+
+        strokeText(x, 4)
+        strokeText(a, 4)
+        strokeText(b, 4)
+        strokeText(y, 4)
+
+        a.setInteractive()
+        b.setInteractive()
+
+        a.on('pointerdown', () => {
+            if (this.sceneData.gameType === 3) {
+                window.socket.emit('leaveRoom', {})
+            }
+            this.scene.start('scene-1')
+        })
+        b.on('pointerdown', () => {
+            x.destroy(true)
+            y.destroy(true)
+            a.destroy(true)
+            b.destroy(true)
+        })
     }
 
 

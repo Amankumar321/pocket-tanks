@@ -84,6 +84,9 @@ export class Tank extends GameObjects.Sprite {
 
         socket.on('opponentShoot', ({selectedWeapon, power, rotation, rotation1, rotation2, position1, position2}) => {
             if (this.active === false) return
+            this.moving = false
+            this.leftSteps = 0
+            this.rightSteps = 0
             this.scene.tank1.setPosition(position2.x, position2.y)
             this.scene.tank1.setRotation(rotation2)
             this.scene.tank2.setPosition(position1.x, position1.y)
@@ -94,6 +97,16 @@ export class Tank extends GameObjects.Sprite {
             this.turret.setRelativeRotation(rotation)
             this.scene.HUD.weaponScrollDisplay.reset(this)
             this.shoot()
+        })
+
+        socket.on('opponentStepLeft', () => {
+            if (this.active === false) return
+            this.stepLeft()
+        })
+
+        socket.on('opponentStepRight', () => {
+            if (this.active === false) return
+            this.stepRight()
         })
 
         this.texture.update()
@@ -324,7 +337,12 @@ export class Tank extends GameObjects.Sprite {
         if (this.movesRemaining > 0) {
             this.leftSteps = 80
             this.moving = true
-            this.movesRemaining--
+            if (this.scene.sceneData.gameType !== 4) {
+                this.movesRemaining--
+            }
+            if (this.scene.sceneData.gameType === 3) {
+                window.socket.emit('stepLeft', {})
+            }
         }
     }
 
@@ -334,7 +352,12 @@ export class Tank extends GameObjects.Sprite {
         if (this.movesRemaining > 0) {
             this.rightSteps = 80
             this.moving = true
-            this.movesRemaining--
+            if (this.scene.sceneData.gameType !== 4) {
+                this.movesRemaining--
+            }
+            if (this.scene.sceneData.gameType === 3) {
+                window.socket.emit('stepRight', {})
+            }
         }
     }
 
@@ -362,6 +385,7 @@ export class Tank extends GameObjects.Sprite {
 
 
     setPower = (power) => {
+        power = Math.floor(power)
         if (power > 100)
             power = 100
         if (power < 1)

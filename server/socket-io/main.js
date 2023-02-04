@@ -218,8 +218,19 @@ const mainsocket = (io) => {
 
 
 
+        client.on('stepLeft', () => {
+            client.broadcast.emit('opponentStepLeft', {})
+        })
+
+
+
+        client.on('stepRight', () => {
+            client.broadcast.emit('opponentStepRight', {})
+        })
+
+
+
         client.on('giveTurn', ({terrainData, pos1, pos2, rotation1, rotation2}) => {
-            console.log(terrainData)
             client.broadcast.emit('recieveTurn', {terrainData, pos1, pos2, rotation1, rotation2})
         })
 
