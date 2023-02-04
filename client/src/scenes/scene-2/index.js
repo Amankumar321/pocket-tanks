@@ -19,7 +19,7 @@ export class Scene2 extends Scene {
 
 
     create = () => {
-        this.fps = this.add.text(0, 0, this.game.loop.actualFps)
+        //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
 
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
@@ -77,7 +77,7 @@ export class Scene2 extends Scene {
 
 
     update = (time, delta) => {
-        this.fps.setText(this.game.loop.actualFps)
+        //this.fps.setText(this.game.loop.actualFps)
     
     }
 

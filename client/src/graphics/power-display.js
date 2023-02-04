@@ -23,7 +23,7 @@ const drawPowerMeter = (ctx, width, height, percentage = 0) => {
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.fillRect(0, 0, width, height)
     ctx.fillStyle = 'rgba(230,0,0,1)'
-    ctx.fillRect(0, 0, width * percentage/100, height)
+    ctx.fillRect(0, 0, Math.max(Math.ceil(width * percentage/100), 1), height)
 }
 
 

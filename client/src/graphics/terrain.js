@@ -57,8 +57,7 @@ export const drawTerrain = (ctx, width, height, terrain) => {
 const makePath = (width, height) => {
     var x, y, prevX, prevY, radius, angle, factor, path = [];
     x = -200
-    y = height
-    y = height * Math.random() * Math.random() + height/10
+    y = height * (1 - Math.random() * Math.random())
     prevX = x
     prevY = y
     path.push({x, y})
@@ -104,17 +103,17 @@ const makePath = (width, height) => {
 
 const getAngle = (x, y, width, height) => {
     var angle = Math.random() * Math.PI - Math.PI/2
-    if (y > height/2) {
-        angle = (angle - Math.PI/2 * Math.random()) / 2
+    if (y > height/1.5) {
+        angle = (angle - Math.PI/2 * Math.sqrt(Math.random())) / 2
     }
-    if (y < height/2) {
-        angle = (angle + Math.PI/2 * Math.random()) / 2
+    if (y < height/1.5) {
+        angle = (angle + Math.PI/2 * Math.sqrt(Math.random())) / 2
     }
     if (x < width/2) {
-        angle = (angle - Math.PI/2 * Math.random()) / 2
+        angle = (angle - Math.PI/2 * Math.sqrt(Math.random())) / 2
     }
     if (x > width/2) {
-        angle = (angle + Math.PI/2 * Math.random()) / 2
+        angle = (angle + Math.PI/2 * Math.sqrt(Math.random())) / 2
     }
     return angle
 }

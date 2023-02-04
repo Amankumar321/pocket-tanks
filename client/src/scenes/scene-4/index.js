@@ -27,7 +27,7 @@ export class Scene4 extends Scene {
 
 
     create = () => {
-        this.fps = this.add.text(0, 0, this.game.loop.actualFps)
+        //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
 
         if (this.sceneData.gameType === 1) {
             this.handleType1()
@@ -90,7 +90,7 @@ export class Scene4 extends Scene {
 
 
     update = (time, delta) => {
-        this.fps.setText(this.game.loop.actualFps)
+        //this.fps.setText(this.game.loop.actualFps)
     }
 
 }

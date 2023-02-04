@@ -210,20 +210,20 @@ export class Tank extends GameObjects.Sprite {
 
         // movement
         if (this.keyA?.isDown) {
-            if (this.active)
-                this.moveLeft()
+            if (this.active && !this.moving && this.movesRemaining > 0)
+                this.stepLeft()
         }
         if (this.keyD?.isDown) {
-            if (this.active)
-                this.moveRight()
+            if (this.active && !this.moving && this.movesRemaining > 0)
+                this.stepRight()
         }
         if (this.keyW?.isDown) {
             if (this.active)
-                this.power++;
+                this.setPower(this.power + 1);
         }
         if (this.keyS?.isDown) {
             if (this.active)
-                this.power--;
+                this.setPower(this.power - 1);
         }
 
         if (this.leftSteps > 0) {
@@ -324,7 +324,7 @@ export class Tank extends GameObjects.Sprite {
         if (this.movesRemaining > 0) {
             this.leftSteps = 80
             this.moving = true
-            //this.movesRemaining--
+            this.movesRemaining--
         }
     }
 
@@ -334,7 +334,7 @@ export class Tank extends GameObjects.Sprite {
         if (this.movesRemaining > 0) {
             this.rightSteps = 80
             this.moving = true
-            //this.movesRemaining--
+            this.movesRemaining--
         }
     }
 
@@ -364,8 +364,8 @@ export class Tank extends GameObjects.Sprite {
     setPower = (power) => {
         if (power > 100)
             power = 100
-        if (power < 0)
-            power = 0
+        if (power < 1)
+            power = 1
         this.power = power
     }
 

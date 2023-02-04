@@ -19,7 +19,7 @@ export class Turret extends GameObjects.Sprite {
         this.tank = tank
         this.canvas = canvas
         this.scene = scene
-        this.setDepth(-2)
+        this.setDepth(-3)
         this.rotationDelta = 0.05
         this.relativeRotation = 0
         this.activeWeapon = null

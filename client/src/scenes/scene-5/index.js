@@ -28,7 +28,7 @@ export class Scene5 extends Scene {
 
 
     create = () => {
-        this.fps = this.add.text(0, 0, this.game.loop.actualFps)
+        //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
 
         var canvas = document.createElement('canvas')
         var ctx = canvas.getContext('2d')
@@ -92,7 +92,7 @@ export class Scene5 extends Scene {
 
 
     update = (time, delta) => {
-        this.fps.setText(this.game.loop.actualFps)
+        //this.fps.setText(this.game.loop.actualFps)
     
     }
 

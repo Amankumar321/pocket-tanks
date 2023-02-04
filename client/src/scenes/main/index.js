@@ -48,8 +48,8 @@ export class MainScene extends Scene {
     create = () => {
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-        this.fps = this.add.text(screenCenterX, 30, this.game.loop.actualFps)
-        this.fps.setOrigin(0.5)
+        //this.fps = this.add.text(screenCenterX, 30, this.game.loop.actualFps)
+        //this.fps.setOrigin(0.5)
 
         if (this.winnerBlastInterval !== null) {
             clearInterval(this.winnerBlastInterval)
@@ -135,7 +135,7 @@ export class MainScene extends Scene {
 
 
     update = (time, delta) => {
-        this.fps.setText(this.game.loop.actualFps)
+        //this.fps.setText(this.game.loop.actualFps)
     
         this.terrain.updateTerrain()
         this.tank1.update()
@@ -177,7 +177,7 @@ export class MainScene extends Scene {
 
         if (this.textures.exists('background')) this.textures.remove('background')
         this.background = this.textures.addCanvas('background', canvas)
-        this.add.image(canvas.width/2, canvas.height/2, 'background').setDepth(-2)
+        this.add.image(canvas.width/2, canvas.height/2, 'background').setDepth(-3)
     }
 
 
