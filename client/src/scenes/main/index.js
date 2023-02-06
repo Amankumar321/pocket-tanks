@@ -26,6 +26,7 @@ export class MainScene extends Scene {
         this.turnPointer = null
         this.winnerBlastInterval = null
         this.gameOver = false
+        this.exitMenuContent = null
     }
 
 
@@ -132,8 +133,14 @@ export class MainScene extends Scene {
         })
 
 
-        this.input.keyboard.on('keydown-ESC', () => {
-            this.showExitMenu()
+        this.input.keyboard.on('keydown', (e) => {
+            if (e.keyCode === 27) {
+                e.preventDefault()
+                if (this.exitMenuContent === null)
+                    this.showExitMenu()
+                else
+                    this.hideExitMenu()
+            }
         })
     }
 
@@ -374,8 +381,7 @@ export class MainScene extends Scene {
 
         a.setInteractive()
         b.setInteractive()
-
-
+        
         a.on('pointerdown', () => {
             if (this.sceneData.gameType === 3) {
                 socket.emit('playAgainRequest', {})
@@ -410,7 +416,7 @@ export class MainScene extends Scene {
     showExitMenu = () => {
         const screenCenterX = this.terrain.width/2
         const screenCenterY = this.terrain.height/2
-
+        
         var x = this.add.text(screenCenterX, screenCenterY, 'EXIT GAME ?')
         var a = this.add.text(screenCenterX - 80, screenCenterY + 50, 'YES')
         var y = this.add.text(screenCenterX, screenCenterY + 50, '/')
@@ -429,6 +435,8 @@ export class MainScene extends Scene {
         a.setInteractive()
         b.setInteractive()
 
+        this.exitMenuContent = this.add.group([x, y, a, b])
+
         a.on('pointerdown', () => {
             if (this.sceneData.gameType === 3) {
                 window.socket.emit('leaveRoom', {})
@@ -436,12 +444,20 @@ export class MainScene extends Scene {
             this.scene.start('scene-1')
         })
         b.on('pointerdown', () => {
-            x.destroy(true)
-            y.destroy(true)
-            a.destroy(true)
-            b.destroy(true)
+            this.hideExitMenu()
         })
     }
+
+
+
+
+    hideExitMenu = () => {
+        if (this.exitMenuContent !== null) {
+            this.exitMenuContent.destroy(true)
+            this.exitMenuContent = null
+        }
+    }
+
 
 
 

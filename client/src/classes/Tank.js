@@ -109,6 +109,20 @@ export class Tank extends GameObjects.Sprite {
             this.stepRight()
         })
 
+        this.scene.input.keyboard.on('keyboard-A', () => {
+            if (this.active && !this.moving && this.movesRemaining > 0) {
+                this.stepLeft()
+                window.socket.emit('stepLeft', {})
+            }
+        })
+
+        this.scene.input.keyboard.on('keyboard-D', () => {
+            if (this.active && !this.moving && this.movesRemaining > 0) {
+                this.stepRight()
+                window.socket.emit('stepRight', {})
+            }
+        })
+
         this.texture.update()
     }
 
@@ -222,14 +236,6 @@ export class Tank extends GameObjects.Sprite {
         this.top.y = this.y - this.height/2 * Math.cos(this.rotation)
 
         // movement
-        if (this.keyA?.isDown) {
-            if (this.active && !this.moving && this.movesRemaining > 0)
-                this.stepLeft()
-        }
-        if (this.keyD?.isDown) {
-            if (this.active && !this.moving && this.movesRemaining > 0)
-                this.stepRight()
-        }
         if (this.keyW?.isDown) {
             if (this.active)
                 this.setPower(this.power + 1);
@@ -340,9 +346,6 @@ export class Tank extends GameObjects.Sprite {
             if (this.scene.sceneData.gameType !== 4) {
                 this.movesRemaining--
             }
-            if (this.scene.sceneData.gameType === 3) {
-                window.socket.emit('stepLeft', {})
-            }
         }
     }
 
@@ -354,9 +357,6 @@ export class Tank extends GameObjects.Sprite {
             this.moving = true
             if (this.scene.sceneData.gameType !== 4) {
                 this.movesRemaining--
-            }
-            if (this.scene.sceneData.gameType === 3) {
-                window.socket.emit('stepRight', {})
             }
         }
     }

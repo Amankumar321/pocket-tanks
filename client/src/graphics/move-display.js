@@ -98,9 +98,11 @@ export const createMoveDisplay = (hud) => {
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepRight()
+            window.socket.emit('stepRight', {})
         }
         else if (hud.scene.activeTank === 2) {
             hud.scene.tank2.stepRight()
+            window.socket.emit('stepRight', {})
         }
     })
 
@@ -112,9 +114,12 @@ export const createMoveDisplay = (hud) => {
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepLeft()
+            window.socket.emit('stepLeft', {})
+            
         }
         else if (hud.scene.activeTank === 2) {
             hud.scene.tank2.stepLeft()
+            window.socket.emit('stepLeft', {})
         }
     })
 
