@@ -3058,6 +3058,7 @@ export class hailstorm {
         if (this.ballsArray.length === 0 && this.dissociated) {
             clearInterval(this.interval1)
             clearInterval(this.interval2)
+            clearInterval(this.interval3)
             weapon.scene.sound.stopByKey('hailstorm')
             weapon.turret.activeWeapon = null
         }
@@ -3111,34 +3112,32 @@ export class hailstorm {
             }, 100);
         }, 7000);
 
-        weapon.scene.tweens.add({
-            targets: this.ballsArray,
-            loop: 15,
-            t: 1,
-            duration: 600,
-            onLoop: () => {
-                var points1 = 0
-                var points2 = 0
-                var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
-                this.ballsArray.forEach(ele => {
-                    if (weapon.tank.isPointInside(ele.x, ele.y)) {
-                        points1 += 0.5
-                    }
-                })
-                setTimeout(() => {
-                    weapon.constantUpdateScore(Math.floor(-points1)) 
-                }, 600*Math.random());
+        var counter = 0
+        this.interval3 = setInterval(() => {
+            if (counter === 15) clearInterval(this.interval3)
+            var points1 = 0
+            var points2 = 0
+            var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
+            this.ballsArray.forEach(ele => {
+                if (weapon.tank.isPointInside(ele.x, ele.y)) {
+                    points1 += 0.5
+                }
+            })
+            setTimeout(() => {
+                weapon.constantUpdateScore(Math.floor(-points1)) 
+            }, 600*Math.random());
 
-                this.ballsArray.forEach(ele => {
-                    if (oppTank.isPointInside(ele.x, ele.y)) {
-                        points2 += 0.5
-                    }
-                })
-                setTimeout(() => {
-                    weapon.constantUpdateScore(Math.ceil(points2)) 
-                }, 600*Math.random()); 
-            }
-        })
+            this.ballsArray.forEach(ele => {
+                if (oppTank.isPointInside(ele.x, ele.y)) {
+                    points2 += 0.5
+                }
+            })
+            setTimeout(() => {
+                weapon.constantUpdateScore(Math.ceil(points2)) 
+            }, 600*Math.random()); 
+            counter++
+            
+        }, 600)
     }
 
     createBalls = (weapon) => {
@@ -3193,6 +3192,7 @@ export class hailstorm {
         else {
             clearInterval(this.interval1)
             clearInterval(this.interval2)
+            clearInterval(this.interval3)
             weapon.scene.sound.stopByKey('hailstorm')
             weapon.turret.activeWeapon = null
         }    
