@@ -86,18 +86,23 @@ export const createPowerDisplay = (hud) => {
     powerDisplay.setDepth(6)
     powerBtn.setInteractive();
 
+    const releasePointer = (e) => {
+        if (hud.scene.input.mousePointer.locked === true) {
+            console.log(e)
+            //hud.scene.sound.play('click', {volume: 0.3})
+            hud.scene.input.mouse.releasePointerLock()
+            powerBtn.setData('active', false)
+            hud.scene.input.off('pointerdown', releasePointer)
+        }
+    }
+
     powerBtn.on('pointerdown', () => {
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         hud.scene.input.mouse.requestPointerLock()
         powerBtn.setData('active', true)
-        hud.scene.input.once('pointerdown', () => {
-            if (hud.scene.input.mousePointer.locked === true) {
-                //hud.scene.sound.play('click', {volume: 0.3})
-                hud.scene.input.mouse.releasePointerLock()
-                powerBtn.setData('active', false)
-            }
-        })
+
+        hud.scene.input.on('pointerdown', releasePointer)
     })
 
 
