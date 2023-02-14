@@ -34,6 +34,7 @@ export class singleshot {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -44,6 +45,7 @@ export class singleshot {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -90,7 +92,7 @@ export class singleshot {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -103,9 +105,10 @@ export class singleshot {
 
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 46 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd, blowPower: 200}, blowTank)
+        var data = {thickness: 15, gradient: grd, blowPower: 200, soundEffect: 'expmedium2', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 46 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 46, 60/46)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -152,6 +155,7 @@ export class bigshot {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -162,6 +166,7 @@ export class bigshot {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -207,7 +212,7 @@ export class bigshot {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -220,9 +225,10 @@ export class bigshot {
 
     blast = (weapon) => {
         var grd = [{relativePosition: 0, color: 'rgba(255,0,0,0)'}, {relativePosition: 1, color: 'rgba(255,0,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 90 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 200}, true)
+        var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 90 - weapon.scene.tank1.hitRadius, data, true)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 90, 30/90)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -275,6 +281,7 @@ export class threeshot {
             ctx.closePath()
             ctx.fill()
     
+            if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
             weapon.scene.textures.addCanvas('projectile-' + index, canvas);
     
             var projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + index)
@@ -296,6 +303,7 @@ export class threeshot {
         weapon.defaultShoot(this.projectile1, undefined, undefined, undefined, weapon.tank.turret.rotation + Math.PI/36)
         weapon.defaultShoot(this.projectile2)
         weapon.defaultShoot(this.projectile3, undefined, undefined, undefined, weapon.tank.turret.rotation - Math.PI/36)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -345,7 +353,7 @@ export class threeshot {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
         if (this.projectiles.length === 0) {
@@ -361,9 +369,10 @@ export class threeshot {
 
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.5, color: 'rgba(100,100,0,1)'}, {relativePosition: 1, color: 'rgba(255,255,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 46 - weapon.tank.hitRadius, {thickness: 16, gradient: grd, blowPower: 200}, true)
+        var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 46 - weapon.tank.hitRadius, data, true)
         weapon.defaultUpdateScore(obj.x, obj.y, 46, 20/46)
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
         if (this.projectiles.length === 0) {
@@ -422,6 +431,7 @@ export class fiveshot {
             ctx.closePath()
             ctx.fill()
     
+            if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
             weapon.scene.textures.addCanvas('projectile-' + index, canvas);
     
             var projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + index)
@@ -447,6 +457,7 @@ export class fiveshot {
         weapon.defaultShoot(this.projectile3)
         weapon.defaultShoot(this.projectile4, undefined, undefined, undefined, weapon.tank.turret.rotation - Math.PI/36)
         weapon.defaultShoot(this.projectile5, undefined, undefined, undefined, weapon.tank.turret.rotation - 2 * Math.PI/36)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -496,7 +507,7 @@ export class fiveshot {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
         if (this.projectiles.length === 0) {
@@ -512,9 +523,10 @@ export class fiveshot {
 
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.5, color: 'rgba(100,30,0,1)'}, {relativePosition: 1, color: 'rgba(255,100,20,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 46 - weapon.tank.hitRadius, {thickness: 16, gradient: grd, blowPower: 200}, true)
+        var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 46 - weapon.tank.hitRadius, data, true)
         weapon.defaultUpdateScore(obj.x, obj.y, 46, 20/46)
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
         if (this.projectiles.length === 0) {
@@ -567,6 +579,7 @@ export class jackhammer {
         this.canvas = canvas
         this.drawProjectile(this.projectileDiameter)
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -588,6 +601,7 @@ export class jackhammer {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -635,7 +649,7 @@ export class jackhammer {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -650,10 +664,11 @@ export class jackhammer {
         if (this.frameCount <= 0) {
             this.frameCount = 10
             var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
-            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd}, blowTank)
+            var data = {thickness: 15, gradient: grd, soundEffect: 'expshort', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank)
             weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 36, 10/36)
             if (this.jumpCount <= 0) {
-                this.projectile.destroy()
+                this.projectile.destroy(true)
                 weapon.scene.textures.remove('projectile')
                 weapon.turret.activeWeapon = null
             }
@@ -724,6 +739,7 @@ export class heatseeker {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -734,6 +750,7 @@ export class heatseeker {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -767,7 +784,7 @@ export class heatseeker {
                 alpha: 0.0,
                 t: 1,
                 ease: 'Linear',
-                onComplete: () => {particle.destroy()}
+                onComplete: () => {particle.destroy(true)}
             });
         }
     }
@@ -811,7 +828,7 @@ export class heatseeker {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -824,9 +841,10 @@ export class heatseeker {
 
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.4, color: 'rgba(120,0,0,1)'}, {relativePosition: 1, color: 'rgba(230,0,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd, blowPower: 200}, blowTank)
+        var data = {thickness: 15, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 80, 40/80)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -881,6 +899,7 @@ export class tracer {
             ctx.closePath()
             ctx.fill()
     
+            if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
             weapon.scene.textures.addCanvas('projectile-' + index, canvas);
     
             var projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + index)
@@ -908,6 +927,7 @@ export class tracer {
         weapon.defaultShoot(this.projectile3)
         weapon.defaultShoot(this.projectile4, undefined, undefined, undefined, weapon.tank.turret.rotation + Phaser.Math.DegToRad(5))
         weapon.defaultShoot(this.projectile5, undefined, undefined, undefined, weapon.tank.turret.rotation + 2 * Phaser.Math.DegToRad(5))
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -956,7 +976,7 @@ export class tracer {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
         if (this.projectiles.length === 0) {
@@ -975,14 +995,16 @@ export class tracer {
         obj.settled = true
         obj.body.stop()
         obj.setGravity(0)
+        
+        weapon.scene.sound.play('tracer')
     
         var sign = obj.relativeAngle > 0 ? '+' : ''
         var angleText = weapon.scene.add.text(obj.x, obj.y + 10, sign + obj.relativeAngle + String.fromCharCode(176))
         angleText.setOrigin(0.5, 0.5).setFont('14px Geneva')
 
         setTimeout(() => {
-            angleText.destroy()
-            obj.destroy()
+            angleText.destroy(true)
+            obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
             this.projectiles = this.projectiles.filter((ele) => { return ele.index !== obj.index })
             if (this.projectiles.length === 0) {
@@ -1034,6 +1056,7 @@ export class piledriver {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1044,6 +1067,7 @@ export class piledriver {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -1090,7 +1114,7 @@ export class piledriver {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -1116,7 +1140,15 @@ export class piledriver {
             x = Math.floor(this.projectile.x)
             y = Math.floor(this.projectile.y) + this.blastDepth[i]
             if (y < weapon.terrain.height) {
-                weapon.terrain.blast(1, x, y, blastRadius - weapon.scene.tank1.hitRadius, {thickness: 20, gradient: grd, blowPower: 30}, blowTank)
+                var data = {thickness: 20, gradient: grd, blowPower: 30}
+                if (i === 0) {
+                    data.soundEffect = 'expshort'
+                    data.soundConfig = {}
+                    weapon.terrain.blast(1, x, y, blastRadius - weapon.scene.tank1.hitRadius, data, blowTank)
+                }
+                else
+                    weapon.terrain.blast(1, x, y, blastRadius - weapon.scene.tank1.hitRadius, data, blowTank)
+
                 weapon.defaultUpdateScore(x, y, blastRadius, 20/blastRadius)
             }
         }
@@ -1129,7 +1161,7 @@ export class piledriver {
                 clearInterval(myInterval)
             }
         }, 50);
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -1179,6 +1211,7 @@ export class dirtmover {
         ctx.fillStyle = grd
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1209,16 +1242,18 @@ export class dirtmover {
     
         const mask = shape.createGeometryMask();
         this.projectile.setMask(mask);
-
+        this.projectile.setVisible(false)
     }
     
     shoot = (weapon) => {
+        this.projectile.setVisible(true)
         const h = 120
         const smallW = 40;
         const bigW = 80;
         const pw = this.projectile.canvas.height/2
         var p1, p2, p3, p4;
         var angle = Phaser.Math.Angle.Wrap(Phaser.Math.DegToRad(this.projectile.angle))
+        weapon.scene.sound.play('expshort')
         
         p1 = {x: weapon.tank.x - pw * Math.cos(angle - Math.PI/2) + (smallW/2) * Math.cos(angle), y: weapon.tank.y - pw * Math.sin(angle - Math.PI/2) + (smallW/2) * Math.sin(angle)}
         p2 = {x: weapon.tank.x - pw * Math.cos(angle - Math.PI/2) - (smallW/2) * Math.cos(angle), y: weapon.tank.y - pw * Math.sin(angle - Math.PI/2) - (smallW/2) * Math.sin(angle)}
@@ -1239,7 +1274,7 @@ export class dirtmover {
         });
         
         setTimeout(() => {
-            this.projectile.destroy();
+            this.projectile.destroy(true);
             weapon.scene.textures.remove('projectile')
             weapon.turret.activeWeapon = null;
             weapon.terrain.allowSave = true
@@ -1323,7 +1358,8 @@ export class crazyivan {
         ctx.arc(canvas.width/2, canvas.height/2, 2, 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-
+    
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1334,6 +1370,7 @@ export class crazyivan {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -1356,6 +1393,7 @@ export class crazyivan {
         var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
         if (Phaser.Math.Distance.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y) < 160) {
             //weapon.fixCloseToTank(this.projectile, {oppTankDist: 160})
+            weapon.scene.sound.play('split', {volume: 0.3})
 
             var targetAngle = Phaser.Math.Angle.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y) + Math.PI;
             var diff = Phaser.Math.Angle.Wrap(targetAngle - this.projectile.body.velocity.angle())
@@ -1366,7 +1404,7 @@ export class crazyivan {
                 i++
             }
 
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove(this.projectile.texture.key)
             this.dissipated = true
         }
@@ -1384,7 +1422,8 @@ export class crazyivan {
         ctx.arc(canvas.width/2, canvas.height/2, 1, 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-
+    
+        if (weapon.scene.textures.exists('projectile-' + this.particles.length)) weapon.scene.textures.remove('projectile-' + this.particles.length)
         weapon.scene.textures.addCanvas('projectile-' + this.particles.length, canvas);
 
         var particle = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + this.particles.length)
@@ -1467,7 +1506,7 @@ export class crazyivan {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         if (this.dissipated === false) {
             weapon.turret.activeWeapon = null
@@ -1490,9 +1529,10 @@ export class crazyivan {
 
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,0.4)'}, {relativePosition: 0.4, color: 'rgba(120,120,0,1)'}, {relativePosition: 1, color: 'rgba(255,255,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36 - weapon.scene.tank1.hitRadius, {thickness: 18, gradient: grd, blowPower: 50, optimize: true}, blowTank)
+        var data = {thickness: 18, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'expshort', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(obj.x, obj.y, 36, 20/36)
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
 
         if (this.dissipated === false) {
@@ -1556,6 +1596,7 @@ export class spider {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1566,6 +1607,7 @@ export class spider {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -1591,8 +1633,10 @@ export class spider {
             var diff = Phaser.Math.Angle.Wrap(targetAngle - this.projectile.body.velocity.angle())
             var vx = this.projectile.body.velocity.x
             var angle = Phaser.Math.Angle.Wrap(Phaser.Math.Angle.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y) + Math.PI);
+
             
             if ((vx > 0 && angle <= Math.PI/2 && angle >= 0) || (vx <= 0 && angle >= Math.PI/2 && angle <= Math.PI)) {
+                weapon.scene.sound.play('split', {volume: 0.3})
                 //weapon.fixCloseToTank(this.projectile, {oppTankDist: 160})
 
                 var minAngle = (vx > 0 ? 0 : Math.PI/2)
@@ -1605,7 +1649,7 @@ export class spider {
                 var y = this.projectile.y
                 
                 this.dissipated = true
-                this.projectile.destroy()
+                this.projectile.destroy(true)
                 weapon.scene.textures.remove(this.projectile.texture.key)
 
                 setTimeout(() => {
@@ -1659,6 +1703,7 @@ export class spider {
 
         ctx.fillRect(0, 0, canvas.width/2, canvas.height)
 
+        if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
         weapon.scene.textures.addCanvas('projectile-' + index, canvas);
 
         var particle = weapon.scene.physics.add.sprite(0, 0, 'projectile-' + index)
@@ -1742,7 +1787,7 @@ export class spider {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         if (this.dissipated === false) {
             weapon.turret.activeWeapon = null
@@ -1767,16 +1812,18 @@ export class spider {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,0.4)'}, {relativePosition: 0.4, color: 'rgba(140,50,30,0.9)'}, {relativePosition: 1, color: 'rgba(255,110,80,1)'}]
         
         if (this.dissipated === false) {
-            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 80 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 200}, blowTank)
+            var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
             weapon.defaultUpdateScore(obj.x, obj.y, 80, 20/80)
-            obj.destroy()
+            obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
             weapon.turret.activeWeapon = null
         }
         else {
-            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 28 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 30, optimize: true}, blowTank)
+            var data = {thickness: 16, gradient: grd, blowPower: 30, optimize: true,  soundEffect: 'expshort', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 28 - weapon.scene.tank1.hitRadius, data, blowTank)
             weapon.defaultUpdateScore(obj.x, obj.y, 28, 20/28)
-            obj.destroy()
+            obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
 
             this.particles = this.particles.filter(ele => {return ele !== obj})
@@ -1828,6 +1875,7 @@ export class sniperrifle {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1838,6 +1886,7 @@ export class sniperrifle {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -1883,7 +1932,7 @@ export class sniperrifle {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -1896,7 +1945,8 @@ export class sniperrifle {
 
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 1, color: 'rgba(220,220,220,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 1, {thickness: 0, gradient: grd, blowPower: 300}, true)
+        var data = {thickness: 0, gradient: grd, blowPower: 300, soundEffect: 'sniper', soundConfig: {volume: 2}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 1, data, true)
         var vec = new Phaser.Math.Vector2(1,1)
 
         for (let index = 0; index < 200; index++) {
@@ -1920,7 +1970,7 @@ export class sniperrifle {
             })            
         }
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -1969,6 +2019,7 @@ export class magicwall {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -1979,6 +2030,7 @@ export class magicwall {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -2025,7 +2077,7 @@ export class magicwall {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -2044,6 +2096,8 @@ export class magicwall {
         var emitter = weapon.scene.add.container()
         var shape = {h: 0, w: 8}
         var vec = new Phaser.Math.Vector2(1,1)
+
+        weapon.scene.sound.play('magicwall', {rate: 0.6})
 
         emitter.emit = () => {
             for (let index = 0; index < 2; index++) {
@@ -2102,7 +2156,7 @@ export class magicwall {
             }
         })
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
     }
 
@@ -2169,6 +2223,7 @@ export class dirtslinger {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -2179,6 +2234,7 @@ export class dirtslinger {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -2226,7 +2282,7 @@ export class dirtslinger {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -2243,6 +2299,8 @@ export class dirtslinger {
         const w = 120
         const x = obj.x
         const y = obj.y
+
+        weapon.scene.sound.play('rockslide')
 
         var prevH = 0
 
@@ -2307,7 +2365,7 @@ export class dirtslinger {
             }
         })
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
     }
 
@@ -2396,6 +2454,7 @@ export class zapper {
         ctx.closePath()
         ctx.fill()
         
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -2406,6 +2465,7 @@ export class zapper {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -2421,6 +2481,7 @@ export class zapper {
         var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
         var dist = Phaser.Math.Distance.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y)
         if (dist < 80) {
+            weapon.scene.sound.play('zapper')
             //weapon.fixCloseToTank(this.projectile, {oppTankDist: 80})
 
             var targetAngle = Phaser.Math.Angle.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y) + Math.PI;
@@ -2463,7 +2524,7 @@ export class zapper {
             //var score = (tank === weapon.tank) ? -40 : 40
             weapon.constantUpdateScore(40)
 
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove(this.projectile.texture.key)
             this.zapped = true
         }   
@@ -2508,7 +2569,7 @@ export class zapper {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -2521,9 +2582,10 @@ export class zapper {
 
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.4, color: 'rgba(120,80,0,1)'}, {relativePosition: 1, color: 'rgba(230,160,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 40 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd, blowPower: 50}, blowTank)
+        var data =  {thickness: 15, gradient: grd, blowPower: 50, soundEffect: 'expshort', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 40 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 40, 40/40)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -2574,6 +2636,7 @@ export class napalm {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -2584,6 +2647,7 @@ export class napalm {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -2665,15 +2729,17 @@ export class napalm {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
-        weapon.scene.textures.remove(obj.texture.key)
         if (obj === this.projectile) {
+            obj.destroy(true)
+            weapon.scene.textures.remove(obj.texture.key)
             weapon.turret.activeWeapon = null
         }
         else {
-            if (obj.smokeEmitter !== null)
+            if (obj.smokeEmitter !== null) {
                 obj.smokeEmitter.remove()
+            }
             this.particles = this.particles.filter(p => { return p === obj })
+            obj.destroy(true)
             if (this.particles.length === 0)
                 weapon.turret.activeWeapon = null
         }
@@ -2691,11 +2757,13 @@ export class napalm {
             this.createParticle(weapon, angle, i)
         }
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
 
+        weapon.scene.sound.play('napalm')
+
         weapon.scene.tweens.add({
-            targets: this.projectile,
+            targets: [],
             duration: 600,
             t: 1,
             loop: 7,
@@ -2743,6 +2811,7 @@ export class napalm {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('particle-' + index)) weapon.scene.textures.remove('particle-' + index)
         weapon.scene.textures.addCanvas('particle-' + index, canvas);
         var p = weapon.scene.physics.add.sprite(this.projectile.x, this.projectile.y, 'particle-' + index)
         p.body.velocity.set(1,1).setLength(80).setAngle(angle)
@@ -2751,6 +2820,7 @@ export class napalm {
         p.bounceCount = 0
         p.canvas = canvas
         p.tweens = []
+        p.smokeEmitter = null
         this.projectile.setAlpha(Math.random())
         this.particles.push(p)
 
@@ -2783,6 +2853,7 @@ export class napalm {
             ctx.closePath()
             ctx.fill()
 
+            //if (weapon.scene.textures.exists('smoke')) weapon.scene.textures.remove('smoke')
             weapon.scene.textures.addCanvas('smoke', canvas)
             var smokeEmitter = weapon.scene.add.particles('smoke').createEmitter({
                 x: p.x,
@@ -2850,16 +2921,18 @@ export class hailstorm {
         this.ballsArray = []
         this.ballsCount = 30
         this.ballRadius = 5
-        this.timer = null
         this.logoCanvas = Logos.hailstorm
-        this.outOfBoundCount = 0
+        this.dissociated = false
+        this.interval1 = null
+        this.interval2 = null
     }
 
     reset = () => {
+        this.interval1 = null
+        this.interval2 = null
+        this.dissociated = false
         this.projectile = null
         this.ballsArray = []
-        this.timer = null
-        this.outOfBoundCount = 0
     }
 
     create = (weapon) => {
@@ -2879,6 +2952,7 @@ export class hailstorm {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
         this.projectile.canvas = canvas
@@ -2888,6 +2962,7 @@ export class hailstorm {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     onTerrainHit = (weapon, obj) => {
@@ -2951,10 +3026,15 @@ export class hailstorm {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
         weapon.scene.textures.remove(obj.texture.key)
-        if (obj === this.projectile)
+        if (obj === this.projectile) {
+            obj.destroy(true)
             weapon.turret.activeWeapon = null
+        }
+        else {
+            this.ballsArray = this.ballsArray.filter(ball => {return obj !== ball})
+            obj.destroy(true)
+        }
     }
 
     update = (weapon) =>  {
@@ -2965,20 +3045,103 @@ export class hailstorm {
         
         if (this.projectile === null) {
             this.ballsArray.forEach(ball => {
-                if (ball.body !== undefined)
-                    this.ballUpdate(weapon, ball)
+                this.ballUpdate(weapon, ball)
+                if (ball.toRemove === true) {
+                    weapon.scene.textures.remove(ball.texture.key)
+                    ball.destroy()
+                }
+            })
+            this.ballsArray = this.ballsArray.filter(ball => {
+                return ball.toRemove === false
             })
         }
-        if (this.outOfBoundCount >= this.ballsCount) {
-            this.ballsArray.forEach(e => {
-                e.destroy()
-                weapon.scene.textures.remove(e.texture.key)
-            })
+        if (this.ballsArray.length === 0 && this.dissociated) {
+            clearInterval(this.interval1)
+            clearInterval(this.interval2)
+            weapon.scene.sound.stopByKey('hailstorm')
             weapon.turret.activeWeapon = null
         }
     }
 
     dissociate = (weapon) => {
+        weapon.scene.sound.play('aquabomb_splash')
+        this.createBalls(weapon)
+
+        setTimeout(() => {
+            weapon.scene.sound.play('hailstorm', {volume: 2})
+        }, 2000);
+
+        var projX = this.projectile.x
+        var projY = this.projectile.y
+
+        var base = weapon.terrain.getBase(this.projectile.x, this.projectile.y)
+        this.originalSlope = weapon.terrain.getSlope(base.x, base.y)
+        if (isNaN(this.originalSlope) === true) {
+            if (this.projectile.body.velocity.x > 0) {
+                this.originalSlope = -Math.PI/2
+            }
+            else {
+                this.originalSlope = Math.PI/2
+            }
+        }
+        weapon.scene.textures.remove(this.projectile.texture.key)
+        this.projectile.destroy(true)
+        this.projectile = null
+
+        var i = 0;
+        this.interval1 = setInterval(() => {
+            if (i === this.ballsCount) {
+                this.dissociated = true
+                clearInterval(this.interval1)
+                return;
+            }
+            this.spawnBall(weapon, i, projX, projY)
+            i++
+        }, 100);
+
+        setTimeout(() => {
+            this.interval2 = setInterval(() => {
+                if (this.ballsArray.length === 0)  {
+                    if (this.dissociated) {
+                        clearInterval(this.interval2)
+                        return;
+                    }
+                }
+                else this.removeBall(weapon)
+            }, 100);
+        }, 7000);
+
+        weapon.scene.tweens.add({
+            targets: this.ballsArray,
+            loop: 15,
+            t: 1,
+            duration: 600,
+            onLoop: () => {
+                var points1 = 0
+                var points2 = 0
+                var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
+                this.ballsArray.forEach(ele => {
+                    if (weapon.tank.isPointInside(ele.x, ele.y)) {
+                        points1 += 0.5
+                    }
+                })
+                setTimeout(() => {
+                    weapon.constantUpdateScore(Math.floor(-points1)) 
+                }, 600*Math.random());
+
+                this.ballsArray.forEach(ele => {
+                    if (oppTank.isPointInside(ele.x, ele.y)) {
+                        points2 += 0.5
+                    }
+                })
+                setTimeout(() => {
+                    weapon.constantUpdateScore(Math.ceil(points2)) 
+                }, 600*Math.random()); 
+            }
+        })
+    }
+
+    createBalls = (weapon) => {
         for (let index = 0; index < this.ballsCount; index++) {
             var canvas = document.createElement('canvas')
             var ctx = canvas.getContext('2d')
@@ -2994,121 +3157,48 @@ export class hailstorm {
             ctx.fillStyle = grd
             ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+            if (weapon.scene.textures.exists('ball-' + index)) weapon.scene.textures.remove('ball-' + index) 
             weapon.scene.textures.addCanvas('ball-' + index, canvas);
-            var ball = weapon.scene.physics.add.sprite(this.projectile.x, this.projectile.y, 'ball-' + index)
-            ball.setPosition(this.projectile.x, this.projectile.y)
-            ball.canvas = canvas
-            ball.setDepth(3)
-            ball.setBounce(1,1)
-            ball.visible = false
-            ball.body.setSize(this.ballRadius/3, this.ballRadius/3, this.ballRadius/2, this.ballRadius/2)
-            this.ballsArray.push(ball)
         }
-
-        var base = weapon.terrain.getBase(this.projectile.x, this.projectile.y)
-        this.originalSlope = weapon.terrain.getSlope(base.x, base.y)
-        if (isNaN(this.originalSlope) === true) {
-            if (this.projectile.body.velocity.x > 0) {
-                this.originalSlope = -Math.PI/2
-            }
-            else {
-                this.originalSlope = Math.PI/2
-            }
-        }
-        this.projectile.destroy()
-        weapon.scene.textures.remove(this.projectile.texture.key)
-        this.projectile = null
-        this.weapon = weapon
-
-        this.timer = weapon.scene.time.addEvent({delay: 100, callback: this.spawnBall, callbackScope: this, repeat: this.ballsCount});
-
-        weapon.scene.tweens.add({
-            targets: this.ballsArray,
-            loop: 15,
-            t: 1,
-            duration: 600,
-            onLoop: () => {
-                var points1 = 0
-                var points2 = 0
-                var temp
-                var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
-                this.ballsArray.forEach(ele => {
-                    if (ele.visible) {
-                        if (weapon.tank.isPointInside(ele.x, ele.y)) {
-                            points1 += 0.5
-                        }
-                    }
-                })
-                setTimeout(() => {
-                    weapon.constantUpdateScore(Math.floor(-points1)) 
-                }, 600*Math.random());
-
-                this.ballsArray.forEach(ele => {
-                    if (ele.visible) {
-                        if (oppTank.isPointInside(ele.x, ele.y)) {
-                            points2 += 0.5
-                        }
-                    }
-                })
-                setTimeout(() => {
-                    weapon.constantUpdateScore(Math.ceil(points2)) 
-                }, 600*Math.random()); 
-            }
-        })
-
-        setTimeout(() => {
-            this.removeBalls(weapon)
-        }, 7000);
     }
 
-    spawnBall = () => {
+    spawnBall = (weapon, index, x, y) => {
         var deviate = [5, -1, 3, -8, -6, 9, 3, -7, 4, -2, 6, 7, -3, 2, 8, 6, -9, -4, -8, 4, -2, 6, 7, -3, 2, 8, 2, -7, 5, 8, -1]
-        var idx;
 
-        var found = this.ballsArray.find((ball, index) => {
-            idx = index
-            return ball.visible === false
-        })
+        var ball = weapon.scene.physics.add.sprite(x, y, 'ball-' + index)
+        ball.setPosition(x, y)
+        ball.setDepth(3)
+        ball.setBounce(1,1)
+        ball.toRemove = false
+        ball.body.setSize(this.ballRadius/3, this.ballRadius/3, this.ballRadius/2, this.ballRadius/2)
+        ball.setGravityY(150)
+        this.ballsArray.push(ball)
 
-        if (found) {
-            found.visible = true
-            found.setGravityY(150)
-            var perpendicular = this.originalSlope - Math.PI/2
-            var vec1, vec2, vec3;
-            vec1 = new Phaser.Math.Vector2(20 * Math.cos(perpendicular), 20 * Math.sin(perpendicular))
-            vec2 = new Phaser.Math.Vector2(deviate[idx] * Math.cos(this.originalSlope), (deviate[idx] * Math.sin(this.originalSlope)))
-            vec3 = vec1.add(vec2)
-            found.setVelocity(vec3.x, vec3.y)
-            found.setDragX(0.8)
-            this.weapon.scene.physics.add.collider(this.ballsArray.filter((ball, i) => { return i < idx}), found)
-        }
+        var perpendicular = this.originalSlope - Math.PI/2
+        var vec1, vec2, vec3;
+        vec1 = new Phaser.Math.Vector2(20 * Math.cos(perpendicular), 20 * Math.sin(perpendicular))
+        vec2 = new Phaser.Math.Vector2(deviate[index] * Math.cos(this.originalSlope), (deviate[index] * Math.sin(this.originalSlope)))
+        vec3 = vec1.add(vec2)
+        ball.setVelocity(vec3.x, vec3.y)
+        ball.setDragX(0.8)
+
+        weapon.scene.physics.add.collider(this.ballsArray.filter((ball, i) => { return i < index}), ball)
     }
 
-    removeBalls = (weapon) => {
-        var removeBall = () => {
-            var found = this.ballsArray.find((ball) => {
-                return (ball.visible === true)
-            })
-    
-            if (found) {
-                found.visible = false
-                found.setGravityY(0)
-                found.setVelocity(0)
-                found.setDragX(0)
-                weapon.scene.textures.remove(found.texture.key)
-            }
-            else {
-                this.ballsArray.forEach(e => { e.destroy() })
-                weapon.turret.activeWeapon = null
-            }
-        } 
-
-        this.timer = weapon.scene.time.addEvent({delay: 100, callback: removeBall, callbackScope: this, repeat: this.ballsCount});
+    removeBall = (weapon) => {
+        if (this.ballsArray.length > 0) {
+            var ball = this.ballsArray[0]
+            ball.toRemove = true
+        }
+        else {
+            clearInterval(this.interval1)
+            clearInterval(this.interval2)
+            weapon.scene.sound.stopByKey('hailstorm')
+            weapon.turret.activeWeapon = null
+        }    
     }
     
     ballUpdate = (weapon, ball) => {
-        if (ball.visible === false) return
-
         var rotation = ball.body.velocity.angle()
 
         var ballX = ball.x
@@ -3136,8 +3226,7 @@ export class hailstorm {
             }
 
             if (ball.x <= this.ballRadius || ball.x >= weapon.scene.terrain.width - this.ballRadius - 1) {
-                this.outOfBoundCount++
-                ball.setVisible(false)
+                ball.toRemove = true
                 return
             }
             
@@ -3154,6 +3243,7 @@ export class hailstorm {
                 ball.setVelocityX(0)
                 ball.setVelocityY(0)
                 ball.setGravityY(0)
+                ball.body.preUpdate(0, true)
             }
             else {
                 var perpendicular = angle - Math.PI/2
@@ -3162,8 +3252,6 @@ export class hailstorm {
                 var reflect = angle - diff
                 var k = 10 * Math.abs(Math.cos(perpendicular))
                 var vec1 = new Phaser.Math.Vector2(k * Math.cos(perpendicular), k * Math.sin(perpendicular))
-                // var vec2 = new Phaser.Math.Vector2()
-                //vec2.set(k * Math.cos(perpendicular), k * Math.sin(perpendicular))
                 ball.body.velocity.setLength(36)
                 ball.body.velocity.setAngle(reflect)
                 ball.body.velocity.add(vec1)
@@ -3234,6 +3322,7 @@ export class groundhog {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -3245,6 +3334,7 @@ export class groundhog {
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
         this.prevState = {x: this.projectile.x, y: this.projectile.y}
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -3302,7 +3392,7 @@ export class groundhog {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -3311,9 +3401,10 @@ export class groundhog {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(150,0,80,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
         if (this.destroyed !== true) {
             this.destroyed = true
-            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 70 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd, blowPower: 100}, true)
+            var data =  {thickness: 15, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 70 - weapon.scene.tank1.hitRadius,data, true)
             weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 70, 50/70)
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
             weapon.turret.activeWeapon = null
         }
@@ -3377,6 +3468,7 @@ export class worm {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -3388,6 +3480,7 @@ export class worm {
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
         this.prevState = {x: this.projectile.x, y: this.projectile.y}
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -3445,7 +3538,7 @@ export class worm {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -3454,9 +3547,10 @@ export class worm {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(0,20,100,1)'}, {relativePosition: 1, color: 'rgba(150,100,255,1)'}]
         if (this.destroyed !== true) {
             this.destroyed = true
-            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 60 - weapon.scene.tank1.hitRadius, {thickness: 12, gradient: grd, blowPower: 100}, true)
+            var data = {thickness: 12, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 60 - weapon.scene.tank1.hitRadius, data, true)
             weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 60, 50/60)
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
             weapon.turret.activeWeapon = null
         }
@@ -3485,10 +3579,12 @@ export class homingworm {
         this.prevState = null
         this.logoCanvas = Logos.homingworm
         this.destroyed = false
+        this.canTurn = true
     }
 
     reset = () => {
         this.projectile = null
+        this.canTurn = true
         this.insideTerrain = false
         this.destroyed = false
     }
@@ -3522,6 +3618,7 @@ export class homingworm {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -3533,6 +3630,7 @@ export class homingworm {
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
         this.prevState = {x: this.projectile.x, y: this.projectile.y}
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -3581,7 +3679,9 @@ export class homingworm {
         if (this.insideTerrain === true && this.destroyed === false) {
             var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
             if (Phaser.Math.Distance.BetweenPoints(oppTank, this.projectile) < 200) {
-                if (Math.abs(oppTank.x - this.projectile.x) < 10) {
+                if (Math.abs(oppTank.x - this.projectile.x) < 10 && this.canTurn) {
+                    this.canTurn = false
+                    weapon.scene.sound.play('homing')
                     this.projectile.body.velocity.setAngle(-Math.PI/2)
                 }
             }
@@ -3602,7 +3702,7 @@ export class homingworm {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -3611,9 +3711,10 @@ export class homingworm {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(50,0,100,1)'}, {relativePosition: 1, color: 'rgba(100,0,200,1)'}]
         if (this.destroyed !== true) {
             this.destroyed = true
-            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 46 - weapon.scene.tank1.hitRadius, {thickness: 14, gradient: grd, blowPower: 100}, true)
+            var data = {thickness: 14, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 46 - weapon.scene.tank1.hitRadius, data, true)
             weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 46, 30/46)
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
             weapon.turret.activeWeapon = null
         }
@@ -3664,6 +3765,7 @@ export class skipper {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -3674,6 +3776,7 @@ export class skipper {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -3731,14 +3834,15 @@ export class skipper {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
 
     skipperBounce = (weapon, obj) => {
         if (this.bounce <= 0) return
-            weapon.defaultBounce(obj)
+        weapon.scene.sound.play('skipperbounce')
+        weapon.defaultBounce(obj)
     }
 
     onBounceHit = (weapon, obj) => {
@@ -3749,9 +3853,10 @@ export class skipper {
 
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(50,50,0,1)'}, {relativePosition: 1, color: 'rgba(240,240,20,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 52 - weapon.scene.tank1.hitRadius, {thickness: 14, gradient: grd, blowPower: 100}, blowTank)
+        var data = {thickness: 14, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 52 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 52, 40/52)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -3804,6 +3909,7 @@ export class chainreaction {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -3823,6 +3929,7 @@ export class chainreaction {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('chainparticle')) weapon.scene.textures.remove('chainparticle')
         weapon.scene.textures.addCanvas('chainparticle', canvas);
 
         this.emitter1 = weapon.scene.add.particles('chainparticle').createEmitter({
@@ -3847,6 +3954,7 @@ export class chainreaction {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -3893,7 +4001,7 @@ export class chainreaction {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
         if (this.emitter1 !== null) this.emitter1.stop()
@@ -3927,14 +4035,17 @@ export class chainreaction {
         const createBlast = () => {
             offx = arr[i].x
             offy = arr[i].y
-            weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 46 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50}, blowTank)
-            weapon.defaultUpdateScore(this.projectile.x + offx, this.projectile.y + offy, 46, 20/46)
+            if (Math.floor(this.projectile.y) + offy < weapon.terrain.height) {
+                var data = {thickness: 16, gradient: grd, blowPower: 50, soundEffect: 'expshort', soundConfig: {}}
+                weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 46 - weapon.scene.tank1.hitRadius, data, blowTank)
+                weapon.defaultUpdateScore(this.projectile.x + offx, this.projectile.y + offy, 46, 20/46)
+            }
             i++
         }
 
         var timer = weapon.scene.time.addEvent({delay: 200, callback: createBlast, callbackScope: this, repeat: arr.length - 2});
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
         if (this.emitter1 !== null) this.emitter1.stop()
@@ -3999,6 +4110,7 @@ export class pineapple {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -4009,6 +4121,7 @@ export class pineapple {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -4030,6 +4143,7 @@ export class pineapple {
         var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
         if (Phaser.Math.Distance.Between(oppTank.centre.x, oppTank.centre.y, this.projectile.x, this.projectile.y) < 200) {
             //weapon.fixCloseToTank(this.projectile, {oppTankDist: 200})
+            weapon.scene.sound.play('split')
             this.dissociate(weapon)
         }
     }
@@ -4048,6 +4162,7 @@ export class pineapple {
             ctx.closePath()
             ctx.fill()
             
+            if (weapon.scene.textures.exists('particle-' + i)) weapon.scene.textures.remove('particle-' + i)
             weapon.scene.textures.addCanvas('particle-' + i, canvas);
             var particle = weapon.scene.physics.add.sprite(this.projectile.x, this.projectile.y, 'particle-' + i)
             particle.setDepth(3)
@@ -4059,7 +4174,7 @@ export class pineapple {
         }
 
         weapon.scene.textures.remove('projectile')
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         this.projectile = null
         this.dissociated = true
     }
@@ -4103,7 +4218,7 @@ export class pineapple {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         if (obj === this.projectile) {
             weapon.turret.activeWeapon = null
@@ -4124,17 +4239,19 @@ export class pineapple {
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(50,50,0,1)'}, {relativePosition: 0.4, color: 'rgba(100,100,0,1)'}, {relativePosition: 1, color: 'rgba(240,2400,0,1)'}]
         if (obj === this.projectile) {
-            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, {thickness: 15, gradient: grd, blowPower: 100}, blowTank)
+            var data =  {thickness: 15, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
             weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 80, 40/80)
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
             weapon.turret.activeWeapon = null
         }
         else {
-            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 20 - weapon.scene.tank1.hitRadius, {thickness: 12, gradient: grd, blowPower: 50, optimize: true}, blowTank)
+            var data = {thickness: 12, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'expshort', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 20 - weapon.scene.tank1.hitRadius, data, blowTank)
             weapon.defaultUpdateScore(obj.x, obj.y, 20, 30/20)
             this.particles = this.particles.filter(ele => { return obj !== ele })
-            obj.destroy()
+            obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
             if (this.particles.length === 0)
                 weapon.turret.activeWeapon = null
@@ -4188,6 +4305,7 @@ export class firecracker {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -4198,6 +4316,7 @@ export class firecracker {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -4244,7 +4363,7 @@ export class firecracker {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -4266,25 +4385,27 @@ export class firecracker {
 
         var i = 0;
         var offx, offy
+        var data = {thickness: 16, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'firecracker', soundConfig: {}}
 
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 24 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50, optimize: true}, false)
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 24 - weapon.scene.tank1.hitRadius, data, false)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 24, 5/24)
 
         const createBlast = () => {
             offx = -7*i + arrLeftX[i]
             offy = arrLeftY[i]
-            weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 24 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50, optimize: true}, false)
+            var data = {thickness: 16, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'firecracker', soundConfig: {}}
+            weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 24 - weapon.scene.tank1.hitRadius, data, false)
             weapon.defaultUpdateScore(this.projectile.x + offx, this.projectile.y + offy, 24, 5/24)
             offx = 7*i + arrRightX[i]
             offy = arrRightY[i]
-            weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 24 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50, optimize: true}, false)
+            weapon.terrain.blast(1, Math.floor(this.projectile.x) + offx, Math.floor(this.projectile.y) + offy, 24 - weapon.scene.tank1.hitRadius, data, false)
             weapon.defaultUpdateScore(this.projectile.x + offx, this.projectile.y + offy, 24, 5/24)
             i++
         }
 
         var timer = weapon.scene.time.addEvent({delay: 100, callback: createBlast, callbackScope: this, repeat: totalBlast - 1});
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -4313,9 +4434,11 @@ export class homingmissile {
         this.projectile = null
         this.logoCanvas = Logos.homingmissile
         this.particles = []
+        this.canTurn = true
     }
 
     reset = () => {
+        this.canTurn = true
         this.projectile = null
         this.particles = []
     }
@@ -4355,6 +4478,7 @@ export class homingmissile {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -4365,6 +4489,7 @@ export class homingmissile {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -4376,7 +4501,9 @@ export class homingmissile {
     checkAboveTank = (weapon) => {
         var oppTank = weapon.tank === weapon.scene.tank1 ? weapon.scene.tank2 : weapon.scene.tank1
         if (Phaser.Math.Distance.Between(oppTank.x, oppTank.y, this.projectile.x, this.projectile.y) < 400) {
-            if (Math.abs(oppTank.x - this.projectile.x) < 10) {
+            if (Math.abs(oppTank.x - this.projectile.x) < 10 && this.canTurn) {
+                this.canTurn = false
+                weapon.scene.sound.play('homing')
                 this.projectile.body.velocity.setAngle(Math.PI/2)
             }
         }
@@ -4421,7 +4548,7 @@ export class homingmissile {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -4434,9 +4561,10 @@ export class homingmissile {
 
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(20,0,100,0.8)'}, {relativePosition: 0.3, color: 'rgba(50,20,150,1)'}, {relativePosition: 0.6, color: 'rgba(100,80,180,1)'}, {relativePosition: 0.9, color: 'rgba(170,170,220,1)'}, {relativePosition: 1, color: 'rgba(200,200,255,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 60 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 80}, blowTank)
+        var data = {thickness: 16, gradient: grd, blowPower: 80, soundEffect: 'expmedium', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 60 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 60, 20/60)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
     }
@@ -4495,6 +4623,7 @@ export class dirtball {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -4507,6 +4636,7 @@ export class dirtball {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -4596,7 +4726,7 @@ export class dirtball {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -4621,6 +4751,9 @@ export class dirtball {
 
         var ctx = weapon.terrain.getContext()
         ctx.globalCompositeOperation = "destination-over"
+
+        var soundEffects = ['rocks_1', 'rocks_2', 'rocks_3', 'rocks_4', 'rocks_5', 'rocks_6']
+        var soundEffectIndex = 0
         
         weapon.scene.tweens.add({
             targets: dist,
@@ -4638,6 +4771,18 @@ export class dirtball {
                     if (y < 0 || y >= weapon.terrain.height) continue
                     if (weapon.terrain.getPixel(x, y).alpha < 100) {
                         weapon.terrain.setPixel(x, y, 180, 100, 50, 110 + 2*dist.currentLength)
+                    }
+                }
+                for (let i = 0; i < soundEffects.length; i++) {
+                    const e = soundEffects[i];
+                    var res = weapon.scene.sound.get(e)
+                    if (res !== null) break
+                    if (i === soundEffects.length - 1) {
+                        weapon.scene.sound.play(soundEffects[soundEffectIndex])
+                        soundEffectIndex++
+                        if (soundEffectIndex >= soundEffects.length) {
+                            soundEffectIndex = 0
+                        }
                     }
                 }
             },
@@ -4694,6 +4839,19 @@ export class dirtball {
                         })
                         points = points.filter(p => { return p.toRemove === false })
                         weapon.terrain.update()
+
+                        for (let i = 0; i < soundEffects.length; i++) {
+                            const e = soundEffects[i];
+                            var res = weapon.scene.sound.get(e)
+                            if (res !== null) break
+                            if (i === soundEffects.length - 1) {
+                                weapon.scene.sound.play(soundEffects[soundEffectIndex])
+                                soundEffectIndex++
+                                if (soundEffectIndex >= soundEffects.length) {
+                                    soundEffectIndex = 0
+                                }
+                            }
+                        }
                     },
                 })
 
@@ -4707,7 +4865,7 @@ export class dirtball {
             }
         })
 
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
     }
 
@@ -4781,6 +4939,7 @@ export class tommygun {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
         weapon.scene.textures.addCanvas('projectile-' + index, canvas);
     }
 
@@ -4796,7 +4955,8 @@ export class tommygun {
             projectile.canvas = projectile.texture.canvas
             projectile.index = i
             this.particles.push(projectile)
-            weapon.defaultShoot(projectile, weapon.tank.power * weapon.powerFactor + vOffset[i], undefined, undefined, weapon.tank.turret.rotation + Phaser.Math.DegToRad(aOffset[i]))
+            weapon.scene.sound.play('rungun')
+            weapon.defaultShoot(projectile, weapon.tank.power * weapon.powerFactor + vOffset[i], undefined, undefined, weapon.tank.turret.rotation + Phaser.Math.DegToRad(aOffset[i]))  
             i++
             if (i === this.particleCount) {
                 this.allShot = true
@@ -4852,7 +5012,7 @@ export class tommygun {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
         if (this.particles.length === 0 && this.allShot) {
@@ -4868,9 +5028,10 @@ export class tommygun {
 
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(50,50,150,1)'}, {relativePosition: 0.6, color: 'rgba(50,50,255,1)'}, {relativePosition: 0.7, color: 'rgba(230,240,255,1)'}, {relativePosition: 1, color: 'rgba(230,240,255,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 16 - weapon.tank.hitRadius, {thickness: 12, gradient: grd, blowPower: 30}, true)
+        var data = {thickness: 12, gradient: grd, blowPower: 30, soundEffect: 'expshort2', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 16 - weapon.tank.hitRadius, data, true)
         weapon.defaultUpdateScore(obj.x, obj.y, 16, 20/16)
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         this.particles = this.particles.filter((ele) => { return ele.index !== obj.index })
         if (this.particles.length === 0 && this.allShot === true) {
@@ -4909,6 +5070,7 @@ export class mountainmover {
         this.reset()
         var canvas = document.createElement('canvas')
         
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
         this.projectile.canvas = canvas
@@ -4918,6 +5080,7 @@ export class mountainmover {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile, 0, 0, undefined, undefined)
+        this.projectile.setPosition(this.projectile.x, Math.min(this.projectile.y, weapon.terrain.height - 1))
         this.blast(weapon)
     }
 
@@ -4926,43 +5089,19 @@ export class mountainmover {
     }
 
     onTerrainHit = (weapon, obj) => {
-        var bounce = false
-
-        var [x, y, prevX, prevY] = weapon.retractInTerrain(obj)
-            
-        for (let tempX = prevX - 1; tempX <= prevX + 1; tempX++) {
-            for (let tempY = prevY - 1; tempY <= prevY + 1; tempY++) {
-                var pixel = weapon.terrain.getPixel(tempX, tempY)
-                if (pixel.r === 230 && pixel.g === 0 && pixel.b === 230) {
-                    bounce = true
-                    break
-                }
-            }
-            if (bounce) break
-        }
         
-        if (bounce && obj.bounceCount > 0) {
-            this.onBounceHit(weapon, obj)
-        }
-        
-        if (!bounce || obj.bounceCount <= 0) {
-            this.projectile.setPosition(x, Math.min(y, weapon.terrain.height - 1))
-            this.blast(weapon)   
-        }
-        
-
     }
 
     onBaseHit = (weapon, obj) => {
-        this.onTerrainHit(weapon, obj)
+        //this.onTerrainHit(weapon, obj)
     }
 
     onTankHit = (weapon, obj, tank) => {
-        this.blast(weapon)
+        //this.blast(weapon)
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
     }
@@ -4978,10 +5117,10 @@ export class mountainmover {
         //var grd = []
         //grd.concat(grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1)
         var circles = [grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1]
-
-        weapon.terrain.blast(3, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 160, {thickness: 10, circles: circles})
+        var data = {thickness: 10, circles: circles, soundEffect: 'explong', soundConfig: {}}
+        weapon.terrain.blast(3, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 160, data, false)
         //weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 60, 1)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         setTimeout(() => {
             weapon.turret.activeWeapon = null
@@ -5037,6 +5176,7 @@ export class scattershot {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
         this.projectile.canvas = canvas
@@ -5046,6 +5186,7 @@ export class scattershot {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
@@ -5104,7 +5245,7 @@ export class scattershot {
                 obj.setPosition(x, y)
                 this.dissociate(weapon)
                 this.destroyed = true
-                obj.destroy()
+                obj.destroy(true)
                 weapon.scene.textures.remove('projectile')
             }
         }
@@ -5136,7 +5277,7 @@ export class scattershot {
             this.dissociate(weapon)
             this.destroyed = true
             
-            this.projectile.destroy()
+            this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
         }
 
@@ -5155,6 +5296,7 @@ export class scattershot {
     * @param {Weapon} weapon 
     */
     dissociate = (weapon) => {
+        weapon.scene.sound.play('split')
         for (let index = 0; index < this.maxParticles; index++) {            
             var canvas = document.createElement('canvas')
             var ctx = canvas.getContext('2d')
@@ -5170,6 +5312,7 @@ export class scattershot {
             ctx.closePath()
             ctx.fill()
             
+            if (weapon.scene.textures.exists('projectile-' + index)) weapon.scene.textures.remove('projectile-' + index)
             weapon.scene.textures.addCanvas('projectile-' + index, canvas);
             
             var particle = weapon.scene.physics.add.sprite(this.projectile.x, this.projectile.y, 'projectile-' + index)
@@ -5215,7 +5358,7 @@ export class scattershot {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         if (obj === this.projectile) {
             weapon.turret.activeWeapon = null
@@ -5233,9 +5376,10 @@ export class scattershot {
 
     blast = (weapon, obj, blowTank) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,0)'}, {relativePosition: 0.4, color: 'rgba(100,0,0,1)'}, {relativePosition: 1, color: 'rgba(255,0,0,1)'}]
-        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36, {thickness: 14, gradient: grd, blowPower: 30}, true)
+        var data = {thickness: 14, gradient: grd, blowPower: 30, soundEffect: 'expshort', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(obj.x), Math.floor(obj.y), 36, data, true)
         weapon.defaultUpdateScore(obj.x, obj.y, 36, 10/36)
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key);
         this.particles = this.particles.filter((ele) => {
             return (ele.index !== obj.index) 
@@ -5298,6 +5442,7 @@ export class cruiser {
         ctx.closePath()
         ctx.fill()
 
+        if (weapon.scene.textures.exists('projectile')) weapon.scene.textures.remove('projectile')
         weapon.scene.textures.addCanvas('projectile', canvas);
 
         this.projectile = weapon.scene.physics.add.sprite(0, 0, 'projectile')
@@ -5308,11 +5453,12 @@ export class cruiser {
 
     shoot = (weapon) => {
         weapon.defaultShoot(this.projectile)
+        weapon.scene.sound.play('launch', {volume: 0.5})
     }
 
     update = (weapon) => {
         if (this.rolling === false) {
-            weapon.updateTail(this.projectile, 12, 5, 4, {r: 240, g: 240, b: 240}, true)
+            weapon.updateTail(this.projectile, 12, 4, 4, {r: 240, g: 240, b: 240}, true)
             weapon.defaultUpdate(this.projectile)
         }
         else {
@@ -5374,12 +5520,12 @@ export class cruiser {
     }
 
     onOutOfBound = (weapon, obj) => {
-        obj.destroy()
+        obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         weapon.turret.activeWeapon = null
         this.destroyed = true
         if (this.tail !== null) {
-            this.tail.destroy()
+            this.tail.destroy(true)
         }
     }
 
@@ -5393,13 +5539,14 @@ export class cruiser {
         if (this.destroyed === true) return
         this.destroyed = true
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,20)'}, {relativePosition: 0.4, color: 'rgba(100,0,40,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
-        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 100}, blowTank)
+        var data = {thickness: 16, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
+        weapon.terrain.blast(1, Math.floor(this.projectile.x), Math.floor(this.projectile.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
         weapon.defaultUpdateScore(this.projectile.x, this.projectile.y, 80, 60/80)
-        this.projectile.destroy()
+        this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
         if (this.tail !== null) {
-            this.tail.destroy()
+            this.tail.destroy(true)
         }
     }
 
@@ -5435,6 +5582,19 @@ export class cruiser {
         var correction = (this.rollingRight === true) ? 0 : Math.PI
         this.tail.setRotation(alpha + correction)
         this.projectile.setRotation(this.projectile.rotation + delta)
+
+        var circle = weapon.scene.add.circle(this.projectile.x, this.projectile.y, 2, 0xeeeeee, 0.2)
+        weapon.scene.tweens.add({
+            targets: circle,
+            alpha: 0,
+            scaleX: 0,
+            scaleY: 0,
+            duration: 500,
+            t: 1,
+            onComplete: () => {
+                circle.destroy(true)
+            }
+        })
 
         var x = this.projectile.x
         var y = this.projectile.y
@@ -5490,8 +5650,10 @@ export class cruiser {
         ctx.closePath()
         ctx.fill()
         
+        if (weapon.scene.textures.exists('cruiser-tail')) weapon.scene.textures.remove('cruiser-tail')
         weapon.scene.textures.addCanvas('cruiser-tail', canvas)
         this.tail = weapon.scene.add.sprite(0, 0, 'cruiser-tail')
+        this.tail.setVisible(false)
     }
 }
 

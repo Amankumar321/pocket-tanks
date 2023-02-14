@@ -1,7 +1,7 @@
 import { Scene, GameObjects, BlendModes, Textures } from 'phaser';
-import { WeaponShopScroll } from '../../classes/WeaponShopScroll';
 import WebFontFile from '../../classes/WebFontFile';
 import Phaser from 'phaser';
+import assetLoader from '../../weapons/sounds'
 
 export class Scene1 extends Scene {
     constructor() {
@@ -17,8 +17,20 @@ export class Scene1 extends Scene {
         this.load.image('cover', 'assets/images/c.png')
         this.load.audio('intro', ['assets/sounds/intro.mp3'])
         this.load.audio('background', ['assets/sounds/background.mp3'])
+        this.load.audio('click', ['assets/sounds/click.wav'])
         this.load.image('wall', 'assets/images/wall.png');
-        this.load.addFile(new WebFontFile(this.load, ['Cabin:600i,600,400', 'Russo One']))
+        this.load.addFile(new WebFontFile(this.load, ['Cabin:400', 'Days One']))
+
+        this.load.audio('rocks_1', ['assets/sounds/others/rocks_1.wav'])
+        this.load.audio('rocks_2', ['assets/sounds/others/rocks_2.wav'])
+        this.load.audio('rocks_3', ['assets/sounds/others/rocks_3.wav'])
+        this.load.audio('rocks_4', ['assets/sounds/others/rocks_4.wav'])
+        this.load.audio('rocks_5', ['assets/sounds/others/rocks_5.wav'])
+        this.load.audio('rocks_6', ['assets/sounds/others/rocks_6.wav'])
+
+        this.load.audio('winner', ['assets/sounds/winner.mp3'])
+
+        assetLoader(this)
 
         var w = this.renderer.width
         var h = this.renderer.height
@@ -82,9 +94,13 @@ export class Scene1 extends Scene {
         //b.setOrigin(0.5).setFontSize(200)
         this.createPlayBtn()
         this.sound.stopAll()
-        var intro = this.sound.add('intro', {loop: true})
-        intro.play()
 
+        // var intro = this.sound.add('intro', {loop: true})
+        // intro.play()
+        this.sound.stopByKey('winner')
+        this.sound.play('intro', {loop: true})
+
+        //this.sound.add('click')
 
 
         // var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
@@ -159,7 +175,7 @@ export class Scene1 extends Scene {
 
         ctx.fillRect(r, margin2, width, height - margin2*2)
 
-        var playtxt = this.add.text(screenCenterX, screenCenterY * 5/3 - 50, 'play', {font: '600 Cabin'})
+        var playtxt = this.add.text(screenCenterX, screenCenterY * 5/3 - 50, 'play', {font: '400 Cabin'})
         playtxt.setDepth(20)
         playtxt.setColor('rgba(240,240,240,1)')
         playtxt.setStroke('rgba(155,155,155,1)', 4)
@@ -171,6 +187,7 @@ export class Scene1 extends Scene {
 
         this.playbtn.setInteractive()
         this.playbtn.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-2')
         })
     }

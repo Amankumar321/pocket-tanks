@@ -54,6 +54,7 @@ export class ScrollList {
         
         this.selectedDisplay.setInteractive()
         this.selectedDisplay.on('pointerdown', () => {
+            this.scene.sound.play('click', {volume: 0.3})
             this.scene.hideTurnPointer()
             this.scene.input.mouse.requestPointerLock()
             this.toShow = true
@@ -62,6 +63,7 @@ export class ScrollList {
         this.scene.input.on('pointerdown', () => {
             if (this.scene.input.mouse.locked === true ) {
                 if (this.activeItem !== null && this.visible) {
+                    //this.scene.sound.play('click', {volume: 0.3})
                     this.setActive(this.activeItem)
                     this.scene.input.mouse.releasePointerLock()
                     this.hide()
@@ -176,7 +178,7 @@ export class ScrollList {
 
 
     update = () => {
-        if (this.scene.input.mouse.locked) {
+        if (this.scene.input.mouse.locked && this.visible) {
             this.scrollList.children.each((child, index) => {
                 var x = child.x
                 var y = child.y

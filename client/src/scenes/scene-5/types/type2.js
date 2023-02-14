@@ -165,6 +165,7 @@ export const type2 = (scene) => {
 
         rect.setInteractive()
         rect.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             pickWeapon(pickableArray[index])
         })
     }
@@ -191,6 +192,7 @@ export const type2 = (scene) => {
 
         rect.setInteractive()
         rect.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             pickWeapon(pickableArray[index + totalWeapons/2])
         })
     }
@@ -258,6 +260,7 @@ export const type2 = (scene) => {
 
     g.setInteractive()
     g.on('pointerdown', () => {
+        scene.sound.play('click', {volume: 0.3})
         if (scene.player1.weapons.length + scene.player2.weapons.length === totalWeapons)
             scene.scene.start('main-scene', {gameType: 2, player1: scene.player1, player2: scene.player2})
         else {

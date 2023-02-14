@@ -19,9 +19,14 @@ export class Weapon {
         this.powerFactor = this.turret.powerFactor
         this.terrain = this.scene.terrain
         this.weaponHandler = weaponArray[this.id]
-
+        this.allowUpdate = false
+        
         this.create()
-        this.shoot()
+
+        setTimeout(() => {
+            this.shoot()
+            this.allowUpdate = true
+        }, 500);
     }
 
 
@@ -39,7 +44,8 @@ export class Weapon {
 
 
     update = () => {
-        this.weaponHandler.update(this)
+        if (this.allowUpdate)
+            this.weaponHandler.update(this)
     }
 
 

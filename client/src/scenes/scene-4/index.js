@@ -20,6 +20,7 @@ export class Scene4 extends Scene {
 
 
     preload = () => {
+        //this.sound.add('click')
         //this.load.baseURL = 'assets/';
         //this.load.image('tank', 'sprites/tank.png');
     }
@@ -55,6 +56,7 @@ export class Scene4 extends Scene {
         backbtn.setInteractive()
 
         backbtn.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             if (this.sceneData.gameType === 3) {
                 const socket = window.socket
                 socket.emit('leaveRoom', {})

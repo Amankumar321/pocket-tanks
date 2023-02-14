@@ -89,10 +89,11 @@ export class HUD extends Textures.CanvasTexture {
     
         this.update()
 
-        this.scene.input.mouse.onMouseDown = () => {
-            if (this.scene.input.mouse.locked)
-                this.weaponScrollList.incY(this.scene.input.mousePointer.movementY/10)
-        }
+        // this.scene.input.mouse.onMouseDown = () => {
+        //     if (this.scene.input.mouse.locked && this.weaponScrollList.visible === true) {
+        //         this.weaponScrollList.incY(this.scene.input.mousePointer.movementY/10)
+        //     }
+        // }
     }
 
 

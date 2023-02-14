@@ -119,6 +119,7 @@ export const type3 = (scene) => {
     })
 
     socket.on('opponentWeaponPick', ({arrayIndex}) => {
+        scene.sound.play('click', {volume: 0.3})
         var oppPick = pickableArray[arrayIndex]
         var x = rect3.x - rect3.width/2 + 10
         var y = rect3.y - rect3.height/2 + 10 + scene.player2.weapons.length * 40
@@ -176,6 +177,7 @@ export const type3 = (scene) => {
 
             rect.setInteractive()
             rect.on('pointerdown', () => {
+                scene.sound.play('click', {volume: 0.3})
                 pickWeapon(pickableArray[index])
             })
         }
@@ -201,6 +203,7 @@ export const type3 = (scene) => {
     
             rect.setInteractive()
             rect.on('pointerdown', () => {
+                scene.sound.play('click', {volume: 0.3})
                 pickWeapon(pickableArray[index + totalWeapons/2])
             })
         }
@@ -238,6 +241,7 @@ export const type3 = (scene) => {
     n.setInteractive()
     
     n.on('pointerdown', () => {
+        scene.sound.play('click', {volume: 0.3})
         scene.scene.start('scene-4', {gameType: scene.sceneData.gameType, player1: scene.player1})
     })
     
@@ -251,6 +255,7 @@ export const type3 = (scene) => {
     g.setInteractive()
     g.on('pointerdown', () => {
         if (scene.player1.weapons.length + scene.player2.weapons.length === totalWeapons) {
+            scene.sound.play('click', {volume: 0.3})
             socket.emit('ready', {})
             g.setText('WAITING...')
             g.disableInteractive()

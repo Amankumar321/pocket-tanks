@@ -95,6 +95,7 @@ export const createMoveDisplay = (hud) => {
     moveRightBtn.setInteractive().setOrigin(0, 0.5);
 
     moveRightBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepRight()
@@ -111,6 +112,7 @@ export const createMoveDisplay = (hud) => {
     moveLeftBtn.setInteractive().setOrigin(1,0.5);
 
     moveLeftBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.stepLeft()

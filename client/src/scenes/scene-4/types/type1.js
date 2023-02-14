@@ -50,6 +50,7 @@ export const type1 = (scene) => {
         strokeText(levelTxt, 6)
 
         level.box.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             levels[selectedLevel - 1].box.setAlpha(0) 
             level.box.setAlpha(1)
             selectedLevel = level.value
@@ -76,6 +77,7 @@ export const type1 = (scene) => {
 
     g.setInteractive()
     g.on('pointerdown', () => {
+        scene.sound.play('click', {volume: 0.3})
         scene.scene.start('scene-5', {gameType: 1, player1: scene.player1, cpu1: {name: "CPU " + selectedLevel, level: selectedLevel, color: cpuColor}})
     })
 }

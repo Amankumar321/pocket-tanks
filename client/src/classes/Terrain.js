@@ -34,7 +34,8 @@ export class Terrain extends Textures.CanvasTexture {
         this.multiplayerPoints = []
         this.previousSaved = null
         this.frameCount = -1
-        this.allowSave = false
+        this.soundEffects = ['rocks_1', 'rocks_2', 'rocks_3', 'rocks_4', 'rocks_5', 'rocks_6']
+        this.soundEffectIndex = 0
     }
 
 
@@ -204,16 +205,25 @@ export class Terrain extends Textures.CanvasTexture {
                 return (hole.toRemove === false)
             })
         }
-
+        
         if (this.matrix.length === 0) {
             this.animate = false
-            if (this.allowSave) {
-                this.save()
-                this.allowSave = false
-            }
             return
         }
         else {
+            for (let i = 0; i < this.soundEffects.length; i++) {
+                const e = this.soundEffects[i];
+                var res = this.scene.sound.get(e)
+                if (res !== null) break
+                if (i === this.soundEffects.length - 1) {
+                    this.scene.sound.play(this.soundEffects[this.soundEffectIndex])
+                    this.soundEffectIndex++
+                    if (this.soundEffectIndex >= this.soundEffects.length) {
+                        this.soundEffectIndex = 0
+                    }
+                }
+            }
+        
             this.matrix = this.matrix.filter((ele) => {
                 return (ele.base < ele.ground)
             })

@@ -36,8 +36,10 @@ export const createFireButton = (hud) => {
     hud.fireButton.setDepth(6)
     hud.fireButton.setInteractive();
 
-    hud.fireButton.on('pointerdown', () => {
+    const fire = () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
+       
         if (hud.scene.activeTank === 1) {
             if (hud.scene.sceneData.gameType === 3)
                 socket.emit('shoot', {selectedWeapon: hud.scene.tank1.selectedWeapon, power: hud.scene.tank1.power,
@@ -52,5 +54,8 @@ export const createFireButton = (hud) => {
                     position1: {x: hud.scene.tank1.x, y: hud.scene.tank1.y}, position2: {x: hud.scene.tank2.x, y: hud.scene.tank2.y}})
             hud.scene.tank2.shoot()
         }
-    })
+    }
+
+    hud.scene.input.keyboard.on('keydown-SPACE', fire)
+    hud.fireButton.on('pointerdown', fire)
 }

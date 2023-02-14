@@ -87,11 +87,13 @@ export const createPowerDisplay = (hud) => {
     powerBtn.setInteractive();
 
     powerBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         hud.scene.input.mouse.requestPointerLock()
         powerBtn.setData('active', true)
-        hud.scene.input.on('pointerdown', () => {
+        hud.scene.input.once('pointerdown', () => {
             if (hud.scene.input.mousePointer.locked === true) {
+                //hud.scene.sound.play('click', {volume: 0.3})
                 hud.scene.input.mouse.releasePointerLock()
                 powerBtn.setData('active', false)
             }
@@ -106,6 +108,7 @@ export const createPowerDisplay = (hud) => {
     powerRightBtn.setInteractive().setOrigin(1,0);
 
     powerRightBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.setPower(hud.scene.tank1.power + 1)
@@ -120,6 +123,7 @@ export const createPowerDisplay = (hud) => {
     powerLeftBtn.setInteractive().setOrigin(0,0);
 
     powerLeftBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.setPower(hud.scene.tank1.power - 1)

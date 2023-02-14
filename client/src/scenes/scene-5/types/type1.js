@@ -168,6 +168,7 @@ export const type1 = (scene) => {
 
         rect.setInteractive()
         rect.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             pickWeapon(pickableArray[index])
         })
     }
@@ -194,6 +195,7 @@ export const type1 = (scene) => {
 
         rect.setInteractive()
         rect.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             pickWeapon(pickableArray[index + totalWeapons/2])
         })
     }
@@ -260,6 +262,7 @@ export const type1 = (scene) => {
 
     g.setInteractive()
     g.on('pointerdown', () => {
+        scene.sound.play('click', {volume: 0.3})
         if (remainingArray.length === 0)
             scene.scene.start('main-scene', {gameType: 1, player1: scene.player1, cpu1: scene.cpu1})
         else if (turn === 1) {

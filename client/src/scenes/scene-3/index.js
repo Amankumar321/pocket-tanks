@@ -21,9 +21,10 @@ export class Scene3 extends Scene {
 
 
     preload = () => {
-        this.load.addFile(new WebFontFile(this.load, ['Audiowide', 'Exo 2:600', 'Bungee', 'Righteous', 'Days One', 'Iceland']))
+        //this.load.addFile(new WebFontFile(this.load, ['Audiowide', 'Exo 2:600', 'Bungee', 'Righteous', 'Days One', 'Iceland']))
         //this.load.baseURL = 'assets/';
         //this.load.image('tank', 'sprites/tank.png');
+        //this.sound.add('click')
     }
 
 
@@ -55,6 +56,7 @@ export class Scene3 extends Scene {
         
         backbtn.setInteractive()
         backbtn.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-2')
         })
     }

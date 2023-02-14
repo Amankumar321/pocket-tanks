@@ -129,7 +129,18 @@ export const createAngleDisplay = (hud) => {
     angleDisplay.setDepth(6)
     angleBtn.setInteractive();
 
+    const releasePointer = () => {
+        if (hud.scene.input.mousePointer.locked === true) {
+            //hud.scene.sound.play('click', {volume: 0.3})
+            hud.scene.input.mouse.releasePointerLock()
+            hud.crossAir.setVisible(false)
+            hud.crossAir.setData('toShow', false)
+            hud.scene.input.off('pointerdown', releasePointer)
+        }
+    }
+
     angleBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.input.mouse.requestPointerLock()
@@ -138,13 +149,7 @@ export const createAngleDisplay = (hud) => {
             var alpha = hud.scene.tank1.turret.rotation
             hud.crossAir.setPosition(hud.scene.tank1.turret.x + crossAirRadius * Math.sin(alpha), hud.scene.tank1.turret.y - crossAirRadius * Math.cos(alpha))
             
-            hud.scene.input.on('pointerdown', () => {
-                if (hud.scene.input.mousePointer.locked === true) {
-                    hud.scene.input.mouse.releasePointerLock()
-                    hud.crossAir.setVisible(false)
-                    hud.crossAir.setData('toShow', false)
-                }
-            })
+            hud.scene.input.on('pointerdown', releasePointer)
         }
         else if (hud.scene.activeTank === 2) {
             hud.scene.input.mouse.requestPointerLock()
@@ -153,13 +158,7 @@ export const createAngleDisplay = (hud) => {
             var alpha = hud.scene.tank2.turret.rotation
             hud.crossAir.setPosition(hud.scene.tank2.turret.x + crossAirRadius * Math.sin(alpha), hud.scene.tank2.turret.y - crossAirRadius * Math.cos(alpha))
             
-            hud.scene.input.on('pointerdown', () => {
-                if (hud.scene.input.mousePointer.locked === true) {
-                    hud.scene.input.mouse.releasePointerLock()
-                    hud.crossAir.setVisible(false)
-                    hud.crossAir.setData('toShow', false)
-                }
-            })
+            hud.scene.input.on('pointerdown', releasePointer)
         }
     })
 
@@ -230,6 +229,7 @@ export const createAngleDisplay = (hud) => {
     angleRightBtn.setInteractive().setOrigin(1,1);
 
     angleRightBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.turret.relativeRotation += Math.PI/180
@@ -244,6 +244,7 @@ export const createAngleDisplay = (hud) => {
     angleLeftBtn.setInteractive().setOrigin(0,1);
 
     angleLeftBtn.on('pointerdown', () => {
+        hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.turret.relativeRotation -= Math.PI/180

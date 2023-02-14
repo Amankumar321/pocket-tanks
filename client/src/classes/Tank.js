@@ -109,14 +109,16 @@ export class Tank extends GameObjects.Sprite {
             this.stepRight()
         })
 
-        this.scene.input.keyboard.on('keyboard-A', () => {
+        this.scene.input.keyboard.on('keydown-A', () => {
+            this.scene.sound.play('click', {volume: 0.3})
             if (this.active && !this.moving && this.movesRemaining > 0) {
                 this.stepLeft()
                 window.socket.emit('stepLeft', {})
             }
         })
 
-        this.scene.input.keyboard.on('keyboard-D', () => {
+        this.scene.input.keyboard.on('keydown-D', () => {
+            this.scene.sound.play('click', {volume: 0.3})
             if (this.active && !this.moving && this.movesRemaining > 0) {
                 this.stepRight()
                 window.socket.emit('stepRight', {})
@@ -365,10 +367,10 @@ export class Tank extends GameObjects.Sprite {
 
     shoot = () => {
         if (!this.active) return
+        this.scene.hideTurnPointer()
+        
         this.active = false
         this.turret.shoot(this.weapons[this.selectedWeapon]?.id)
-        this.scene.hideTurnPointer()
-
         if (this.scene.sceneData.gameType !== 4) {
             this.weapons.splice(this.selectedWeapon, 1)
         }

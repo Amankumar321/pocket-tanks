@@ -40,6 +40,7 @@ export class MainScene extends Scene {
 
 
     preload = () => {
+        //this.sound.add('click')
         // this.load.audio('background', ['assets/sounds/background.mp3'])
         // this.load.image('wall', 'assets/images/wall.png');
     }
@@ -88,8 +89,9 @@ export class MainScene extends Scene {
         this.createHUD()
 
         this.sound.stopAll()
-        var bg = this.sound.add('background', {loop: true})
-        bg.play()
+        // var bg = this.sound.add('background', {loop: true})
+        // bg.play()
+        this.sound.play('background', {loop: true})
 
         this.terrain.multiplayerPoints = []
 
@@ -135,6 +137,7 @@ export class MainScene extends Scene {
 
         this.input.keyboard.on('keydown', (e) => {
             if (e.keyCode === 27) {
+                this.sound.play('click', {volume: 0.3})
                 e.preventDefault()
                 if (this.exitMenuContent === null)
                     this.showExitMenu()
@@ -382,7 +385,8 @@ export class MainScene extends Scene {
         a.setInteractive()
         b.setInteractive()
         
-        a.on('pointerdown', () => {
+        a.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             if (this.sceneData.gameType === 3) {
                 socket.emit('playAgainRequest', {})
                 a.disableInteractive()
@@ -392,10 +396,13 @@ export class MainScene extends Scene {
                 x.setText('Waiting for opponent...')
             }
             else {
+                this.sound.stopByKey('winner')
                 this.scene.start('scene-5', this.sceneData)
             }
         })
-        b.on('pointerdown', () => {
+        b.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
+            this.sound.stopByKey('winner')
             this.scene.start('scene-1')
             if (this.sceneData.gameType === 3) {
                 const socket = window.socket
@@ -437,13 +444,15 @@ export class MainScene extends Scene {
 
         this.exitMenuContent = this.add.group([x, y, a, b])
 
-        a.on('pointerdown', () => {
+        a.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             if (this.sceneData.gameType === 3) {
                 window.socket.emit('leaveRoom', {})
             }
             this.scene.start('scene-1')
         })
-        b.on('pointerdown', () => {
+        b.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.hideExitMenu()
         })
     }
@@ -471,6 +480,8 @@ export class MainScene extends Scene {
             tank = this.tank2
         }
         else return
+
+        this.sound.play('winner', {loop: true})
 
         var height = 60
         var w1 = this.add.text(tank.x - 38, tank.y - height - 11, 'W')

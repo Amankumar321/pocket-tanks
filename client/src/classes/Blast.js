@@ -34,8 +34,11 @@ export class Blast {
         this.y = y
         this.toRemove = false
         this.blowTank = blowTank
+        this.soundEffect = data.soundEffect
+        this.soundConfig = data.soundConfig
 
         this.init()
+
     }
 
 
@@ -43,15 +46,27 @@ export class Blast {
         if (this.type === 1) {
             this.gradient = this.data.gradient
             this.thickness = this.data.thickness
+            if (this.soundEffect) {
+                //this.scene.sound.stopByKey(this.soundEffect)
+                this.scene.sound.play(this.soundEffect, this.soundConfig)
+            }
         }
         if (this.type === 2) {
             this.circles = this.data.circles
             this.thickness = this.data.thickness
+            if (this.soundEffect) {
+                //this.scene.sound.stopByKey(this.soundEffect)
+                this.scene.sound.play(this.soundEffect, this.soundConfig)
+            }
         }
         if (this.type === 3) {
             this.circles = this.data.circles
             this.thickness = this.data.thickness
             this.variableRadius = this.maxRadius
+            if (this.soundEffect) {
+                this.scene.sound.stopByKey(this.soundEffect)
+                this.scene.sound.play(this.soundEffect, this.soundConfig)
+            }
         }
     }
 

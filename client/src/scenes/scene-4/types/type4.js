@@ -76,6 +76,7 @@ export const type4 = (scene) => {
         color.box.setInteractive()
         color.box.setFillStyle(colorValues[index], 1)
         color.box.on('pointerdown', () => {
+            scene.sound.play('click', {volume: 0.3})
             f.setText(color.name)
             f.setColor(int2rgba(colorValues[index]))
             strokeText(f, 6)
@@ -98,6 +99,7 @@ export const type4 = (scene) => {
 
     g.setInteractive()
     g.on('pointerdown', () => {
+        scene.sound.play('click', {volume: 0.3})
         scene.scene.start('scene-5', {gameType: 4, player1: scene.player1, player2: {name: c.text, color: colorValues[selectedColor]}})
     })
 }

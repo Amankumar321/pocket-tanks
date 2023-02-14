@@ -57,6 +57,7 @@ export const type3 = (scene) => {
     }
 
     socket.once('playAgain', () => {
+        this.sound.stopByKey('winner')
         scene.scene.start('scene-5', scene.sceneData)
     })
 
@@ -76,6 +77,7 @@ export const type3 = (scene) => {
     n.setInteractive()
     
     n.on('pointerdown', () => {
+        this.sound.stopByKey('winner')
         scene.scene.start('scene-4', {gameType: scene.sceneData.gameType, player1: player1})
     })
     

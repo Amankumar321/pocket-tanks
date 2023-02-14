@@ -44,6 +44,7 @@ export const type3 = (scene) => {
             strokeText(room.z, 6)
             room.z.setInteractive()
             room.z.on('pointerdown', () => {
+                scene.sound.play('click', {volume: 0.3})
                 socket.emit('joinRoom', {roomId: room.roomId, name: scene.player1.name, color: scene.player1.color})
             })
         });
@@ -84,6 +85,7 @@ export const type3 = (scene) => {
     g.setInteractive()
     
     const myRoom = () => {
+        scene.sound.play('click', {volume: 0.3})
         if (gtype === 0) {
             socket.emit('createRoom', {player: scene.player1})
             g.setText('DELETE ROOM')

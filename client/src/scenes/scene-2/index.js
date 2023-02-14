@@ -13,7 +13,7 @@ export class Scene2 extends Scene {
     preload = () => {
         //this.load.baseURL = 'assets/';
         //this.load.image('tank', 'sprites/tank.png');
-        this.load.addFile(new WebFontFile(this.load, ['Audiowide', 'Exo 2:600', 'Bungee', 'Righteous', 'Days One', 'Iceland']))
+        //this.sound.add('click')
     }
 
 
@@ -52,6 +52,7 @@ export class Scene2 extends Scene {
         
         backbtn.setInteractive()
         backbtn.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-1')
         })
 
@@ -61,15 +62,19 @@ export class Scene2 extends Scene {
         d.setInteractive()
 
         a.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-3', {gameType: 1})
         })
         b.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-3', {gameType: 2})
         })
         c.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-3', {gameType: 3})
         })
         d.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-3', {gameType: 4})
         })
     }
