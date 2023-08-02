@@ -18,8 +18,8 @@ Gaming library - Phaser js
 
 # Sample from original
 
-![alt text](https://github.com/Amankumar321/pocket-tanks/blob/main/564da9c610227989f789a120bbee611c.jpeg)
-![alt text](https://github.com/Amankumar321/pocket-tanks/blob/main/643x0w.jpg)
+![alt text](https://github.com/Amankumar321/pocket-tanks/blob/6b8af457f00a59afbba9ddd35206e5803a484950/564da9c610227989f789a120bbee611c.jpeg)
+![alt text](https://github.com/Amankumar321/pocket-tanks/blob/6b8af457f00a59afbba9ddd35206e5803a484950/643x0w.jpg)
 
 # About
 
