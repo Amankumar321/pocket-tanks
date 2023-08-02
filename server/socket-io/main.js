@@ -177,6 +177,7 @@ const mainsocket = (io) => {
             var x, randomArray = []
             for (let index = 0; index < count; index++) {
                 x = Math.floor(Math.random() * max)
+                //x= 9
                 randomArray.push(x)
             }
             room.randomArray = randomArray

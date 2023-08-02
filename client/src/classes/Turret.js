@@ -1,5 +1,6 @@
 import { GameObjects, Physics } from "phaser";
 import { Weapon } from "./Weapon";
+import Phaser from "phaser";
 
 export class Turret extends GameObjects.Sprite {
     /**
@@ -42,27 +43,41 @@ export class Turret extends GameObjects.Sprite {
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height/2)
 
         //this.createProjectile()
+        const callback = () => {
+            if (this.activeWeapon !== null) {
+                this.activeWeapon.update()
+            }
+        }
+
+        this.scene.physics.world.on('worldstep', callback, this)
     }
 
     update = () => {
+        const crossAirRadius = 80
         var x = this.tank.x + (this.tank.height/2) * Math.sin(this.tank.rotation)
         var y = this.tank.y - (this.tank.height/2) * Math.cos(this.tank.rotation)
         this.setPosition(x, y)
 
         if (this.keyQ?.isDown) {
-            if (this.tank.active)
+            if (this.tank.active) {
                 this.relativeRotation -= this.rotationDelta
+                this.setRotation(this.relativeRotation + this.tank.rotation)
+                const alpha = this.rotation
+                this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
+                this.scene.HUD.crossAir.visibleTime = 40
+            }
         }
         if (this.keyE?.isDown) {
-            if (this.tank.active)
+            if (this.tank.active) {
                 this.relativeRotation += this.rotationDelta
+                this.setRotation(this.relativeRotation + this.tank.rotation)
+                const alpha = this.rotation
+                this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
+                this.scene.HUD.crossAir.visibleTime = 40
+            }
         }
 
         this.setRotation(this.relativeRotation + this.tank.rotation)
-
-        if (this.activeWeapon !== null) {
-            this.activeWeapon.update()
-        }
     }
 
 

@@ -57,7 +57,11 @@ export const type3 = (scene) => {
     }
 
     socket.once('playAgain', () => {
-        this.sound.stopByKey('winner')
+        scene.sound.stopByKey('winner')
+        if (scene.winnerBlastInterval !== null) {
+            clearInterval(scene.winnerBlastInterval)
+            scene.winnerBlastInterval = null
+        }
         scene.scene.start('scene-5', scene.sceneData)
     })
 
@@ -77,11 +81,16 @@ export const type3 = (scene) => {
     n.setInteractive()
     
     n.on('pointerdown', () => {
-        this.sound.stopByKey('winner')
+        scene.sound.stopByKey('winner')
         scene.scene.start('scene-4', {gameType: scene.sceneData.gameType, player1: player1})
     })
     
     socket.once('opponentLeft', () => {
+        scene.sound.stopByKey('winner')
+        if (scene.winnerBlastInterval !== null) {
+            clearInterval(scene.winnerBlastInterval)
+            scene.winnerBlastInterval = null
+        }
         m.setVisible(true)
         n.setVisible(true)
         overlay.setVisible(true)

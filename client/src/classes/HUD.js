@@ -54,7 +54,8 @@ export class HUD extends Textures.CanvasTexture {
     
         var ctx = this.canvas.getContext('2d')
 
-        ctx.fillStyle = 'rgba(40,40,40,1)'
+        //ctx.fillStyle = 'rgba(40,40,40,1)'
+        ctx.fillStyle = 'rgba(0,0,0,1)'
     
         ctx.moveTo(0, height)
         ctx.lineTo(0, height * 2/3)
@@ -162,6 +163,7 @@ export class HUD extends Textures.CanvasTexture {
             this.moveDisplayText.setText(this.scene.tank2.movesRemaining)
         }
 
+    
         if ((this.scene.tank1.turret.activeWeapon !== null) || (this.scene.tank2.turret.activeWeapon !== null)) {
             this.disable()
         }
@@ -177,6 +179,10 @@ export class HUD extends Textures.CanvasTexture {
                     this.enable()
                 }
             }
+        }
+
+        if ((this.scene.tank1.settled !== true) || (this.scene.tank2.settled !== true)) {
+            this.disable()
         }
 
         if (this.scene.gameOver == true) {

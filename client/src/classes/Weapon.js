@@ -39,6 +39,7 @@ export class Weapon {
 
     shoot = () => {
         this.weaponHandler.shoot(this)
+        this.update()
     }
 
 
@@ -52,7 +53,7 @@ export class Weapon {
     defaultShoot = (obj, v, g = 300, p, r) => {
         var velocity = v === undefined ? this.tank.power * this.powerFactor : v
         var gravity = g
-        var rotation = r === undefined ? this.turret.rotation : r
+        var rotation = r === undefined ? this.turret.rotation - Math.PI/2 : r
 
         if (p !== null && p !== undefined) {
             obj.setPosition(p.x, p.y)
@@ -62,16 +63,31 @@ export class Weapon {
         }
 
         obj.setRotation(rotation)
-        obj.setVelocity(velocity * Math.sin(rotation), -velocity * Math.cos(rotation)) 
+        obj.setVelocity(velocity * Math.cos(rotation), velocity * Math.sin(rotation)) 
         obj.body.setGravityY(gravity)
-        obj.setDepth(2)
+        obj.setDepth(2)        
+        //obj.body.prevCenter = new Phaser.Math.Vector2(obj.body.center.x, obj.body.center.y)
+        
+        //console.log(obj.body.prevCenter.x, obj.body.prevCenter.y)
+        //obj.updateFromGameObject()
+        obj.body.setSize(1,1)
+        obj.body.preUpdate(false, 0)
+        //obj.body.updateFromGameObject()
+        //obj.body.center.x = obj.x
+        //obj.body.center.y = obj.y
+        //console.log(obj.body.center.x, obj.body.center.y)
     }
 
 
 
     defaultUpdate = (obj) => {
-        var x = obj.x
-        var y = obj.y
+        var x = obj.body.x
+        var y = obj.body.y
+
+        //console.log('update pos', x, y, this.terrain.getPixel(x,y))
+        //console.log('update vel', obj.body.velocity.x, obj.body.velocity.y)
+
+        //this.terrain.setPixel(x,y, 255,255,255,255)
         
         var tank1 = this.tank
         var tank2 = (this.tank === this.scene.tank1) ? this.scene.tank2 : this.scene.tank1
@@ -126,37 +142,47 @@ export class Weapon {
         //     this.weaponHandler.onBounceHit(this, obj)
         // }
 
-        else if (this.terrain.getPixel(x, y).alpha > 0) {
+        if (this.terrain.getPixel(x, y).alpha > 0 && obj.body !== undefined) {
             this.weaponHandler.onTerrainHit(this, obj)
         }
+
+        // if (obj.body !== undefined) {
+        //     obj.body.prevCenter.set(obj.body.center.x, obj.body.center.y)
+        // }
     }
 
 
 
     updateTail = (obj, factor, minimum, thickness, color, taper) => {
         var tailLength = obj.body.speed / factor + minimum
+        //var tailLength = new Phaser.Math.Vector2(obj.velX, obj.velY).length() / factor + minimum
         tailLength = Math.floor(tailLength)
     
         var centreX = obj.canvas.width/2
         var centreY = obj.canvas.height/2
 
-        for (let col = 0; col < centreX; col++) {
-            for (let row = -thickness/2; row < thickness/2; row++) {
-                obj.texture.setPixel(col, centreY + row, 0, 0, 0, 0)
-            }
-        }
+        var ctx = obj.canvas.getContext('2d')
+        
+        var grd = ctx.createLinearGradient(obj.canvas.width/2, obj.canvas.height/2, obj.canvas.width/2 - tailLength,  obj.canvas.height/2)
+        grd.addColorStop(0, `rgba(${color.r},${color.g},${color.b},1)`)
+        grd.addColorStop(1, `rgba(${color.r},${color.g},${color.b},0)`)
+        ctx.fillStyle = grd
 
-        for (let col = 0; col < tailLength; col++) {
-            for (let row = -thickness/2; row < thickness/2; row++) {
-                obj.texture.setPixel(centreX - col, centreY + row, color.r, color.g, color.b, 255*(1 - col/tailLength))
-            }
-            if (taper === true) {
-                thickness = thickness * (1 - col / (tailLength * 8))
-            }
-        }
+        ctx.clearRect(0, 0, centreX, obj.canvas.height)
 
-        obj.texture.refresh();
-        obj.texture.update()
+        if (taper === false) {
+            ctx.fillRect(centreX - tailLength, centreY - thickness/2, tailLength, thickness)
+        }
+        else {
+            ctx.beginPath()
+            ctx.moveTo(centreX - tailLength, centreY - thickness/2 + thickness/8)
+            ctx.lineTo(centreX, centreY - thickness/2)
+            ctx.lineTo(centreX, centreY + thickness/2)
+            ctx.lineTo(centreX - tailLength, centreY + thickness/2 - thickness/8)
+            ctx.closePath()
+            ctx.fill()
+        }
+        //ctx.fillRect(0, 0, tailLength, thickness)
     }
 
 
@@ -222,9 +248,9 @@ export class Weapon {
 
     defaultDigTerrain = (obj, thickness, intensity) => {
         if (obj.prevState !== null && obj.prevState !== undefined) {
-            if (this.terrain.getPixel(obj.prevState.x, obj.prevState.y).alpha === 0 && this.terrain.getPixel(obj.x, obj.y).alpha === 0) {
-                obj.prevState.x = obj.x
-                obj.prevState.y = obj.y
+            if (this.terrain.getPixel(obj.prevState.x, obj.prevState.y).alpha === 0 && this.terrain.getPixel(obj.body.x, obj.body.y).alpha === 0) {
+                obj.prevState.x = obj.body.x
+                obj.prevState.y = obj.body.y
                 return
             }
 
@@ -253,94 +279,122 @@ export class Weapon {
 
             ctx.beginPath()
             ctx.moveTo(obj.prevState.x, obj.prevState.y)
-            ctx.lineTo(obj.x, obj.y)
+            ctx.lineTo(obj.body.x, obj.body.y)
             ctx.stroke()
 
-            this.terrain.pushMultiplayerPoints({type: 'dig', x1: obj.prevState.x, y1: obj.prevState.y, x2: obj.x, y2: obj.y, intensity, thickness})
-            
-            obj.prevState.x = obj.x
-            obj.prevState.y = obj.y
+            obj.prevState.x = obj.body.x
+            obj.prevState.y = obj.body.y
         }
 
         else {
-            obj.prevState = {x: obj.x, y: obj.y}
+            obj.prevState = {x: obj.body.x, y: obj.body.y}
         }
     }
 
 
 
-    defaultBounce = (obj, factor = 0.6) => {
+    defaultBounce = (obj, factor = 0.6, speed) => {
         var rotation = 0
-        if (obj.body.velocity.x !== 0) {
-            rotation = Math.atan(obj.body.velocity.y / obj.body.velocity.x)
-    
-            if (obj.body.velocity.x < 0) {
-                rotation = rotation + Math.PI
-            }
-        }
-        else {
-            if (obj.body.velocity.y < 0) {
-                rotation = -Math.PI/2
-            }
-            if (obj.body.velocity.y >= 0) {
-                rotation = Math.PI/2
-            }
+
+        if (obj.body.speed === 0) {
+            return false
         }
 
-        var vx = obj.body.velocity.x
-        var vy = obj.body.velocity.y
-        var v = new Phaser.Math.Vector2(vx, vy)
+        //console.log('bounce pos', obj.body.center.x, obj.body.center.y)
+        //console.log('bounce velocity', obj.body.velocity.x, obj.body.velocity.y)
+
+        if (this.terrain.getPixel(obj.body.prev.x, obj.body.prev.y).alpha > 0) {
+            console.log('bounce inside terrain', obj.body.prev.x, obj.body.prev.y)
+            obj.setPosition(obj.body.prev.x, obj.body.prev.y)
+            obj.body.updateFromGameObject()
+            return false
+        }
+
+        var rotation = obj.body.velocity.angle()
 
         if (this.terrain.getPixel(x, y).alpha !== 0) {
             var [x, y, prevX, prevY] = this.retractInTerrain(obj)
-            obj.x = x
-            obj.y = y
-
+            //obj.setPosition(x,y)
+            //obj.body.updateFromGameObject()
+            obj.body.x = x
+            obj.body.y = y
+        
             var slope = this.terrain.getSlope(prevX, prevY)
             if (isNaN(slope) === true) {
                 if (obj.body.velocity.x > 0) {
-                    slope = Math.PI/2
-                }
-                else {
                     slope = -Math.PI/2
                 }
+                else {
+                    slope = Math.PI/2
+                }
             }
-            var perpendicular = slope + Math.PI/2
-            var alpha = perpendicular - rotation
-            var f = factor
-       
-            v.rotate(2 * alpha - Math.PI)
-            obj.setVelocity(v.x * f, v.y * f)
-            obj.body.preUpdate(true, 0)
+
+            //var perpendicular = slope - Math.PI/2
+            //var alpha = perpendicular - rotation
+            var diff = rotation - slope
+            var reflect = slope - diff
+            var newSpeed = speed ? speed : obj.body.speed * factor
+
+            obj.body.velocity.setAngle(reflect)
+            obj.body.velocity.setLength(newSpeed)
+            obj.body.preUpdate(false, 0)
+            //obj.body.updateFromGameObject()
+            //obj.body.updateFromGameObject()
+
+            //console.log('bounce---velocity', obj.body.velocity.x, obj.body.velocity.y)
+            //console.log('bounce---pos', obj.body.center.x, obj.body.center.y)
+            //console.log('bounce---', this.terrain.getPixel(obj.body.center.x, obj.body.center.y))
+            //console.log(reflect)
+
+            return true
         }
+
+        return false
     }
 
 
 
 
     retractInTerrain = (obj) => {
-        var x = Math.floor(obj.x)
-        var y = Math.floor(obj.y)
+        var x = obj.body.x
+        var y = obj.body.y
+
+        //console.log('retract pos', x, y)
+
+        if (obj.body.speed === 0) {
+            return [x, y, x, y]
+        }
+
+        if (this.terrain.getPixel(obj.body.prev.x, obj.body.prev.y).alpha > 0) {
+            console.log('prev inside terrain', obj.body.prev.x, obj.body.prev.y)
+            return [obj.body.prev.x, obj.body.prev.y, obj.body.prev.x, obj.body.prev.y]
+        }
+
         var prevX = x, prevY = y;
         var initX = x, initY = y;
-        var maxCount = Math.ceil(obj.body.speed)
-        var theta = Phaser.Math.Angle.Wrap(obj.body.velocity.angle() + Math.PI)
+        var maxCount = 100000
+        var theta = obj.body.velocity.angle()
+        // var theta = Phaser.Math.Angle.Wrap(new Phaser.Math.Vector2(obj.velX, obj.velY).angle() + Math.PI)
         var sin = Math.sin(theta)
         var cos = Math.cos(theta)
 
-        //new Phaser.Physics.Arcade.Body().gravity.
         var accelarationX = obj.body.gravity.x
         var accelarationY = obj.body.gravity.y
-        var t = 0.001
+
+        var t = 0.0001
         var v = obj.body.speed
+        // var v = new Phaser.Math.Vector2(obj.velX, obj.velY).length()
 
         while (this.terrain.getPixel(x, y).alpha !== 0) {
             prevX = x
             prevY = y
 
-            x = Math.floor(initX + v * cos * t + 1/2 * accelarationX * t * t)
-            y = Math.floor(initY + v * sin * t + 1/2 * accelarationY * t * t)
-            t = t + 0.001
+            x = initX - (v * cos + 1/2 * accelarationX * t) * t
+            y = initY - (v * sin + 1/2 * accelarationY * t) * t
+
+            t = t + 0.0001
+
+            //this.terrain.setPixel(prevX,prevY,255,0,0,255)
 
             maxCount--
             if (maxCount <= 0) {
@@ -350,12 +404,146 @@ export class Weapon {
             }
         }
 
-        // x = Math.floor(x)
-        // y = Math.floor(y)
-        // prevX = Math.floor(prevX)
-        // prevY = Math.floor(prevY)
+        //console.log('retract----pos', x, y)
+        //console.log('retract----', this.terrain.getPixel(x,y))
 
         return [x, y, prevX, prevY]
+    }
+
+
+
+    retractBase = (obj) => {
+        var x = obj.body.x
+        var y = obj.body.y
+
+        if (obj.body.speed === 0) {
+            return [x, y, x, y]
+        }
+
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = 100000
+        var theta = obj.body.velocity.angle()
+        // var theta = Phaser.Math.Angle.Wrap(new Phaser.Math.Vector2(obj.velX, obj.velY).angle() + Math.PI)
+        var sin = Math.sin(theta)
+        var cos = Math.cos(theta)
+
+        var accelarationX = obj.body.gravity.x
+        var accelarationY = obj.body.gravity.y
+
+        var t = 0.0001
+        var v = obj.body.speed
+
+        while (y >= this.terrain.height - 1) {
+            prevX = x
+            prevY = y
+
+            x = initX - (v * cos + 1/2 * accelarationX * t) * t
+            y = initY - (v * sin + 1/2 * accelarationY * t) * t
+
+            t = t + 0.0001
+
+            maxCount--
+            if (maxCount <= 0) {
+                x = initX
+                y = initY
+                break
+            }
+        }
+
+        return [x, y, prevX, prevY]
+    }
+
+
+
+    retractInAir = (obj) => {
+        var x = obj.body.x
+        var y = obj.body.y
+
+        if (obj.body.speed === 0) {
+            return [x, y, x, y]
+        }
+
+        if (obj.body.position.equals(obj.body.prev)) {
+            return [x, y, x, y]
+        }
+
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = 100000
+        var theta = obj.body.velocity.angle()
+        // var theta = Phaser.Math.Angle.Wrap(new Phaser.Math.Vector2(obj.velX, obj.velY).angle() + Math.PI)
+        var sin = Math.sin(theta)
+        var cos = Math.cos(theta)
+
+        var accelarationX = obj.body.gravity.x
+        var accelarationY = obj.body.gravity.y
+
+        var t = 0.0001
+        var v = obj.body.speed
+        // var v = new Phaser.Math.Vector2(obj.velX, obj.velY).length()
+
+        while (this.terrain.getPixel(x, y).alpha === 0) {
+            prevX = x
+            prevY = y
+
+            x = initX - (v * cos + 1/2 * accelarationX * t) * t
+            y = initY - (v * sin + 1/2 * accelarationY * t) * t
+
+            t = t + 0.0001
+
+            maxCount--
+            if (maxCount <= 0) {
+                x = initX
+                y = initY
+                break
+            }
+        }
+
+        return [x, y, prevX, prevY]
+    }
+
+
+
+    checkCloseToTerrain = (obj, distance) => {
+        var x = obj.body.x
+        var y = obj.body.y
+
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = distance
+        var theta = obj.body.velocity.angle()
+        var sin = Math.sin(theta)
+        var cos = Math.cos(theta)
+
+        var accelarationX = obj.body.gravity.x
+        var accelarationY = obj.body.gravity.y
+
+        var t = 0.01
+        var v = 100
+
+        while (this.terrain.getPixel(x, y).alpha === 0) {
+            prevX = x
+            prevY = y
+
+            x = initX + (v * cos + 1/2 * accelarationX * t) * t
+            y = initY + (v * sin + 1/2 * accelarationY * t) * t
+
+            t = t + 0.01
+
+            maxCount--
+            if (maxCount <= 0) {
+                return false
+            }
+        }
+
+        if (x >= this.terrain.width - 1 || x <= 0) {
+            return false
+        }
+
+        if (y <= 0) return false
+
+        return true
     }
 
 
@@ -363,30 +551,32 @@ export class Weapon {
 
     fixCloseToTank = (obj, data) => {
         var myTank = this.tank
-        var oppTank = (this.tank === this.scene.tank1) ? this.scene.tank1 : this.scene.tank2
+        var oppTank = (this.tank === this.scene.tank1) ? this.scene.tank2 : this.scene.tank1
 
         if (data.oppTankDist !== undefined) {
-            var x = Math.floor(obj.x)
-            var y = Math.floor(obj.y)
+            var x = obj.body.x
+            var y = obj.body.y
             var prevX = x, prevY = y;
             var initX = x, initY = y;
-            var maxCount = Math.ceil(obj.body.speed)
-            var theta = Phaser.Math.Angle.Wrap(obj.body.velocity.angle() + Math.PI)
+            var maxCount = 10000
+            var theta = obj.body.velocity.angle()
+            //var theta = Phaser.Math.Angle.Wrap(new Phaser.Math.Vector2(obj.velX, obj.velY).angle() + Math.PI)
             var sin = Math.sin(theta)
             var cos = Math.cos(theta)
 
             var accelarationX = obj.body.gravity.x
             var accelarationY = obj.body.gravity.y
-            var t = 0.001
+ 
+            var t = 0.0001
             var v = obj.body.speed
 
-            while (Phaser.Math.Distance.Between(obj, oppTank.centre) < data.oppTankDist) {
+            while (Phaser.Math.Distance.BetweenPoints(obj.body.x, obj.body.y, oppTank.centre.x, oppTank.centre.y) < data.oppTankDist) {
                 prevX = x
                 prevY = y
 
-                x = Math.floor(initX + v * cos * t + 1/2 * accelarationX * t * t)
-                y = Math.floor(initY + v * sin * t + 1/2 * accelarationY * t * t)
-                t = t + 0.001
+                x = initX - (v * cos + 1/2 * accelarationX * t) * t
+                y = initY - (v * sin + 1/2 * accelarationY * t) * t
+                t = t + 0.0001
 
                 maxCount--
                 if (maxCount <= 0) {
@@ -395,11 +585,18 @@ export class Weapon {
                     break
                 }
             }
-            obj.setPosition(Math.floor(prevX), Math.floor(prevY))
-            //obj.setVelocity(0)
-            //obj.setGravity(0)
-            //obj.setAcceleration(0)
-            obj.body.preUpdate(true, 0)
+
+            //obj.setPosition(prevX, prevY)
+            //obj.body.updateFromGameObject()
+            obj.body.x = prevX
+            obj.body.y = prevY
         }
+    }
+
+
+
+    setBodyCenter = (obj, x, y) => {
+        //this.center.set(this.position.x + this.halfWidth, this.position.y + this.halfHeight);
+        obj.body.position.set(x - obj.body.halfWidth, y - obj.body.halfHeight)
     }
 }

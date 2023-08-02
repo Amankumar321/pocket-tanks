@@ -36,6 +36,8 @@ export class Terrain extends Textures.CanvasTexture {
         this.frameCount = -1
         this.soundEffects = ['rocks_1', 'rocks_2', 'rocks_3', 'rocks_4', 'rocks_5', 'rocks_6']
         this.soundEffectIndex = 0
+
+        this.scene.physics.world.on('worldstep', this.updateTerrain, this)
     }
 
 
@@ -65,7 +67,7 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     save = () => {
-        this.update()
+        //this.update()
         this.previousSaved = this.context.getImageData(0, 0, this.width, this.height)
     }
 
@@ -73,11 +75,13 @@ export class Terrain extends Textures.CanvasTexture {
 
     restore = () => {
         this.context.putImageData(this.previousSaved, 0, 0)
+        this.update()
     }
 
 
 
     multiplayerCorrection = (data) => {
+        return
         this.context.putImageData(this.previousSaved, 0, 0)
         this.update()
 
@@ -244,6 +248,7 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     blast = (type, x, y, radius, data, blowTank) => {
+        console.log(this.frameCount, x, y)
         this.animate = true
         var hole = new Blast(this.scene, type, x, y, radius, data, blowTank)
         this.blastArray.push(hole)
@@ -561,5 +566,48 @@ export class Terrain extends Textures.CanvasTexture {
         }
 
         return null
+    }
+
+    
+
+
+    retractPoint = (x, y, velocity, accelaration, gravity) => {
+        if (velocity === undefined) return
+        if (accelaration === undefined) accelaration = new Phaser.Math.Vector2(0, 0)
+        if (gravity === undefined) gravity = new Phaser.Math.Vector2(0, 0)
+
+        if (velocity.length() === 0 && accelaration.length() === 0 && gravity.length() === 0) return [x, y, x, y]
+        
+        var prevX = x, prevY = y;
+        var initX = x, initY = y;
+        var maxCount = 100000
+        var theta = velocity.angle()
+        var sin = Math.sin(theta)
+        var cos = Math.cos(theta)
+
+        var accelarationX = accelaration.x + gravity.x
+        var accelarationY = accelaration.y + gravity.y
+
+        var t = 0.0001
+        var v = velocity.length()
+
+        while (this.getPixel(x, y).alpha !== 0) {
+            prevX = x
+            prevY = y
+
+            x = initX - (v * cos + 1/2 * accelarationX * t) * t
+            y = initY - (v * sin + 1/2 * accelarationY * t) * t
+
+            t = t + 0.0001
+
+            maxCount--
+            if (maxCount <= 0) {
+                x = initX
+                y = initY
+                break
+            }
+        }
+
+        return [x, y, prevX, prevY]
     }
 }

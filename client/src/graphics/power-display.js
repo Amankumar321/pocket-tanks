@@ -53,7 +53,7 @@ const drawArrow = (ctx, width, height, angle) => {
 export const createPowerDisplay = (hud) => {
     var w = 200
     var h = 80
-    var powerDisplay = hud.scene.add.container(hud.width * 3/4, hud.height * 11/12)
+    var powerDisplay = hud.scene.add.container(hud.width * 3/4, hud.height * 10.8/12)
 
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
@@ -87,24 +87,27 @@ export const createPowerDisplay = (hud) => {
     powerBtn.setInteractive();
 
     const releasePointer = (e) => {
-        if (hud.scene.input.mousePointer.locked === true) {
-            console.log(e)
-            //hud.scene.sound.play('click', {volume: 0.3})
-            hud.scene.input.mouse.releasePointerLock()
-            powerBtn.setData('active', false)
-            hud.scene.input.off('pointerdown', releasePointer)
+        if (powerBtn.getData('active') === true) {
+            if (powerBtn.getData('allowHide') === false) {
+                powerBtn.setData('allowHide', true)
+            }
+            else {
+                hud.scene.sound.play('click', {volume: 0.3})
+                powerBtn.setData('active', false)
+                hud.scene.input.off('pointerdown', releasePointer)
+            }
         }
     }
 
-    powerBtn.on('pointerdown', () => {
+    powerBtn.on('pointerdown', (e) => {
+        if (powerBtn.getData('active') === true) return
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
-        hud.scene.input.mouse.requestPointerLock()
         powerBtn.setData('active', true)
-
+        powerBtn.setData('allowHide', false)
         hud.scene.input.on('pointerdown', releasePointer)
     })
-
+    
 
     
 
@@ -150,16 +153,24 @@ export const createPowerDisplay = (hud) => {
     powerDisplay.add(hud.powerMeter)
     
     hud.powerMeter.refresh = () => {
+        var delX = hud.scene.input.mousePointer.x - hud.scene.input.mousePointer.prevPosition.x
+        if (delX > 0) {
+            delX = Math.ceil(delX)
+        }
+        else {
+            delX = Math.floor(delX)
+        }
+
         if (hud.scene.activeTank === 1) {
             if (powerBtn.getData('active') === true) {
-                hud.scene.tank1.setPower(hud.scene.tank1.power + hud.scene.input.mousePointer.movementX)
+                hud.scene.tank1.setPower(hud.scene.tank1.power + delX)
                 hud.scene.input.mousePointer.movementX = 0
             }
             drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank1.power)
         }
         else if (hud.scene.activeTank === 2) {
             if (powerBtn.getData('active') === true) {
-                hud.scene.tank2.setPower(hud.scene.tank2.power + hud.scene.input.mousePointer.movementX)
+                hud.scene.tank2.setPower(hud.scene.tank2.power + delX)
                 hud.scene.input.mousePointer.movementX = 0
             }
             drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank2.power)

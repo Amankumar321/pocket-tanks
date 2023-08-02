@@ -50,14 +50,20 @@ export class Scene3 extends Scene {
         canvas.width = 150
         canvas.height = 100
         drawBackBtn(ctx, canvas.width, canvas.height)
-        this.textures.addCanvas('back-btn', canvas)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        var backtexture = this.textures.addCanvas('back-btn', canvas, true)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()
         backbtn.on('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-2')
+        })
+
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
         })
     }
 

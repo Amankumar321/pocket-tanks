@@ -15,6 +15,7 @@ export class Blast {
         this.scene = scene
         this.count = 0
         this.optimized = (this.data.optimize === undefined) ? false : (this.data.optimize)
+        //this.optimized = 1
         
         this.canvas = document.createElement('canvas')
         this.canvas.width = scene.renderer.width
@@ -122,6 +123,7 @@ export class Blast {
                 this.scene.tank1.body.setVelocity(this.data.blowPower * Math.cos(angle), 2 * this.data.blowPower * Math.sin(angle))
                 this.scene.tank1.body.setGravityY(300)
                 this.scene.tank1.setPosition(this.scene.tank1.centre.x, this.scene.tank1.centre.y)
+                this.scene.tank1.body.position.set(this.scene.tank1.centre.x, this.scene.tank1.centre.y)
                 this.blowTank = false
             }
             if (this.blowTank && this.innerRadius + this.thickness + this.scene.tank2.hitRadius > dist2) {
@@ -134,6 +136,7 @@ export class Blast {
                 this.scene.tank2.body.setVelocity(this.data.blowPower * Math.cos(angle), 2 * this.data.blowPower * Math.sin(angle))
                 this.scene.tank2.body.setGravityY(300)
                 this.scene.tank2.setPosition(this.scene.tank2.centre.x, this.scene.tank2.centre.y)
+                this.scene.tank2.body.position.set(this.scene.tank2.centre.x, this.scene.tank2.centre.y)
                 this.blowTank = false
             }
         }

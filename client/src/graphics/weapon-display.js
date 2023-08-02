@@ -65,7 +65,7 @@ const drawWeaponScrollBox = (ctx, width, height) => {
 export const createWeaponDisplay = (hud) => {
     var w = 220
     var h = 80
-    var weaponContainer = hud.scene.add.container(hud.width * 1/4, hud.height * 11/12)
+    var weaponContainer = hud.scene.add.container(hud.width * 1/4, hud.height * 10.6/12)
     weaponContainer.setDepth(6)
 
     var canvas = document.createElement('canvas');
@@ -128,10 +128,10 @@ const createWeaponScrollDisplay = (hud, weaponLogo) => {
     if (hud.scene.textures.exists('weapon-scroll-box')) hud.scene.textures.remove('weapon-scroll-box')
     hud.scene.textures.addCanvas('weapon-scroll-box', canvas);
 
-    hud.weaponScrollDisplay.scrollBox = hud.scene.add.image(0, 0, 'weapon-scroll-box')
+    hud.weaponScrollDisplay.scrollBox = hud.scene.add.image(0, 0, 'weapon-scroll-box').setOrigin(0.5)
     scrollContainer.add(hud.weaponScrollDisplay.scrollBox)
 
-    hud.weaponScrollDisplay.scrollBackground = hud.scene.add.rectangle(0, h/24, w - w/12, h - h/6, 0x000000).setOrigin(0.5)
+    hud.weaponScrollDisplay.scrollBackground = hud.scene.add.rectangle(0, h/24, w - w/12, h - h/6, 0x000000)
     scrollContainer.add(hud.weaponScrollDisplay.scrollBackground)
 
     hud.weaponScrollDisplay.tileHeight = h/3 - h/6

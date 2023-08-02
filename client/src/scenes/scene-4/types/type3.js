@@ -9,6 +9,8 @@ export const type3 = (scene) => {
     const socket = window.socket
     socket.removeAllListeners()
 
+    console.log(scene.roomList)
+
     scene.player1 = scene.sceneData.player1
 
     const screenCenterX = scene.cameras.main.worldView.x + scene.cameras.main.width / 2;
@@ -27,32 +29,57 @@ export const type3 = (scene) => {
     var selectedColor = (new Date()).getSeconds() % 8
     //
 
-    scene.roomList = []
+    const noRoom = scene.add.container(scene.renderer.width/2, scene.renderer.height/2).setVisible(false)
+    noRoom.add(scene.add.image(0, -50, 'face-frown-regular').setDisplaySize(200, 200).setAlpha(0.8))
+    noRoom.add(scene.add.text(0, 100, 'No online rooms.')
+    .setFontFamily('Verdana').setFontSize(30).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
+    noRoom.add(scene.add.text(0, 140, 'Create your own room and invite friends.')
+    .setFontFamily('Verdana').setFontSize(20).setOrigin(0.5, 0.5).setAlign('center'))
+
+    if (scene.roomList === undefined)
+        scene.roomList = []
 
     const updateRooms = () => {
         scene.roomList.forEach((room, index) => {
             if (index > 4) return
-            room.x = scene.add.rectangle(screenCenterX - 300, 150 + (index + 1) * 80, 50, 50, room.host.color, 255);
-            room.y = scene.add.text(screenCenterX - 250, 150 + (index + 1) * 80, room.host.name).setFontSize(26);
-            room.z = scene.add.text(screenCenterX + 250, 150 + (index + 1) * 80, 'Play').setFontSize(26);
+            //room.x = scene.add.rectangle(screenCenterX - 300, 150 + (index + 1) * 80, 50, 50, room.host.color, 255);
+            var name = (room.host.name.length < 12) ? room.host.name : (room.host.name.slice(0,10) + "...")
+            room.x = scene.add.text(screenCenterX - 350, 150 + (index + 1) * 80, index + 1).setFontSize(26);
+            room.y = scene.add.text(screenCenterX - 300, 150 + (index + 1) * 80, name).setFontSize(26);
+            room.z = scene.add.text(screenCenterX + 280, 150 + (index + 1) * 80, 'Play').setFontSize(26);
+            room.x.setColor('rgba(180,180,180,1)')
             room.z.setColor('rgba(240,240,240,1)')
-            room.y.setColor('rgba(180,180,180,1)')
-            room.x.setOrigin(0.5)
+            room.y.setColor(int2rgba(room.host.color))
+            //room.x.setOrigin(0.5)
+            room.x.setOrigin(0, 0.4).setFontSize(40).setFontFamily('"Days One"')
             room.y.setOrigin(0, 0.4).setFontSize(40).setFontFamily('"Days One"')
             room.z.setOrigin(0.5, 0.4).setFontSize(40).setFontFamily('"Days One"')
+            strokeText(room.x, 6)
             strokeText(room.y, 6)
             strokeText(room.z, 6)
             room.z.setInteractive()
+        
+            if (room.host.socketId === socket.id) {
+                room.y.setText(room.y.text + " (You)")
+            }
+
             room.z.on('pointerdown', () => {
                 scene.sound.play('click', {volume: 0.3})
                 socket.emit('joinRoom', {roomId: room.roomId, name: scene.player1.name, color: scene.player1.color})
             })
         });
+
+        if (scene.roomList.length === 0) {
+            noRoom.setVisible(true)
+        }
+        else {
+            noRoom.setVisible(false)
+        }
     }
 
     const clearRooms = () => {
         scene.roomList.forEach((room, index) => {
-            if (index > 4) return
+            console.log(index + " removed")
             room.x.destroy(true)
             room.y.destroy(true)
             room.z.destroy(true)
@@ -60,8 +87,12 @@ export const type3 = (scene) => {
         scene.roomList = []
     }
 
+    scene.clearRooms = clearRooms
+    clearRooms()
+
     socket.on('setRooms', ({rooms}) => {
         clearRooms()
+        console.log('setRooms ', rooms.length)
         rooms.forEach((room) => { scene.roomList.push(room) })
         updateRooms()
     })

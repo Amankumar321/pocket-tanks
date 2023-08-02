@@ -35,8 +35,8 @@ export class Scene5 extends Scene {
         canvas.width = 150
         canvas.height = 100
         drawBackBtn(ctx, canvas.width, canvas.height)
-        this.textures.addCanvas('back-btn', canvas)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        var backtexture = this.textures.addCanvas('back-btn', canvas, true)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()
@@ -62,6 +62,12 @@ export class Scene5 extends Scene {
         else if (this.sceneData.gameType === 4) {
             this.handleType4()
         }
+
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
+        })
         
     }
 

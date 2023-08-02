@@ -46,7 +46,6 @@ export class MainScene extends Scene {
     }
 
 
-
     create = () => {
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
@@ -70,6 +69,7 @@ export class MainScene extends Scene {
         this.createBoundWalls()
         this.createTank1()
         this.createTank2()
+        this.createAd()
        
         if (this.sceneData.gameType === 1) {
             this.handleType1()
@@ -145,16 +145,25 @@ export class MainScene extends Scene {
                     this.hideExitMenu()
             }
         })
+
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
+        })
+
+        // setTimeout(() => {
+        //     this.terrain.save()
+        // }, 2000);
     }
 
 
 
     update = (time, delta) => {
         //this.fps.setText(this.game.loop.actualFps)
-    
-        this.terrain.updateTerrain()
-        this.tank1.update()
-        this.tank2.update()
+        //this.terrain.updateTerrain()
+        //this.tank1.update()
+        //this.tank2.update()
         this.HUD.refresh()
 
         this.checkSwitchTurn()
@@ -163,12 +172,14 @@ export class MainScene extends Scene {
 
 
     createBoundWalls = () => {
-        this.rightWall = this.physics.add.image(this.renderer.width, this.renderer.height, 'wall')
-        this.leftWall = this.physics.add.image(0, this.renderer.height, 'wall')
-        this.rightWall.setScale(1, this.renderer.height * 4)
-        this.leftWall.setScale(1, this.renderer.height * 4)
+        this.rightWall = this.physics.add.image(this.renderer.width + 50, this.renderer.height, 'wall')
+        this.leftWall = this.physics.add.image(-50, this.renderer.height, 'wall')
+        this.rightWall.setSize(100, this.renderer.height * 4)
+        this.leftWall.setSize(100, this.renderer.height * 4)
         this.leftWall.setImmovable(true).setAlpha(0)
         this.rightWall.setImmovable(true).setAlpha(0)
+        this.leftWall.setOrigin(1, 0)
+        this.rightWall.setOrigin(0, 0)
     }
 
 
@@ -187,7 +198,8 @@ export class MainScene extends Scene {
         grd.addColorStop(0.5, 'rgba(90,30,130,1)')
         grd.addColorStop(1, 'rgba(200,40,255,1)')
 
-        ctx.fillStyle = grd
+        //ctx.fillStyle = grd
+        ctx.fillStyle = 'rgba(0,0,0,1)'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
         if (this.textures.exists('background')) this.textures.remove('background')
@@ -252,6 +264,64 @@ export class MainScene extends Scene {
     }
 
 
+
+    createAd = () => {
+        var adBtn = this.add.text(this.renderer.width/2, this.renderer.height * 8/9, "Auto Adjust\n(Watch Ad)").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
+        adBtn.setOrigin(0.5, 0.5).setColor("rgba(0,0,0,1)").setDepth(101)
+
+        var adImg = this.add.rectangle(this.renderer.width/2, this.renderer.height * 8/9, 160, 60, 0xcccccc)
+        adImg.setDepth(100).setOrigin(0.5,0.5).setBlendMode()
+
+        const showAd = () => {
+            adBtn.setText("Loading")
+            adBtn.removeInteractive()
+            adImg.removeInteractive()
+            var tank = null;
+            if (this.activeTank === 1) tank = this.tank1
+            if (this.activeTank === 2) tank = this.tank2
+
+            var gdsdk = window.gdsdk
+
+            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
+                gdsdk.showAd('rewarded')
+                .then(response => {
+                    if (tank !== null) {
+                        tank.autoAdjust()
+                    }
+                    adBtn.setText("Auto Adjust\n(Watch Ad)")
+                    adBtn.setInteractive()
+                    adImg.setInteractive()
+                    // Ad process done. You can track "SDK_REWARDED_WATCH_COMPLETE" event if that event triggered, that means the user watched the advertisement completely, you can give reward there.
+                })
+                .catch(error => {
+                    if (tank !== null) {
+                        tank.autoAdjust()
+                    }
+                    //adBtn.setText("Error. Try again")
+                    adImg.setInteractive()
+                    adBtn.setInteractive()
+                    // An error catched. Please don't give reward here.
+                })
+                .finally(() => {
+                    this.game.sound.mute = false
+                })
+            }
+            else {
+                adBtn.setText("Auto Adjust\n(Watch Ad)")
+                adImg.setInteractive()
+                adBtn.setInteractive()
+            }
+        }
+
+        adBtn.setInteractive()
+        adImg.setInteractive()
+
+        adBtn.on('pointerdown', showAd)
+        adImg.on('pointerdown', showAd)
+    }
+
+
+
     checkSwitchTurn = () => {
         if (this.terrain.animate === true) return
         if (this.terrain.blastArray.length !== 0) return
@@ -270,6 +340,8 @@ export class MainScene extends Scene {
         }
 
         else if (this.activeTank === 1 && this.tank1.active === false && this.tank1.turret.activeWeapon === null) {
+            //this.terrain.restore()
+            this.terrain.frameCount = -1
             this.activeTank = 2
             this.tank2.active = true
             this.HUD.reset()
@@ -285,6 +357,8 @@ export class MainScene extends Scene {
             }
         }
         else if (this.activeTank === 2 && this.tank2.active === false && this.tank2.turret.activeWeapon === null){
+            //this.terrain.restore()
+            this.terrain.frameCount = -1
             if (this.sceneData.gameType !== 3) {
                 this.activeTank = 1
                 this.tank1.active = true
@@ -354,6 +428,15 @@ export class MainScene extends Scene {
     }
 
 
+    displayAd = () => {
+        var gdsdk = window.gdsdk
+        if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
+            alert()
+            gdsdk.showAd()
+        }
+    }
+
+
 
     showGameOver = () => {
         this.showWinner()
@@ -384,6 +467,8 @@ export class MainScene extends Scene {
 
         a.setInteractive()
         b.setInteractive()
+
+        var gdsdk = window.gdsdk
         
         a.once('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
@@ -396,9 +481,17 @@ export class MainScene extends Scene {
                 x.setText('Waiting for opponent...')
             }
             else {
+                if (this.winnerBlastInterval !== null) {
+                    clearInterval(this.winnerBlastInterval)
+                    this.winnerBlastInterval = null
+                }
                 this.sound.stopByKey('winner')
                 this.scene.start('scene-5', this.sceneData)
+                this.displayAd()
             }
+            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
+                gdsdk.showAd();
+           }
         })
         b.once('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
@@ -408,6 +501,9 @@ export class MainScene extends Scene {
                 const socket = window.socket
                 socket.emit('leaveRoom', {})
             }
+            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
+                gdsdk.showAd();
+           }
         })
         
         setTimeout(() => {

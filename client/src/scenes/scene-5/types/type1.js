@@ -121,6 +121,7 @@ export const type1 = (scene) => {
             if (remainingArray.length === 0) {
                 g.setText('CONTINUE')
                 g.setColor('rgba(255,255,0,1)')
+                strokeText(g, 6)
             }
 
             //CPU pick
@@ -141,6 +142,7 @@ export const type1 = (scene) => {
                 if (remainingArray.length === 0) {
                     g.setText('CONTINUE')
                     g.setColor('rgba(255,255,0,1)')
+                    strokeText(g, 6)
                 }
             }, 1000);
         }
@@ -151,7 +153,7 @@ export const type1 = (scene) => {
         var pickable = scene.add.container(rect2.x - rect2.width/2 - 80, rect2.y - rect2.height/2 + 10 + index * 40)
         var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
         var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
-        var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
+        var rect = scene.add.rectangle(110,15,250,36).setDepth(2)
         //rect.setStrokeStyle(2, 0xff0000)
         pickable.add(txt)
         pickable.text = weaponArray[randomWeaponIndex].name
@@ -178,7 +180,7 @@ export const type1 = (scene) => {
         var pickable = scene.add.container(rect2.x - rect2.width/2 + 180, rect2.y - rect2.height/2 + 10 + index * 40)
         var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
         var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)
-        var rect = scene.add.rectangle(80,15,250,30).setDepth(2)
+        var rect = scene.add.rectangle(110,15,250,36).setDepth(2)
         //rect.setStrokeStyle(2, 0xff0000)
         pickable.add(txt)
         pickable.text = weaponArray[randomWeaponIndex].name
@@ -199,6 +201,18 @@ export const type1 = (scene) => {
             pickWeapon(pickableArray[index + totalWeapons/2])
         })
     }
+
+    pickableArray.forEach(pickable => {
+        pickable.rect.on('pointerdown', () => {
+            pickable.rect.setStrokeStyle(0,0,0)
+        })
+        pickable.rect.on('pointerover', () => {
+            pickable.rect.setStrokeStyle(2, 0x00ccff, 1)
+        })
+        pickable.rect.on('pointerout', () => {
+            pickable.rect.setStrokeStyle(2, 0x00ccff, 0)
+        })
+    })
 
     const randomPick = () => {
         if (remainingArray.length === 0) {
@@ -224,6 +238,7 @@ export const type1 = (scene) => {
                 if (remainingArray.length === 0) {
                     g.setText('CONTINUE')
                     g.setColor('rgba(255,255,0,1)')
+                    strokeText(g, 6)
                 }
 
                 randomPick()
@@ -247,6 +262,7 @@ export const type1 = (scene) => {
                 if (remainingArray.length === 0) {
                     g.setText('CONTINUE')
                     g.setColor('rgba(255,255,0,1)')
+                    strokeText(g, 6)
                 }
                 
                 randomPick()
@@ -267,6 +283,9 @@ export const type1 = (scene) => {
             scene.scene.start('main-scene', {gameType: 1, player1: scene.player1, cpu1: scene.cpu1})
         else if (turn === 1) {
             g.removeInteractive()
+            pickableArray.forEach(pickable => {
+                pickable.rect.removeInteractive()
+            })
             randomPick()
         }
     })

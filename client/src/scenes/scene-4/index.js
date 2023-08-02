@@ -49,8 +49,8 @@ export class Scene4 extends Scene {
         canvas.width = 150
         canvas.height = 100
         drawBackBtn(ctx, canvas.width, canvas.height)
-        this.textures.addCanvas('back-btn', canvas)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        var backtexture = this.textures.addCanvas('back-btn', canvas, true)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()
@@ -58,10 +58,19 @@ export class Scene4 extends Scene {
         backbtn.on('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
             if (this.sceneData.gameType === 3) {
+                console.log(this.roomList?.length)
+                console.log('clearing rooms')
+                this.clearRooms()
                 const socket = window.socket
                 socket.emit('leaveRoom', {})
             }
             this.scene.start('scene-3', {gameType: this.sceneData.gameType})
+        })
+
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
         })
     }
 

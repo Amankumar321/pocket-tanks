@@ -56,20 +56,34 @@ export class ScrollList {
         this.selectedDisplay.on('pointerdown', () => {
             this.scene.sound.play('click', {volume: 0.3})
             this.scene.hideTurnPointer()
-            this.scene.input.mouse.requestPointerLock()
+            //this.scene.input.mouse.requestPointerLock()
             this.toShow = true
         })
 
         this.scene.input.on('pointerdown', () => {
-            if (this.scene.input.mouse.locked === true ) {
-                if (this.activeItem !== null && this.visible) {
-                    //this.scene.sound.play('click', {volume: 0.3})
+            if (this.visible === true ) {
+                if (this.activeItem !== null) {
+                    this.scene.sound.play('click', {volume: 0.3})
                     this.setActive(this.activeItem)
-                    this.scene.input.mouse.releasePointerLock()
+                    //this.scene.input.mouse.releasePointerLock()
                     this.hide()
                     this.activeItem = null
                 }
             }
+        })
+
+        this.scrollBox.setInteractive()
+        this.scrollBox.on('pointerdown', (e) => {
+            if (this.visible === true ) {
+                if (this.activeItem !== null) {
+                    this.scene.sound.play('click', {volume: 0.3})
+                    this.setActive(this.activeItem)
+                    //this.scene.input.mouse.releasePointerLock()
+                    this.hide()
+                    this.activeItem = null
+                }
+            }
+            //e.event.stopPropagation()
         })
 
         // socket.on('setWeapon', ({index}) => {
@@ -178,7 +192,7 @@ export class ScrollList {
 
 
     update = () => {
-        if (this.scene.input.mouse.locked && this.visible) {
+        if (this.visible) {
             this.scrollList.children.each((child, index) => {
                 var x = child.x
                 var y = child.y
@@ -194,7 +208,7 @@ export class ScrollList {
                 }
             })
 
-            this.scrollList.incY(this.scene.input.mousePointer.movementY)
+            this.scrollList.incY(-this.scene.input.mousePointer.deltaY)
             //this.scrollTiles.incY(this.scene.input.mousePointer.movementY)
 
             this.scrollList.setY(Math.min(this.scrollList.getChildren()[0].y, this.y), this.tileHeight)

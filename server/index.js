@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import mainsocket from './socket-io/main.js'
 
 dotenv.config()
-const PORT = 4000
+const PORT = 5001
 const app = express();
 const server = http.createServer(app)
 

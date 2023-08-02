@@ -5,7 +5,7 @@ import WebFontFile from '../../classes/WebFontFile';
 export class Scene2 extends Scene {
     constructor() {
         super('scene-2');
-        
+        //this.clicktext = null
     }
 
 
@@ -20,6 +20,7 @@ export class Scene2 extends Scene {
 
     create = () => {
         //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
+        //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14)
 
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
@@ -46,8 +47,8 @@ export class Scene2 extends Scene {
         canvas.width = 150
         canvas.height = 100
         drawBackBtn(ctx, canvas.width, canvas.height)
-        this.textures.addCanvas('back-btn', canvas)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, 'back-btn')
+        var backtexture = this.textures.addCanvas('back-btn', canvas, true)
+        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()
@@ -60,6 +61,11 @@ export class Scene2 extends Scene {
         b.setInteractive()
         c.setInteractive()
         d.setInteractive()
+
+        this.addClickable(a)
+        this.addClickable(b)
+        this.addClickable(c)
+        this.addClickable(d)
 
         a.on('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
@@ -77,8 +83,29 @@ export class Scene2 extends Scene {
             this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-3', {gameType: 4})
         })
+
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
+        })
     }
 
+    addClickable = (btn) => {
+        return
+        btn.on('pointermove', () => {
+            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
+        })
+
+        btn.on('pointerover', () => {
+            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
+            //this.clicktext.setVisible(true)
+        })
+
+        btn.on('pointerout', () => {
+            //this.clicktext.setVisible(false)
+        })
+    }
 
 
     update = (time, delta) => {

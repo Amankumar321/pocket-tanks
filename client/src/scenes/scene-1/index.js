@@ -2,6 +2,9 @@ import { Scene, GameObjects, BlendModes, Textures } from 'phaser';
 import WebFontFile from '../../classes/WebFontFile';
 import Phaser from 'phaser';
 import assetLoader from '../../weapons/sounds'
+import { createPlayButton } from '../../graphics/play-btn';
+import { Tween } from '../../classes/Tween';
+import { Collider } from '../../classes/Collider';
 
 export class Scene1 extends Scene {
     constructor() {
@@ -9,57 +12,13 @@ export class Scene1 extends Scene {
         this.fps = null
         this.playbtn = null
         this.k = null
+        //this.clicktext = null
     }
 
 
 
     preload = () => {
-        this.load.image('cover', 'assets/images/c.png')
-        this.load.audio('intro', ['assets/sounds/intro.mp3'])
-        this.load.audio('background', ['assets/sounds/background.mp3'])
-        this.load.audio('click', ['assets/sounds/click.wav'])
-        this.load.image('wall', 'assets/images/wall.png');
-        this.load.addFile(new WebFontFile(this.load, ['Cabin:400', 'Days One']))
-
-        this.load.audio('rocks_1', ['assets/sounds/others/rocks_1.wav'])
-        this.load.audio('rocks_2', ['assets/sounds/others/rocks_2.wav'])
-        this.load.audio('rocks_3', ['assets/sounds/others/rocks_3.wav'])
-        this.load.audio('rocks_4', ['assets/sounds/others/rocks_4.wav'])
-        this.load.audio('rocks_5', ['assets/sounds/others/rocks_5.wav'])
-        this.load.audio('rocks_6', ['assets/sounds/others/rocks_6.wav'])
-
-        this.load.audio('winner', ['assets/sounds/winner.mp3'])
-
-        assetLoader(this)
-
-        var w = this.renderer.width
-        var h = this.renderer.height
-
-        var progressBar = this.add.graphics();
-        var progressBox = this.add.graphics();
-
-        var loadingText = this.make.text({x: w / 2, y: h / 2, text: 'Loading',
-            style: {
-                fill: '#cccccc',
-            }
-        });
-
-        loadingText.setOrigin(0.5, 1).setFontSize(36);
-
-        progressBox.lineStyle(2, 0xcccccc)
-        progressBox.strokeRect(w/2 - 160, h/2 + 15, 320, 40);
-
-        this.load.on('progress', function (value) {
-            progressBar.clear();
-            progressBar.fillStyle(0xeeeeee, 1);
-            progressBar.fillRect(w/2 - 150, h/2 + 20, 300 * value, 30);
-        });
-    
-        this.load.on('complete', function () {
-            progressBar.destroy(true)
-            progressBox.destroy(true)
-            loadingText.destroy(true)
-        });
+        //
     }
 
     toggleFullscreen = () => {
@@ -75,13 +34,14 @@ export class Scene1 extends Scene {
 
     create = () => {
         //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
+        //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14)
 
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
         //const a = this.add.text(screenCenterX, screenCenterY - 200, 'Pocket');
         //const b = this.add.text(screenCenterX, screenCenterY - 50, 'Tanks');
 
-        var cover = this.physics.add.image(screenCenterX, screenCenterY - 500, 'cover')
+        var cover = this.physics.add.image(screenCenterX, screenCenterY - 500, 'cover').setScale(1.01)
 
         this.tweens.add({
             targets: cover,
@@ -102,7 +62,43 @@ export class Scene1 extends Scene {
 
         //this.sound.add('click')
 
+        this.input.on('pointerdown', () => {
+            if (window.game.sound.mute === true) {
+                window.game.sound.mute = false
+            }
+        })
 
+        const w = this.cameras.main.width
+
+        var [contactOption, contactBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
+        contactOption.setDisplaySize(80, 60)
+        this.addClickable(contactOption)
+
+        var [aboutOption, aboutsBox] = this.createOption('question-solid', 'About', w * 2/7, screenCenterY * 5/3 - 50)
+        aboutOption.setDisplaySize(60, 80)
+        this.addClickable(aboutOption)
+
+        var [controlsOption, controlsBox] = this.createOption('keyboard-regular', 'Controls', w * 1/7, screenCenterY * 5/3 - 50)
+        controlsOption.setDisplaySize(100, 80)
+        this.addClickable(controlsOption)
+
+        var [tutorialOption, tutorialBox] = this.createOption('youtube', 'Tutorial', w * 6/7, screenCenterY * 5/3 - 50)
+        tutorialOption.setDisplaySize(100, 80)
+        this.addClickable(tutorialOption)
+
+        //
+
+        var canvas = document.createElement('canvas')
+        canvas.width = 40
+        canvas.height = 40
+        var ctx = canvas.getContext('2d')
+        ctx.fillStyle = 'rgba(0,255,0,1)'
+        ctx.beginPath()
+        ctx.arc(20, 20, 20, 0, Math.PI * 2)
+        ctx.closePath()
+        ctx.fill()
+
+        //
         // var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
         // fullscreen.setInteractive({draggable: true})
         // fullscreen.on('pointerdown', this.toggleFullscreen)
@@ -113,67 +109,10 @@ export class Scene1 extends Scene {
     }
 
     createPlayBtn = () => {
-        var width = 180
-        var height = 140
-        var margin1 = 5
-        var margin2 = 10
-        var r = height/2
-        
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-        var canvas = document.createElement('canvas')
-        var ctx = canvas.getContext('2d')
-
-        canvas.width = width + 2*r
-        canvas.height = height
-
-        ctx.fillStyle = 'rgba(165,165,165,1)'
-        ctx.beginPath()
-        ctx.arc(r, height/2, r, Math.PI/2, Math.PI/2 * 3)
-        ctx.lineTo(r + width, 0)
-        ctx.arc(r + width, height/2, r, -Math.PI/2, Math.PI/2)
-        ctx.closePath()
-        ctx.fill()
-
-        ctx.fillStyle = 'rgba(220,220,220,1)'
-        ctx.beginPath()
-        ctx.arc(r, height/2, r - margin1, Math.PI/2, Math.PI/2 * 3)
-        ctx.lineTo(r + width - margin1*2, margin1)
-        ctx.arc(r + width, height/2, r - margin1, -Math.PI/2, Math.PI/2)
-        ctx.closePath()
-        ctx.fill()
-
-        var g = ctx.createRadialGradient(r, height/2, 0, r, height/2, r - margin2)
-        g.addColorStop(0, 'rgba(80,180,240,1)')
-        g.addColorStop(0.2, 'rgba(80,180,240,1)')
-        g.addColorStop(1, 'rgba(50,120,200,1)')
-        ctx.fillStyle = g
-        
-        ctx.beginPath()
-        ctx.arc(r, height/2, r - margin2, Math.PI/2, Math.PI/2 * 3)
-        ctx.closePath()
-        ctx.fill()
-
-        g = ctx.createRadialGradient(r + width, height/2, 0, r + width, height/2, r - margin2)
-        g.addColorStop(0, 'rgba(80,180,240,1)')
-        g.addColorStop(0.2, 'rgba(80,180,240,1)')
-        g.addColorStop(1, 'rgba(50,120,200,1)')
-        ctx.fillStyle = g
-
-        ctx.beginPath()
-        ctx.arc(r + width, height/2, r - margin2, -Math.PI/2, Math.PI/2)
-        ctx.closePath()
-        ctx.fill()
-
-        g = ctx.createLinearGradient(width/2 + r, margin2, width/2 + r, height - margin2)
-        g.addColorStop(0, 'rgba(50,120,200,1)')
-        g.addColorStop(0.4, 'rgba(80,180,240,1)')
-        g.addColorStop(0.6, 'rgba(80,180,240,1)')
-        g.addColorStop(1, 'rgba(50,120,200,1)')
-        ctx.fillStyle = g
-
-        ctx.fillRect(r, margin2, width, height - margin2*2)
+        var canvas = createPlayButton()
 
         var playtxt = this.add.text(screenCenterX, screenCenterY * 5/3 - 50, 'play', {font: '400 Cabin'})
         playtxt.setDepth(20)
@@ -182,21 +121,56 @@ export class Scene1 extends Scene {
         playtxt.setFontSize(75)
         playtxt.setOrigin(0.5, 0.55)
 
-        this.textures.addCanvas('play-btn', canvas)
-        this.playbtn = this.add.image(screenCenterX, screenCenterY * 5/3 - 50, 'play-btn')
+        var playtexture = this.textures.addCanvas('play-btn', canvas, true)
+        this.playbtn = this.add.image(screenCenterX, screenCenterY * 5/3 - 50, playtexture)
+
+       this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14).setDepth(20).setStroke('rgba(80,80,80,1)', 4)
+
 
         this.playbtn.setInteractive()
         this.playbtn.on('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
             this.scene.start('scene-2')
         })
+
+        //this.addClickable(this.playbtn)
     }
 
 
+    addClickable = (btn) => {
+        return
+        btn.on('pointermove', () => {
+            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
+        })
+
+        btn.on('pointerover', () => {
+            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
+            //this.clicktext.setVisible(true)
+        })
+
+        btn.on('pointerout', () => {
+            //this.clicktext.setVisible(false)
+        })
+    }
+
+    createOption = (image, text, x, y) => {
+        var option = this.add.image(x, y - 15, image).setAlpha(0.8).setOrigin(0.5, 0.5)
+        var box = this.add.rectangle(x, y, 120, 120).setStrokeStyle(2, 0xcccccc, 0)
+        box.setInteractive()
+        box.on('pointerover', () => {
+            box.setStrokeStyle(2, 0xcccccc, 1)
+        })
+        box.on('pointerout', () => {
+            box.setStrokeStyle(2, 0xcccccc, 0)
+        })
+        this.add.text(x, y + 40, text).setOrigin(0.5, 0.5).setFontFamily('Verdana')
+        option.setInteractive()
+        return [option, box]
+    }
+
 
     update = (time, delta) => {
-        //this.fps.setText(this.game.loop.actualFps)
-        //this.k.update()
+        //this.collider.update()
     }
 
 }
