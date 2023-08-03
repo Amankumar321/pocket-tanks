@@ -133,18 +133,23 @@ export const createAngleDisplay = (hud) => {
         if (hud.crossAir.getData('toShow') === true) {
             if (hud.crossAir.getData('allowHide') === false) {
                 hud.crossAir.setData('allowHide', true)
+                //hud.mouseLocked = false
             }
             else {
                 hud.scene.sound.play('click', {volume: 0.3})
                 hud.crossAir.setVisible(false)
                 hud.crossAir.setData('toShow', false)
+                hud.mouseLocked = false
                 hud.scene.input.off('pointerdown', releasePointer)
             }
         }
     }
 
     angleBtn.on('pointerdown', (e) => {
+        if (hud.mouseLocked === true) return
         if (hud.crossAir.getData('toShow') === true) return
+        hud.mouseLocked = true
+
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
 
@@ -248,7 +253,9 @@ export const createAngleDisplay = (hud) => {
     angleRightBtn.setInteractive().setOrigin(1,1);
 
     angleRightBtn.on('pointerdown', () => {
+        if (hud.mouseLocked === true) return
         hud.scene.sound.play('click', {volume: 0.3})
+
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.turret.relativeRotation += Math.PI/180
@@ -263,6 +270,8 @@ export const createAngleDisplay = (hud) => {
     angleLeftBtn.setInteractive().setOrigin(0,1);
 
     angleLeftBtn.on('pointerdown', () => {
+        if (hud.mouseLocked === true) return
+
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {

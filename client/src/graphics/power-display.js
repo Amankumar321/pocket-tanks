@@ -90,25 +90,28 @@ export const createPowerDisplay = (hud) => {
         if (powerBtn.getData('active') === true) {
             if (powerBtn.getData('allowHide') === false) {
                 powerBtn.setData('allowHide', true)
+                //hud.mouseLocked = false
             }
             else {
                 hud.scene.sound.play('click', {volume: 0.3})
                 powerBtn.setData('active', false)
+                hud.mouseLocked = false
                 hud.scene.input.off('pointerdown', releasePointer)
             }
         }
     }
 
     powerBtn.on('pointerdown', (e) => {
+        if (hud.mouseLocked === true) return
         if (powerBtn.getData('active') === true) return
+        hud.mouseLocked = true
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
+        //console.log(e.position, hud)
         powerBtn.setData('active', true)
         powerBtn.setData('allowHide', false)
         hud.scene.input.on('pointerdown', releasePointer)
     })
-    
-
     
 
     var powerRightBtn = hud.scene.add.image(w/2, 0, 'power-display-right')
@@ -116,7 +119,9 @@ export const createPowerDisplay = (hud) => {
     powerRightBtn.setInteractive().setOrigin(1,0);
 
     powerRightBtn.on('pointerdown', () => {
+        if (hud.mouseLocked === true) return
         hud.scene.sound.play('click', {volume: 0.3})
+
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
             hud.scene.tank1.setPower(hud.scene.tank1.power + 1)
@@ -131,6 +136,8 @@ export const createPowerDisplay = (hud) => {
     powerLeftBtn.setInteractive().setOrigin(0,0);
 
     powerLeftBtn.on('pointerdown', () => {
+        if (hud.mouseLocked === true) return
+
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
@@ -151,9 +158,12 @@ export const createPowerDisplay = (hud) => {
     hud.scene.textures.addCanvas('power-display-meter', canvas);
     hud.powerMeter = hud.scene.add.image(0, -h/4, 'power-display-meter')
     powerDisplay.add(hud.powerMeter)
-    
+
     hud.powerMeter.refresh = () => {
-        var delX = hud.scene.input.mousePointer.x - hud.scene.input.mousePointer.prevPosition.x
+        var curr = hud.scene.input.mousePointer
+        var prev = hud.scene.input.mousePointer.prev ? hud.scene.input.mousePointer.prev : hud.scene.input.mousePointer.prevPosition
+        var delX = (curr.x - prev.x)/2
+
         if (delX > 0) {
             delX = Math.ceil(delX)
         }

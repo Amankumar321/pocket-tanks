@@ -37,6 +37,8 @@ export const createFireButton = (hud) => {
     hud.fireButton.setInteractive();
 
     const fire = () => {
+        if (hud.mouseLocked === true) return
+        if (hud.scene.sceneData.gameType === 3 && hud.scene.activeTank === 2) return
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
        

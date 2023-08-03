@@ -1498,7 +1498,6 @@ export class crazyivan {
     }
 
     onOutOfBound = (weapon, obj) => {
-        console.log(obj.body.position)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
         if (this.dissipated === false) {

@@ -54,6 +54,9 @@ export class ScrollList {
         
         this.selectedDisplay.setInteractive()
         this.selectedDisplay.on('pointerdown', () => {
+            if (this.scene.HUD.mouseLocked === true) return
+            this.scene.HUD.mouseLocked = true
+
             this.scene.sound.play('click', {volume: 0.3})
             this.scene.hideTurnPointer()
             //this.scene.input.mouse.requestPointerLock()
@@ -69,6 +72,7 @@ export class ScrollList {
                     this.hide()
                     this.activeItem = null
                 }
+                this.scene.HUD.mouseLocked = false
             }
         })
 
@@ -82,6 +86,7 @@ export class ScrollList {
                     this.hide()
                     this.activeItem = null
                 }
+                this.scene.HUD.mouseLocked = false
             }
             //e.event.stopPropagation()
         })
@@ -207,6 +212,10 @@ export class ScrollList {
                     child.getData('textContent').setColor('white')
                 }
             })
+
+            //var curr = this.scene.input.mousePointer
+            //var prev = this.scene.input.mousePointer.prev ? this.scene.input.mousePointer.prev : this.scene.input.mousePointer.prevPosition
+            //var delY = (curr.y - prev.y)/2
 
             this.scrollList.incY(-this.scene.input.mousePointer.deltaY)
             //this.scrollTiles.incY(this.scene.input.mousePointer.movementY)

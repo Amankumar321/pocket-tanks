@@ -40,6 +40,7 @@ export class Tank extends GameObjects.Sprite {
         this.movesRemaining = 4
         this.moving = false
         this.hitRadius = this.height/4
+        this.gameType = this.scene.sceneData.gameType
         
         this.keyA = this.scene.input.keyboard.addKey('A');
         this.keyD = this.scene.input.keyboard.addKey('D');
@@ -113,16 +114,18 @@ export class Tank extends GameObjects.Sprite {
         })
 
         this.scene.input.keyboard.on('keydown-A', () => {
-            this.scene.sound.play('click', {volume: 0.3})
+            if (this.gameType === 3 && this === this.scene.tank2) return 
             if (this.active && !this.moving && this.movesRemaining > 0) {
+                this.scene.sound.play('click', {volume: 0.3})
                 this.stepLeft()
                 window.socket.emit('stepLeft', {})
             }
         })
 
         this.scene.input.keyboard.on('keydown-D', () => {
-            this.scene.sound.play('click', {volume: 0.3})
+            if (this.gameType === 3 && this === this.scene.tank2) return 
             if (this.active && !this.moving && this.movesRemaining > 0) {
+                this.scene.sound.play('click', {volume: 0.3})
                 this.stepRight()
                 window.socket.emit('stepRight', {})
             }
@@ -168,12 +171,18 @@ export class Tank extends GameObjects.Sprite {
 
         // movement
         if (this.keyW?.isDown) {
-            if (this.active)
-                this.setPower(this.power + 1);
+            if (this.active) {
+                if ((this.gameType === 3 && this === this.scene.tank1) || this.gameType !== 3){
+                    this.setPower(this.power + 1);
+                }
+            }
         }
         if (this.keyS?.isDown) {
-            if (this.active)
-                this.setPower(this.power - 1);
+            if (this.active) {
+                if ((this.gameType === 3 && this === this.scene.tank1) || this.gameType !== 3){
+                    this.setPower(this.power - 1);
+                }
+            }
         }
 
         if (this.leftSteps > 0) {
@@ -210,14 +219,19 @@ export class Tank extends GameObjects.Sprite {
             if (newX === prevX && newY === prevY) {
                 if (this.terrain.getPixel(this.body.x, this.body.y).alpha === 0) {
                     this.body.y = this.body.y + 1
-                    this.settled = false
+                    if (this.terrain.getPixel(this.body.x, this.body.y).alpha !== 0) {
+                        var rotation = this.terrain.getSlope(this.body.x, this.body.y)
+                        if (rotation !== undefined) {
+                            this.setRotation(rotation)
+                        }
+                        this.settled = true
+                    }
+                    else {
+                        this.settled = false
+                    }
                 }
                 else {
                     this.settled = true
-                    var rotation = this.terrain.getSlope(pos.x, pos.y)
-                    if (rotation !== undefined) {
-                        this.setRotation(rotation)
-                    }
                 }
                 return
             }
@@ -317,6 +331,7 @@ export class Tank extends GameObjects.Sprite {
             //this.setRotation(this.terrain.getSlope(nextPos.x, nextPos.y))
         }
     }
+
 
 
 

@@ -165,8 +165,9 @@ export class MainScene extends Scene {
         //this.tank1.update()
         //this.tank2.update()
         this.HUD.refresh()
-
         this.checkSwitchTurn()
+
+        this.input.mousePointer.prev = {x: this.input.mousePointer.x, y: this.input.mousePointer.y}
     }
 
 
@@ -266,16 +267,23 @@ export class MainScene extends Scene {
 
 
     createAd = () => {
-        var adBtn = this.add.text(this.renderer.width/2, this.renderer.height * 8/9, "Auto Adjust\n(Watch Ad)").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
+        var adBtn = this.add.text(this.renderer.width/2, this.renderer.height * 8/9, "Auto Adjust").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
         adBtn.setOrigin(0.5, 0.5).setColor("rgba(0,0,0,1)").setDepth(101)
 
         var adImg = this.add.rectangle(this.renderer.width/2, this.renderer.height * 8/9, 160, 60, 0xcccccc)
-        adImg.setDepth(100).setOrigin(0.5,0.5).setBlendMode()
+        adImg.setDepth(100).setOrigin(0.5,0.5)
+
+        if (this.sceneData.gameType === 3) {
+            adImg.setFillStyle(0x999999)
+        }
 
         const showAd = () => {
+            if (this.HUD.mouseLocked === true) return
+            if (this.sceneData.gameType === 3) return
             adBtn.setText("Loading")
-            adBtn.removeInteractive()
-            adImg.removeInteractive()
+            //adBtn.removeInteractive()
+            //adImg.removeInteractive()
+
             var tank = null;
             if (this.activeTank === 1) tank = this.tank1
             if (this.activeTank === 2) tank = this.tank2
@@ -288,7 +296,7 @@ export class MainScene extends Scene {
                     if (tank !== null) {
                         tank.autoAdjust()
                     }
-                    adBtn.setText("Auto Adjust\n(Watch Ad)")
+                    adBtn.setText("Auto Adjust")
                     adBtn.setInteractive()
                     adImg.setInteractive()
                     // Ad process done. You can track "SDK_REWARDED_WATCH_COMPLETE" event if that event triggered, that means the user watched the advertisement completely, you can give reward there.
@@ -307,7 +315,10 @@ export class MainScene extends Scene {
                 })
             }
             else {
-                adBtn.setText("Auto Adjust\n(Watch Ad)")
+                if (tank !== null) {
+                    tank.autoAdjust()
+                }
+                adBtn.setText("Auto Adjust")
                 adImg.setInteractive()
                 adBtn.setInteractive()
             }

@@ -248,7 +248,7 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     blast = (type, x, y, radius, data, blowTank) => {
-        console.log(this.frameCount, x, y)
+        //console.log(this.frameCount, x, y)
         this.animate = true
         var hole = new Blast(this.scene, type, x, y, radius, data, blowTank)
         this.blastArray.push(hole)
@@ -291,7 +291,7 @@ export class Terrain extends Textures.CanvasTexture {
             do_break = false;
         
             // find top
-            for (; j >= -200; j--) {
+            for (; j >= 0; j--) {
                 if (this.getPixel(i, j).alpha === 0) {
                     do_break = true;
                 }

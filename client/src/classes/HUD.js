@@ -42,6 +42,7 @@ export class HUD extends Textures.CanvasTexture {
         this.scoreDisplay1 = null
         this.scoreDisplay2 = null
         this.overlay = null
+        this.mouseLocked = false
         
         this.create()
     }

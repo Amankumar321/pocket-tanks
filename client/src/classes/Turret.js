@@ -26,6 +26,7 @@ export class Turret extends GameObjects.Sprite {
         this.activeWeapon = null
         this.id = id
         this.powerFactor = 8
+        this.gameType = this.scene.sceneData.gameType
 
         this.keyQ = this.scene.input.keyboard.addKey('Q');
         this.keyE = this.scene.input.keyboard.addKey('E');
@@ -54,26 +55,30 @@ export class Turret extends GameObjects.Sprite {
 
     update = () => {
         const crossAirRadius = 80
-        var x = this.tank.x + (this.tank.height/2) * Math.sin(this.tank.rotation)
-        var y = this.tank.y - (this.tank.height/2) * Math.cos(this.tank.rotation)
+        var x = this.tank.body.x + (this.tank.height/2) * Math.sin(this.tank.rotation)
+        var y = this.tank.body.y - (this.tank.height/2) * Math.cos(this.tank.rotation)
         this.setPosition(x, y)
 
         if (this.keyQ?.isDown) {
             if (this.tank.active) {
-                this.relativeRotation -= this.rotationDelta
-                this.setRotation(this.relativeRotation + this.tank.rotation)
-                const alpha = this.rotation
-                this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
-                this.scene.HUD.crossAir.visibleTime = 40
+                if ((this.gameType === 3 && this.tank === this.scene.tank1) || this.gameType !== 3){
+                    this.relativeRotation -= this.rotationDelta
+                    this.setRotation(this.relativeRotation + this.tank.rotation)
+                    const alpha = this.rotation
+                    this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
+                    this.scene.HUD.crossAir.visibleTime = 40
+                }
             }
         }
         if (this.keyE?.isDown) {
             if (this.tank.active) {
-                this.relativeRotation += this.rotationDelta
-                this.setRotation(this.relativeRotation + this.tank.rotation)
-                const alpha = this.rotation
-                this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
-                this.scene.HUD.crossAir.visibleTime = 40
+                if ((this.gameType === 3 && this.tank === this.scene.tank1) || this.gameType !== 3){
+                    this.relativeRotation += this.rotationDelta
+                    this.setRotation(this.relativeRotation + this.tank.rotation)
+                    const alpha = this.rotation
+                    this.scene.HUD.crossAir.setPosition(this.x + crossAirRadius * Math.sin(alpha), this.y - crossAirRadius * Math.cos(alpha))
+                    this.scene.HUD.crossAir.visibleTime = 40
+                }
             }
         }
 
