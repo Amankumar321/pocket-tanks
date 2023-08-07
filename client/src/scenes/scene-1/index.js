@@ -70,23 +70,27 @@ export class Scene1 extends Scene {
 
         const w = this.cameras.main.width
 
-        var [contactOption, contactBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
-        contactOption.setDisplaySize(80, 60)
-        this.addClickable(contactOption)
+        var [guideOption, guideBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
+        guideOption.setDisplaySize(80, 60)
+        this.addClickable(guideOption)
+        guideBox.setInteractive()
+        guideBox.on('pointerdown', () => { this.scene.start('guide-scene') })
 
-        var [aboutOption, aboutsBox] = this.createOption('question-solid', 'About', w * 2/7, screenCenterY * 5/3 - 50)
+        var [aboutOption, aboutBox] = this.createOption('question-solid', 'About', w * 2/7, screenCenterY * 5/3 - 50)
         aboutOption.setDisplaySize(60, 80)
-        this.addClickable(aboutOption)
+        aboutBox.setInteractive()
+        aboutBox.on('pointerdown', () => { this.scene.start('about-scene') })
 
         var [controlsOption, controlsBox] = this.createOption('keyboard-regular', 'Controls', w * 1/7, screenCenterY * 5/3 - 50)
         controlsOption.setDisplaySize(100, 80)
-        this.addClickable(controlsOption)
+        controlsBox.setInteractive()
+        controlsBox.on('pointerdown', () => { this.scene.start('controls-scene') })
 
         var [tutorialOption, tutorialBox] = this.createOption('youtube', 'Tutorial', w * 6/7, screenCenterY * 5/3 - 50)
         tutorialOption.setDisplaySize(100, 80)
-        this.addClickable(tutorialOption)
+        tutorialBox.setInteractive()
+        tutorialBox.on('pointerdown', () => { this.scene.start('tutorial-scene') })
 
-        //
 
         var canvas = document.createElement('canvas')
         canvas.width = 40

@@ -2,7 +2,7 @@
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawFireBtn = (ctx, width, height) => {
+const drawFireFrame = (ctx, width, height) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.fillRect(0, 0, width, height)
     ctx.lineWidth = 2
@@ -21,20 +21,8 @@ const drawFireBtn = (ctx, width, height) => {
 
 export const createFireButton = (hud) => {
     const socket = window.socket
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d')
-
-    canvas.height = 60 
-    canvas.width = 160
-
-    drawFireBtn(ctx, canvas.width, canvas.height)
-
-    if (hud.scene.textures.exists('fireButton')) hud.scene.textures.remove('fireButton')
-    hud.scene.textures.addCanvas('fireButton', canvas);
     
-    hud.fireButton = hud.scene.add.image(hud.width/2, hud.height * 9/12, 'fireButton')
-    hud.fireButton.setDepth(6)
-    hud.fireButton.setInteractive();
+    var fireButton = drawFireBtn(hud.scene, hud.width/2, hud.height * 9/12, 60, 160)
 
     const fire = () => {
         if (hud.mouseLocked === true) return
@@ -59,5 +47,24 @@ export const createFireButton = (hud) => {
     }
 
     hud.scene.input.keyboard.on('keydown-SPACE', fire)
-    hud.fireButton.on('pointerdown', fire)
+    fireButton.on('pointerdown', fire)
+}
+
+export const drawFireBtn = (scene, x, y, h = 60, w = 160) => {
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d')
+
+    canvas.height = h
+    canvas.width = w
+
+    drawFireFrame(ctx, canvas.width, canvas.height)
+
+    if (scene.textures.exists('fireButton')) scene.textures.remove('fireButton')
+    scene.textures.addCanvas('fireButton', canvas);
+    
+    var fireButton = scene.add.image(x, y, 'fireButton')
+    fireButton.setDepth(6)
+    fireButton.setInteractive();
+    
+    return fireButton
 }

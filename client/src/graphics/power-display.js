@@ -4,7 +4,7 @@ import { HUD } from "../classes/HUD"
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawPowerDisplay = (ctx, width, height) => {
+const drawPowerFrame = (ctx, width, height) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.fillRect(0, 0, width, height/2)
     //ctx.fillStyle = 'rgba(0,0,0,1)'
@@ -53,38 +53,11 @@ const drawArrow = (ctx, width, height, angle) => {
 export const createPowerDisplay = (hud) => {
     var w = 200
     var h = 80
-    var powerDisplay = hud.scene.add.container(hud.width * 3/4, hud.height * 10.8/12)
 
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d')
+    var [powerBtn, powerDisplayText, powerMeter, powerLeftBtn, powerRightBtn] = drawPowerDisplay(hud.scene, hud.width * 3/4, hud.height * 10.8/12, w, h)
 
-    canvas.height = h
-    canvas.width = w
-
-    drawPowerDisplay(ctx, canvas.width, canvas.height)
-    if (hud.scene.textures.exists('power-display')) hud.scene.textures.remove('power-display')
-    hud.scene.textures.addCanvas('power-display', canvas);
-
-    canvas = document.createElement('canvas');
-    ctx = canvas.getContext('2d')
-    canvas.height = 30 
-    canvas.width = 30
-    drawArrow(ctx, canvas.width, canvas.height, 0)
-    if (hud.scene.textures.exists('power-display-right')) hud.scene.textures.remove('power-display-right')
-    hud.scene.textures.addCanvas('power-display-right', canvas);
-
-    canvas = document.createElement('canvas');
-    ctx = canvas.getContext('2d')
-    canvas.height = 30 
-    canvas.width = 30
-    drawArrow(ctx, canvas.width, canvas.height, Math.PI)
-    if (hud.scene.textures.exists('power-display-left')) hud.scene.textures.remove('power-display-left')
-    hud.scene.textures.addCanvas('power-display-left', canvas);
-    
-    var powerBtn = hud.scene.add.image(0, 0, 'power-display')
-    powerDisplay.add(powerBtn)
-    powerDisplay.setDepth(6)
-    powerBtn.setInteractive();
+    hud.powerDisplayText = powerDisplayText
+    hud.powerMeter = powerMeter
 
     const releasePointer = (e) => {
         if (powerBtn.getData('active') === true) {
@@ -112,11 +85,6 @@ export const createPowerDisplay = (hud) => {
         powerBtn.setData('allowHide', false)
         hud.scene.input.on('pointerdown', releasePointer)
     })
-    
-
-    var powerRightBtn = hud.scene.add.image(w/2, 0, 'power-display-right')
-    powerDisplay.add(powerRightBtn)
-    powerRightBtn.setInteractive().setOrigin(1,0);
 
     powerRightBtn.on('pointerdown', () => {
         if (hud.mouseLocked === true) return
@@ -131,10 +99,6 @@ export const createPowerDisplay = (hud) => {
         }
     })
 
-    var powerLeftBtn = hud.scene.add.image(-w/2 + w * 2/5, 0, 'power-display-left')
-    powerDisplay.add(powerLeftBtn)
-    powerLeftBtn.setInteractive().setOrigin(0,0);
-
     powerLeftBtn.on('pointerdown', () => {
         if (hud.mouseLocked === true) return
 
@@ -148,17 +112,6 @@ export const createPowerDisplay = (hud) => {
         }
     })
 
-    canvas = document.createElement('canvas');
-    ctx = canvas.getContext('2d')
-    canvas.height = h * 3/12
-    canvas.width = w * 19/20
-    drawPowerMeter(ctx, canvas.width, canvas.height, 0)
-
-    if (hud.scene.textures.exists('power-display-meter')) hud.scene.textures.remove('power-display-meter')
-    hud.scene.textures.addCanvas('power-display-meter', canvas);
-    hud.powerMeter = hud.scene.add.image(0, -h/4, 'power-display-meter')
-    powerDisplay.add(hud.powerMeter)
-
     hud.powerMeter.refresh = () => {
         var curr = hud.scene.input.mousePointer
         var prev = hud.scene.input.mousePointer.prev ? hud.scene.input.mousePointer.prev : hud.scene.input.mousePointer.prevPosition
@@ -170,6 +123,9 @@ export const createPowerDisplay = (hud) => {
         else {
             delX = Math.floor(delX)
         }
+
+        var canvas = powerMeter.texture.canvas
+        var ctx = canvas.getContext('2d')
 
         if (hud.scene.activeTank === 1) {
             if (powerBtn.getData('active') === true) {
@@ -186,8 +142,65 @@ export const createPowerDisplay = (hud) => {
             drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank2.power)
         }
     }
-
-    hud.powerDisplayText = hud.scene.add.text(-w/2 + w * 2/5 + w * 3/10, h * 1/5, '').setOrigin(0.5).setFont('20px Geneva')
-    powerDisplay.add(hud.powerDisplayText)
 }
 
+
+
+export const drawPowerDisplay = (scene, x, y, w = 200, h = 80) => {
+    var powerDisplay = scene.add.container(x, y)
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d')
+
+    canvas.height = h
+    canvas.width = w
+
+    drawPowerFrame(ctx, canvas.width, canvas.height)
+    if (scene.textures.exists('power-display')) scene.textures.remove('power-display')
+    scene.textures.addCanvas('power-display', canvas);
+
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d')
+    canvas.height = 30 
+    canvas.width = 30
+    drawArrow(ctx, canvas.width, canvas.height, 0)
+    if (scene.textures.exists('power-display-right')) scene.textures.remove('power-display-right')
+    scene.textures.addCanvas('power-display-right', canvas);
+
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d')
+    canvas.height = 30 
+    canvas.width = 30
+    drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    if (scene.textures.exists('power-display-left')) scene.textures.remove('power-display-left')
+    scene.textures.addCanvas('power-display-left', canvas);
+    
+    var powerBtn = scene.add.image(0, 0, 'power-display')
+    powerDisplay.add(powerBtn)
+    powerDisplay.setDepth(6)
+    powerBtn.setInteractive();
+
+    var powerRightBtn = scene.add.image(w/2, 0, 'power-display-right')
+    powerDisplay.add(powerRightBtn)
+    powerRightBtn.setInteractive().setOrigin(1,0);
+
+    var powerLeftBtn = scene.add.image(-w/2 + w * 2/5, 0, 'power-display-left')
+    powerDisplay.add(powerLeftBtn)
+    powerLeftBtn.setInteractive().setOrigin(0,0);
+
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d')
+    canvas.height = h * 3/12
+    canvas.width = w * 19/20
+    drawPowerMeter(ctx, canvas.width, canvas.height, 60)
+
+    if (scene.textures.exists('power-display-meter')) scene.textures.remove('power-display-meter')
+    scene.textures.addCanvas('power-display-meter', canvas);
+    var powerMeter = scene.add.image(0, -h/4, 'power-display-meter')
+    powerDisplay.add(powerMeter)
+
+    var powerDisplayText = scene.add.text(-w/2 + w * 2/5 + w * 3/10, h * 1/5, '60').setOrigin(0.5).setFont('20px Geneva')
+    powerDisplay.add(powerDisplayText)
+
+    return [powerBtn, powerDisplayText, powerMeter, powerLeftBtn, powerRightBtn]
+}

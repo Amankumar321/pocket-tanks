@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { socket } from './socket/index'
-import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene } from './scenes';
+import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene } from './scenes';
 
 // window["GD_OPTIONS"] = {
 //   "debug": false,
@@ -80,7 +80,17 @@ const gameConfig = {
     target: 60,
     //forceSetTimeOut: true
   },
-  scene: [LoadingScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
+  dom: {
+    createContainer: true
+  },
+  // plugins: {
+  //   global: [{
+  //       key: 'rexYoutubePlayer',
+  //       plugin: YoutubePlayerPlugin,
+  //       start: true
+  //   }]
+  // },
+  scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 
 

@@ -53,7 +53,7 @@ const drawWeaponScrollBox = (ctx, width, height) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 
- const drawArrow = (ctx, width, height, angle) => {
+const drawArrow = (ctx, width, height, angle) => {
     
 }
 
@@ -65,46 +65,10 @@ const drawWeaponScrollBox = (ctx, width, height) => {
 export const createWeaponDisplay = (hud) => {
     var w = 220
     var h = 80
-    var weaponContainer = hud.scene.add.container(hud.width * 1/4, hud.height * 10.6/12)
-    weaponContainer.setDepth(6)
-
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d')
-
-    canvas.height = h
-    canvas.width = w
-
-    drawWeaponBox(ctx, canvas.width, canvas.height)
-    if (hud.scene.textures.exists('weapon-box')) hud.scene.textures.remove('weapon-box')
-    hud.scene.textures.addCanvas('weapon-box', canvas);
-
-    hud.weaponBox = hud.scene.add.image(0, 0, 'weapon-box')
-    weaponContainer.add(hud.weaponBox)
-
-    var innerW = w - w/12
-    var innerH = h - h/2
-    var weaponDisplay = hud.scene.add.container(0, h/8)
-    var key = Math.random().toString(32).slice(3,7)
-    var logoCanvas = hud.scene.activeTank === 1 ? weaponArray[hud.scene.tank1.selectedWeapon].logoCanvas : weaponArray[hud.scene.tank2.selectedWeapon].logoCanvas
-    if (hud.scene.textures.exists(key)) hud.scene.textures.remove(key)
-    hud.scene.textures.addCanvas(key, logoCanvas)
-    var margin = (innerH - logoCanvas.height * ((innerH/logoCanvas.height) * 0.9))/2
-    var weaponLogo = hud.scene.add.image(-(w - w/12)/2 + margin, 0, key)
-    weaponLogo.setOrigin(0, 0.5).setScale(innerH/weaponLogo.height * 0.9, innerH/weaponLogo.height * 0.9)
-
-    var weaponDisplayBackground = hud.scene.add.rectangle(0, 0, w - w/12, h - h/2, 0x000000).setOrigin(0.5)
-    weaponDisplay.add(weaponDisplayBackground)
-    weaponDisplay.setDepth(15)
-
-    weaponDisplay.add(weaponLogo)
-    var textWidth = innerW - weaponLogo.width + margin * 2
-    hud.weaponName = hud.scene.add.text(-innerW/2 + weaponLogo.width + margin * 2 + textWidth/2, 0, '').setFontFamily('Geneva').setFontSize(18)
-    hud.weaponName.setOrigin(0.5)
-    weaponDisplay.add(hud.weaponName)
-
-    weaponContainer.add(weaponDisplay)
-
-    hud.weaponBox.setInteractive()
+    
+    var [weaponBox, weaponName, weaponLogo] = drawWeaponDisplay(hud.scene, hud.width * 1/4, hud.height * 10.6/12, w, h)
+    hud.weaponBox = weaponBox
+    hud.weaponName = weaponName
 
     createWeaponScrollDisplay(hud, weaponLogo)
 }
@@ -139,3 +103,58 @@ const createWeaponScrollDisplay = (hud, weaponLogo) => {
     hud.weaponScrollDisplay.create()
 }
 
+
+export const drawWeaponDisplay = (scene, x, y, w = 220, h = 80) => {
+    var weaponContainer = scene.add.container(x, y)
+    weaponContainer.setDepth(6)
+
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d')
+
+    canvas.height = h
+    canvas.width = w
+
+    drawWeaponBox(ctx, canvas.width, canvas.height)
+    if (scene.textures.exists('weapon-box')) scene.textures.remove('weapon-box')
+    scene.textures.addCanvas('weapon-box', canvas);
+
+    var weaponBox = scene.add.image(0, 0, 'weapon-box')
+    weaponContainer.add(weaponBox)
+
+    var innerW = w - w/12
+    var innerH = h - h/2
+    var weaponDisplay = scene.add.container(0, h/8)
+    var key = Math.random().toString(32).slice(3,7)
+    var logoCanvas = weaponArray[0].logoCanvas;
+
+    if (scene.activeTank === 1) {
+        logoCanvas = weaponArray[scene.tank1.selectedWeapon].logoCanvas
+    }
+    else if (scene.activeTank === 2) {
+        logoCanvas = weaponArray[scene.tank2.selectedWeapon].logoCanvas
+    }
+    
+    if (scene.textures.exists(key)) scene.textures.remove(key)
+    scene.textures.addCanvas(key, logoCanvas)
+    
+    var margin = (innerH - logoCanvas.height * ((innerH/logoCanvas.height) * 0.9))/2
+    var weaponLogo = scene.add.image(-(w - w/12)/2 + margin, 0, key)
+    weaponLogo.setOrigin(0, 0.5).setScale(innerH/weaponLogo.height * 0.9, innerH/weaponLogo.height * 0.9)
+
+    var weaponDisplayBackground = scene.add.rectangle(0, 0, w - w/12, h - h/2, 0x000000).setOrigin(0.5)
+    weaponDisplay.add(weaponDisplayBackground)
+    weaponDisplay.setDepth(15)
+
+    weaponDisplay.add(weaponLogo)
+
+    var textWidth = innerW - weaponLogo.width + margin * 2
+    var weaponName = scene.add.text(-innerW/2 + weaponLogo.width + margin * 2 + textWidth/2, 0, 'Single Shot').setFontFamily('Geneva').setFontSize(18)
+    weaponName.setOrigin(0.5)
+    weaponDisplay.add(weaponName)
+
+    weaponContainer.add(weaponDisplay)
+
+    weaponBox.setInteractive()
+
+    return [weaponBox, weaponName, weaponLogo]
+}

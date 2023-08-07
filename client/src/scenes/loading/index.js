@@ -29,6 +29,9 @@ export class LoadingScene extends Scene {
         })
 
         this.load.image('cover', 'assets/images/c.png')
+        this.load.image('pt_3', 'assets/images/pt_3.png')
+        this.load.image('pt_4', 'assets/images/pt_4.png')
+        this.load.image('pt_5', 'assets/images/pt_5.png')
         this.load.svg('face-frown-regular', 'assets/images/face-frown-regular.svg')
         this.load.svg('address-book-regular', 'assets/images/address-book-regular.svg')
         this.load.svg('question-solid', 'assets/images/question-solid.svg')

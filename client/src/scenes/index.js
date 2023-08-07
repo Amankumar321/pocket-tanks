@@ -5,3 +5,7 @@ export * from './scene-3';
 export * from './scene-4';
 export * from './scene-5';
 export * from './loading';
+export * from './controls'
+export * from './about';
+export * from './guide';
+export * from './tutorial';
