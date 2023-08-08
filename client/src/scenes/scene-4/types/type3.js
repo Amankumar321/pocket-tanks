@@ -131,9 +131,13 @@ export const type3 = (scene) => {
     g.setInteractive()
     
     const myRoom = () => {
-        if (socket.connected === false) return
-        serverError.setVisible(true)
-        
+        if (socket.connected === false) {
+            serverError.setVisible(true)
+            noRoom.setVisible(false)
+            return
+        }
+        serverError.setVisible(false)
+
         scene.sound.play('click', {volume: 0.3})
         if (gtype === 0) {
             socket.emit('createRoom', {player: scene.player1})
