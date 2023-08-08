@@ -32,16 +32,16 @@ export const type3 = (scene) => {
     const noRoom = scene.add.container(scene.renderer.width/2, scene.renderer.height/2).setVisible(false)
     noRoom.add(scene.add.image(0, -50, 'face-frown-regular').setDisplaySize(200, 200).setAlpha(0.8))
     noRoom.add(scene.add.text(0, 100, 'No online rooms')
-    .setFontFamily('Verdana').setFontSize(30).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
+    .setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
     noRoom.add(scene.add.text(0, 140, 'Create your own room and invite friends.')
-    .setFontFamily('Verdana').setFontSize(20).setOrigin(0.5, 0.5).setAlign('center'))
+    .setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center'))
 
     const serverError = scene.add.container(scene.renderer.width/2, scene.renderer.height/2).setVisible(false)
     serverError.add(scene.add.image(0, -50, 'face-frown-regular').setDisplaySize(200, 200).setAlpha(0.8))
     serverError.add(scene.add.text(0, 100, 'Server Error')
-    .setFontFamily('Verdana').setFontSize(30).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
+    .setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
     serverError.add(scene.add.text(0, 140, 'Please try again later or refresh.')
-    .setFontFamily('Verdana').setFontSize(20).setOrigin(0.5, 0.5).setAlign('center'))
+    .setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center'))
 
     if (scene.roomList === undefined)
         scene.roomList = []
