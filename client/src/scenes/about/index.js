@@ -46,7 +46,7 @@ export class AboutScene extends Scene {
         var h = this.game.renderer.height
 
         this.add.text(w/2, h/5, header).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(32)
-        this.add.text(w/2, h/2.6, aboutText1).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(20).setAlign('center')
+        this.add.text(w/2, h/2.6, aboutText1).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(21).setAlign('center')
         //this.add.text(w/2, h/2, aboutText2).setFontFamily('Verdana').setWordWrapWidth(400)
         
         var pt1 = this.add.image(w/2 - 10, h/1.4, 'pt_4')
