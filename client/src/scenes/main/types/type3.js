@@ -62,6 +62,10 @@ export const type3 = (scene) => {
             clearInterval(scene.winnerBlastInterval)
             scene.winnerBlastInterval = null
         }
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.gameplayStop();
+        }
+
         scene.scene.start('scene-5', scene.sceneData)
     })
 
@@ -82,6 +86,9 @@ export const type3 = (scene) => {
     
     n.on('pointerdown', () => {
         scene.sound.stopByKey('winner')
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.gameplayStop();
+        }
         scene.scene.start('scene-4', {gameType: scene.sceneData.gameType, player1: player1})
     })
     

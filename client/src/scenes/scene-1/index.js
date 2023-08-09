@@ -33,6 +33,7 @@ export class Scene1 extends Scene {
 
 
     create = () => {
+        
         //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
         //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14)
 

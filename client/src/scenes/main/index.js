@@ -24,7 +24,7 @@ export class MainScene extends Scene {
         this.cpuHandler = null
         this.sceneData = null
         this.turnPointer = null
-        this.winnerBlastInterval = null
+        this.winnerBlastTween = null
         this.gameOver = false
         this.exitMenuContent = null
     }
@@ -40,6 +40,9 @@ export class MainScene extends Scene {
 
 
     preload = () => {
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.gameplayStart();
+        }
         //this.sound.add('click')
         // this.load.audio('background', ['assets/sounds/background.mp3'])
         // this.load.image('wall', 'assets/images/wall.png');
@@ -52,9 +55,9 @@ export class MainScene extends Scene {
         //this.fps = this.add.text(screenCenterX, 30, this.game.loop.actualFps)
         //this.fps.setOrigin(0.5)
 
-        if (this.winnerBlastInterval !== null) {
-            clearInterval(this.winnerBlastInterval)
-            this.winnerBlastInterval = null
+        if (this.winnerBlastTween !== null) {
+            this.winnerBlastTween.stop()
+            this.winnerBlastTween = null
         }
         this.events.once('terrain-finished', () => {
             if (this.activeTank === 2) {
@@ -69,7 +72,7 @@ export class MainScene extends Scene {
         this.createBoundWalls()
         this.createTank1()
         this.createTank2()
-        this.createAd()
+        this.createAutoAdjust()
        
         if (this.sceneData.gameType === 1) {
             this.handleType1()
@@ -266,69 +269,77 @@ export class MainScene extends Scene {
 
 
 
-    createAd = () => {
-        var adBtn = this.add.text(this.renderer.width/2, this.renderer.height * 8/9, "Auto Adjust").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
+    createAutoAdjust = () => {
+        var adBtn = this.add.text(this.renderer.width/2 - 20, this.renderer.height * 8/9, "Auto Adjust").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
         adBtn.setOrigin(0.5, 0.5).setColor("rgba(0,0,0,1)").setDepth(101)
 
-        var adImg = this.add.rectangle(this.renderer.width/2, this.renderer.height * 8/9, 160, 60, 0xcccccc)
+        var clapperBoard = this.add.image(this.renderer.width/2 + 60, this.renderer.height * 8/9, 'clapperboard').setDepth(101)
+        clapperBoard.displayHeight = 30
+        clapperBoard.displayWidth = 30
+
+        var adImg = this.add.rectangle(this.renderer.width/2, this.renderer.height * 8/9, 180, 60, 0xcccccc)
         adImg.setDepth(100).setOrigin(0.5,0.5)
 
         if (this.sceneData.gameType === 3) {
             adImg.setFillStyle(0x999999)
         }
 
-        const showAd = () => {
-            if (this.HUD.mouseLocked === true) return
-            if (this.sceneData.gameType === 3) return
-            adBtn.setText("Loading")
-            //adBtn.removeInteractive()
-            //adImg.removeInteractive()
-
+        const autoAdjust = () => {
             var tank = null;
             if (this.activeTank === 1) tank = this.tank1
             if (this.activeTank === 2) tank = this.tank2
-
-            var gdsdk = window.gdsdk
-
-            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-                gdsdk.showAd('rewarded')
-                .then(response => {
-                    if (tank !== null) {
-                        tank.autoAdjust()
-                    }
-                    adBtn.setText("Auto Adjust")
-                    adBtn.setInteractive()
-                    adImg.setInteractive()
-                    // Ad process done. You can track "SDK_REWARDED_WATCH_COMPLETE" event if that event triggered, that means the user watched the advertisement completely, you can give reward there.
-                })
-                .catch(error => {
-                    if (tank !== null) {
-                        tank.autoAdjust()
-                    }
-                    //adBtn.setText("Error. Try again")
-                    adImg.setInteractive()
-                    adBtn.setInteractive()
-                    // An error catched. Please don't give reward here.
-                })
-                .finally(() => {
-                    this.game.sound.mute = false
-                })
+            if (tank !== null) {
+                tank.autoAdjust()
             }
-            else {
-                if (tank !== null) {
-                    tank.autoAdjust()
+            adBtn.setText("Auto Adjust")
+            adImg.setInteractive()
+            adBtn.setInteractive()
+        }
+
+        const clickHandler = () => {
+            if (this.HUD.mouseLocked === true) return
+            if (this.sceneData.gameType === 3) return
+
+            adBtn.disableInteractive()
+            adImg.disableInteractive()
+            
+            adBtn.setText("Loading")
+            
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
+                    gdsdk.showAd('rewarded')
+                    .then(response => {
+                        autoAdjust()
+                    })
+                    .catch(error => {
+                        autoAdjust()
+                    })
+                    .finally(() => {
+                        this.game.sound.mute = false
+                    })
                 }
-                adBtn.setText("Auto Adjust")
-                adImg.setInteractive()
-                adBtn.setInteractive()
+            }
+
+            if (window.sdk === 'crazygames') {
+                const callbacks = {
+                    adFinished: () => {this.game.sound.mute = false; autoAdjust()},
+                    adError: (error) => {this.game.sound.mute = false; autoAdjust()},
+                    adStarted: () => {this.game.sound.mute = true},
+                };
+                window.CrazyGames.SDK.ad.requestAd("rewarded", callbacks);
+            }
+
+            else {
+                autoAdjust()
             }
         }
 
         adBtn.setInteractive()
         adImg.setInteractive()
 
-        adBtn.on('pointerdown', showAd)
-        adImg.on('pointerdown', showAd)
+        adBtn.on('pointerdown', clickHandler)
+        adImg.on('pointerdown', clickHandler)
     }
 
 
@@ -439,14 +450,6 @@ export class MainScene extends Scene {
     }
 
 
-    displayAd = () => {
-        var gdsdk = window.gdsdk
-        if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-            alert()
-            gdsdk.showAd()
-        }
-    }
-
 
 
     showGameOver = () => {
@@ -479,42 +482,69 @@ export class MainScene extends Scene {
         a.setInteractive()
         b.setInteractive()
 
-        var gdsdk = window.gdsdk
+        //var gdsdk = window.gdsdk
         
         a.once('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
-            if (this.sceneData.gameType === 3) {
-                socket.emit('playAgainRequest', {})
-                a.disableInteractive()
-                a.setText('')
-                b.setText('')
-                y.setText('')
-                x.setText('Waiting for opponent...')
+
+            const restartGame = () => {
+                if (this.sceneData.gameType === 3) {
+                    socket.emit('playAgainRequest', {})
+                    a.disableInteractive()
+                    a.setText('')
+                    b.setText('')
+                    y.setText('')
+                    x.setText('Waiting for opponent...')
+                }
+                else {
+                    if (this.winnerBlastTween !== null) {
+                        this.winnerBlastTween.stop()
+                        this.winnerBlastTween = null
+                    }
+                    this.sound.stopByKey('winner')
+                    this.scene.start('scene-5', this.sceneData)
+                }
+            }
+
+            if (window.sdk === 'crazygames') {
+                const callbacks = {
+                    adFinished: () => {this.game.sound.mute = false; restartGame()},
+                    adError: (error) => {this.game.sound.mute = false; restartGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
+                };
+                window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+                
             }
             else {
-                if (this.winnerBlastInterval !== null) {
-                    clearInterval(this.winnerBlastInterval)
-                    this.winnerBlastInterval = null
-                }
-                this.sound.stopByKey('winner')
-                this.scene.start('scene-5', this.sceneData)
-                this.displayAd()
+                restartGame()
             }
-            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-                gdsdk.showAd();
-           }
         })
+
         b.once('pointerdown', () => {
-            this.sound.play('click', {volume: 0.3})
-            this.sound.stopByKey('winner')
-            this.scene.start('scene-1')
-            if (this.sceneData.gameType === 3) {
-                const socket = window.socket
-                socket.emit('leaveRoom', {})
+
+            const endGame = () => {
+                this.sound.play('click', {volume: 0.3})
+                this.sound.stopByKey('winner')
+                this.scene.start('scene-1')
+                if (this.sceneData.gameType === 3) {
+                    const socket = window.socket
+                    socket.emit('leaveRoom', {})
+                }
             }
-            if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-                gdsdk.showAd();
-           }
+
+            if (window.sdk === 'crazygames') {
+                const callbacks = {
+                    adFinished: () => {this.game.sound.mute = false; endGame()},
+                    adError: (error) => {this.game.sound.mute = false; endGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
+                };
+    
+                window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+            }
+            else {
+                endGame()
+            }
+
         })
         
         setTimeout(() => {
@@ -528,6 +558,8 @@ export class MainScene extends Scene {
 
 
     showExitMenu = () => {
+        if (this.gameOver) return
+
         const screenCenterX = this.terrain.width/2
         const screenCenterY = this.terrain.height/2
         
@@ -552,15 +584,34 @@ export class MainScene extends Scene {
         this.exitMenuContent = this.add.group([x, y, a, b])
 
         a.once('pointerdown', () => {
-            this.sound.play('click', {volume: 0.3})
-            if (this.sceneData.gameType === 3) {
-                window.socket.emit('leaveRoom', {})
+            const exitGame = () => {
+                this.sound.play('click', {volume: 0.3})
+                if (this.sceneData.gameType === 3) {
+                    window.socket.emit('leaveRoom', {})
+                }
+                this.scene.start('scene-1')                
             }
-            this.scene.start('scene-1')
+
+            if (window.sdk === 'crazygames') {
+                const callbacks = {
+                    adFinished: () => {this.game.sound.mute = false; exitGame()},
+                    adError: (error) => {this.game.sound.mute = false; exitGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
+                };
+                window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+            }
+            else {
+                exitGame()
+            }
+            
         })
+
         b.once('pointerdown', () => {
-            this.sound.play('click', {volume: 0.3})
-            this.hideExitMenu()
+            const resumeGame = () => {
+                this.sound.play('click', {volume: 0.3})
+                this.hideExitMenu()
+            }
+            resumeGame()
         })
     }
 
@@ -589,6 +640,10 @@ export class MainScene extends Scene {
         else return
 
         this.sound.play('winner', {loop: true})
+
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.happytime();
+        }
 
         var height = 60
         var w1 = this.add.text(tank.x - 38, tank.y - height - 11, 'W')
@@ -620,35 +675,41 @@ export class MainScene extends Scene {
             })
         })
 
-        this.winnerBlastInterval = setInterval(() => {
-            var fillColor = Math.floor(Math.random() * 0xffffff)
-            var vec = new Phaser.Math.Vector2(1,1)
-            var posX = tank.x + (0.5 - Math.random()) * 120
-            var posY = tank.y + (0.5 - Math.random()) * 60 - height
-
-            for (let index = 0; index < 100; index++) {
-                var particle = this.add.circle(posX, posY, 1, fillColor, 255) 
-
-                vec.setAngle(Math.PI * 2 * Math.random())
-                vec.setLength(Math.pow(Math.random(), 2) * 60)
-
-                var t = Math.random() * 1000 + 800
-                this.tweens.add({
-                    targets: particle,
-                    duration: t,
-                    ease: 'Quad.easeOut',
-                    x: particle.x + vec.x,
-                    y: particle.y + vec.y
-                })    
-                this.tweens.add({
-                    targets: particle,
-                    duration: t,
-                    ease: 'Quad.easeOut',
-                    alpha: 0,
-                    onComplete: () => { particle.destroy(true) }
-                })
+        this.winnerBlastTween = this.tweens.add({
+            targets: letters,
+            duration: 100,
+            t: 1,
+            loop: -1,
+            onLoop: () => {
+                var fillColor = Math.floor(Math.random() * 0xffffff)
+                var vec = new Phaser.Math.Vector2(1,1)
+                var posX = tank.x + (0.5 - Math.random()) * 120
+                var posY = tank.y + (0.5 - Math.random()) * 60 - height
+    
+                for (let index = 0; index < 100; index++) {
+                    var particle = this.add.circle(posX, posY, 1, fillColor, 255) 
+    
+                    vec.setAngle(Math.PI * 2 * Math.random())
+                    vec.setLength(Math.pow(Math.random(), 2) * 60)
+    
+                    var t = Math.random() * 1000 + 800
+                    this.tweens.add({
+                        targets: particle,
+                        duration: t,
+                        ease: 'Quad.easeOut',
+                        x: particle.x + vec.x,
+                        y: particle.y + vec.y
+                    })    
+                    this.tweens.add({
+                        targets: particle,
+                        duration: t,
+                        ease: 'Quad.easeOut',
+                        alpha: 0,
+                        onComplete: () => { particle.destroy(true) }
+                    })
+                }
             }
-        }, 300);
+        });
     }
 
 

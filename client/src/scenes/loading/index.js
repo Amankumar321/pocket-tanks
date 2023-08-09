@@ -15,6 +15,9 @@ export class LoadingScene extends Scene {
 
 
     preload = () => {
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.sdkGameLoadingStart();
+        }
         this.load.image('logo', 'assets/images/logo.png');
     }
 
@@ -32,6 +35,7 @@ export class LoadingScene extends Scene {
         this.load.image('pt_3', 'assets/images/pt_3.png')
         this.load.image('pt_4', 'assets/images/pt_4.png')
         this.load.image('pt_5', 'assets/images/pt_5.png')
+        this.load.svg('clapperboard', 'assets/images/clapperboard.svg')
         this.load.svg('face-frown-regular', 'assets/images/face-frown-regular.svg')
         this.load.svg('address-book-regular', 'assets/images/address-book-regular.svg')
         this.load.svg('question-solid', 'assets/images/question-solid.svg')
@@ -105,25 +109,14 @@ export class LoadingScene extends Scene {
             progressBox.destroy(true)
             loadingText.destroy(true)
             beginbtn.setVisible(true)
+
+            if (window.sdk === 'crazygames') {
+                window.CrazyGames.SDK.game.sdkGameLoadingStop();
+            }
             //begintext.setVisible(true)
         });
 
         this.load.start()
-    }
-
-    displayAd = () => {
-        var gdsdk = window.gdsdk
-        
-        if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-            console.log('playing')
-            gdsdk.showAd()
-            .then(res => {
-                console.log('success')
-            })
-            .catch(error => {
-                console.log('error')
-            })
-        }
     }
 
 

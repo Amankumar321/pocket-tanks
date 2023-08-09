@@ -42,7 +42,9 @@ import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene, Contro
 //   js.id = id;
 //   js.src = 'https://html5.api.gamedistribution.com/main.min.js';
 //   fjs.parentNode.insertBefore(js, fjs);
-// }(document, 'script', 'gamedistribution-jssdk'));  
+// }(document, 'script', 'gamedistribution-jssdk')); 
+
+
 
 
 const gameConfig = {
@@ -93,11 +95,19 @@ const gameConfig = {
   scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 
-
+window.sdk = 'crazygames'
 window.socket = socket
 window.game = new Phaser.Game(gameConfig);
 
+window.addEventListener("wheel", (event) => event.preventDefault(), {
+  passive: false,
+});
 
+window.addEventListener("keydown", (event) => {
+  if (["ArrowUp", "ArrowDown", " "].includes(event.key)) {
+    event.preventDefault();
+  }
+});
 
 const openFullscreen = () => {
   var elem = document.getElementsByTagName('canvas')[0];
