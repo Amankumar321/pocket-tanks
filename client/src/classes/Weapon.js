@@ -129,6 +129,10 @@ export class Weapon {
         else if (y >= this.terrain.height) {
             this.weaponHandler.onBaseHit(this, obj)
         }
+        
+        else if (this.terrain.getPixel(x, y).alpha > 0) {
+            this.weaponHandler.onTerrainHit(this, obj)
+        }
 
         else if (hitTank1 === true) {
             this.weaponHandler.onTankHit(this, obj, tank1)
@@ -142,9 +146,6 @@ export class Weapon {
         //     this.weaponHandler.onBounceHit(this, obj)
         // }
 
-        if (this.terrain.getPixel(x, y).alpha > 0 && obj.body !== undefined) {
-            this.weaponHandler.onTerrainHit(this, obj)
-        }
 
         // if (obj.body !== undefined) {
         //     obj.body.prevCenter.set(obj.body.center.x, obj.body.center.y)
@@ -304,7 +305,7 @@ export class Weapon {
         //console.log('bounce velocity', obj.body.velocity.x, obj.body.velocity.y)
 
         if (this.terrain.getPixel(obj.body.prev.x, obj.body.prev.y).alpha > 0) {
-            console.log('bounce inside terrain', obj.body.prev.x, obj.body.prev.y)
+            //console.log('bounce inside terrain', obj.body.prev.x, obj.body.prev.y)
             obj.setPosition(obj.body.prev.x, obj.body.prev.y)
             obj.body.updateFromGameObject()
             return false
@@ -366,7 +367,7 @@ export class Weapon {
         }
 
         if (this.terrain.getPixel(obj.body.prev.x, obj.body.prev.y).alpha > 0) {
-            console.log('prev inside terrain', obj.body.prev.x, obj.body.prev.y)
+            //console.log('prev inside terrain', obj.body.prev.x, obj.body.prev.y)
             return [obj.body.prev.x, obj.body.prev.y, obj.body.prev.x, obj.body.prev.y]
         }
 

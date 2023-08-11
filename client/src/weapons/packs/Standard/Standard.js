@@ -1445,13 +1445,13 @@ export class crazyivan {
 
         weapon.defaultShoot(particle, 200, 300, {x: this.projectile.body.x, y: this.projectile.body.y}, delta)
         //particle.body.preUpdate(true, 0)
-        console.log(particle.body.x, particle.body.y)
+        //console.log(particle.body.x, particle.body.y)
 
         particle.index = index
         particle.movement = index
 
         this.particles.push(particle)
-        console.log(particle.body.x, particle.body.y)
+        //console.log(particle.body.x, particle.body.y)
     }
     
     updateParticleMotion = (weapon, particle, move, index) => {
@@ -3715,7 +3715,6 @@ export class skipper {
     }
 
     blast = (weapon, blowTank = false) => {
-        console.log('blast')
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(50,50,0,1)'}, {relativePosition: 1, color: 'rgba(240,240,20,1)'}]
         var data = {thickness: 14, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
         weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 52 - weapon.scene.tank1.hitRadius, data, blowTank)

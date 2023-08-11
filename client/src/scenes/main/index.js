@@ -43,6 +43,11 @@ export class MainScene extends Scene {
         if (window.sdk === 'crazygames') {
             window.CrazyGames.SDK.game.gameplayStart();
         }
+        if (window.sdk === 'gdsdk') {
+            if (window.gdsdk !== undefined && window.gdsdk.preloadAd !== undefined) {
+                window.gdsdk.preloadAd('rewarded')
+            }
+        }
         //this.sound.add('click')
         // this.load.audio('background', ['assets/sounds/background.mp3'])
         // this.load.image('wall', 'assets/images/wall.png');
@@ -120,7 +125,7 @@ export class MainScene extends Scene {
                 
                 this.terrain.multiplayerPoints = []
                 this.terrain.addPixels = []
-                console.log('turn 1')
+                //console.log('turn 1')
                 this.showTurnPointer()
             }
         })
@@ -148,16 +153,7 @@ export class MainScene extends Scene {
                     this.hideExitMenu()
             }
         })
-
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
-
-        // setTimeout(() => {
-        //     this.terrain.save()
-        // }, 2000);
+        
     }
 
 
@@ -299,6 +295,7 @@ export class MainScene extends Scene {
         const clickHandler = () => {
             if (this.HUD.mouseLocked === true) return
             if (this.sceneData.gameType === 3) return
+            this.sound.play('click', {volume: 0.3})
 
             adBtn.disableInteractive()
             adImg.disableInteractive()
@@ -307,24 +304,16 @@ export class MainScene extends Scene {
             
             if (window.sdk === 'gdsdk') {
                 var gdsdk = window.gdsdk
-                if (typeof gdsdk !== 'undefined' && gdsdk.showAd !== 'undefined') {
-                    gdsdk.showAd('rewarded')
-                    .then(response => {
-                        autoAdjust()
-                    })
-                    .catch(error => {
-                        autoAdjust()
-                    })
-                    .finally(() => {
-                        this.game.sound.mute = false
-                    })
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd("rewarded")
+                    autoAdjust()
                 }
             }
 
             if (window.sdk === 'crazygames') {
                 const callbacks = {
                     adFinished: () => {this.game.sound.mute = false; autoAdjust()},
-                    adError: (error) => {this.game.sound.mute = false; autoAdjust()},
+                    adError: () => {this.game.sound.mute = false; autoAdjust()},
                     adStarted: () => {this.game.sound.mute = true},
                 };
                 window.CrazyGames.SDK.ad.requestAd("rewarded", callbacks);
@@ -372,7 +361,7 @@ export class MainScene extends Scene {
                 socket.emit('giveTurn', {terrainData: this.terrain.multiplayerPoints, pos1: {x: this.tank1.x, y: this.tank1.y}, pos2: {x: this.tank2.x, y: this.tank2.y}, rotation1: this.tank1.rotation, rotation2: this.tank2.rotation})
                 this.terrain.save()
             }
-            console.log('turn 2')
+            //console.log('turn 2')
             this.showTurnPointer()
             if (this.sceneData.gameType === 1) {
                 this.cpuHandler.play()
@@ -385,7 +374,7 @@ export class MainScene extends Scene {
                 this.activeTank = 1
                 this.tank1.active = true
                 this.HUD.reset()
-                console.log('turn 1')
+                //console.log('turn 1')
                 this.showTurnPointer()
             }
             else {
@@ -509,11 +498,18 @@ export class MainScene extends Scene {
             if (window.sdk === 'crazygames') {
                 const callbacks = {
                     adFinished: () => {this.game.sound.mute = false; restartGame()},
-                    adError: (error) => {this.game.sound.mute = false; restartGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adError: () => {this.game.sound.mute = false; restartGame(); window.CrazyGames.SDK.game.gameplayStop()},
                     adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
                 };
                 window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
                 
+            }
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd()
+                    restartGame()
+                }
             }
             else {
                 restartGame()
@@ -521,9 +517,9 @@ export class MainScene extends Scene {
         })
 
         b.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
 
             const endGame = () => {
-                this.sound.play('click', {volume: 0.3})
                 this.sound.stopByKey('winner')
                 this.scene.start('scene-1')
                 if (this.sceneData.gameType === 3) {
@@ -535,11 +531,18 @@ export class MainScene extends Scene {
             if (window.sdk === 'crazygames') {
                 const callbacks = {
                     adFinished: () => {this.game.sound.mute = false; endGame()},
-                    adError: (error) => {this.game.sound.mute = false; endGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adError: () => {this.game.sound.mute = false; endGame(); window.CrazyGames.SDK.game.gameplayStop()},
                     adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
                 };
     
                 window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+            }
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd()
+                    endGame()
+                }
             }
             else {
                 endGame()
@@ -584,8 +587,9 @@ export class MainScene extends Scene {
         this.exitMenuContent = this.add.group([x, y, a, b])
 
         a.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
+
             const exitGame = () => {
-                this.sound.play('click', {volume: 0.3})
                 if (this.sceneData.gameType === 3) {
                     window.socket.emit('leaveRoom', {})
                 }
@@ -595,10 +599,17 @@ export class MainScene extends Scene {
             if (window.sdk === 'crazygames') {
                 const callbacks = {
                     adFinished: () => {this.game.sound.mute = false; exitGame()},
-                    adError: (error) => {this.game.sound.mute = false; exitGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                    adError: () => {this.game.sound.mute = false; exitGame(); window.CrazyGames.SDK.game.gameplayStop()},
                     adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
                 };
                 window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+            }
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd()
+                    exitGame()
+                }
             }
             else {
                 exitGame()
@@ -607,8 +618,9 @@ export class MainScene extends Scene {
         })
 
         b.once('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
+            
             const resumeGame = () => {
-                this.sound.play('click', {volume: 0.3})
                 this.hideExitMenu()
             }
             resumeGame()

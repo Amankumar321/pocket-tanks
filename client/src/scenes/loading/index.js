@@ -23,13 +23,16 @@ export class LoadingScene extends Scene {
 
 
     create = () => {
+
         this.sound.stopAll()
 
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
+        // this.input.on('pointerdown', () => {
+        //     if (window.game.sound.mute === true) {
+        //         window.game.sound.mute = false
+        //     }
+        // })
+
+        window.game.sound.mute = false
 
         this.load.image('cover', 'assets/images/c.png')
         this.load.image('pt_3', 'assets/images/pt_3.png')
@@ -72,11 +75,9 @@ export class LoadingScene extends Scene {
             }
         });
 
-
         //this.add.rectangle(0, 0, this.renderer.width, this.renderer.height, 0x000000).setOrigin(0, 0).setDepth(-5)
 
         loadingText.setOrigin(0.5, 1).setFontSize(36).setFontFamily('Verdana').setFontStyle('bold');
-
 
         //var beginbtn = this.add.rectangle(w / 2, h * 4/5, 200, 50, 0x444444).setOrigin(0.5, 0.5).setVisible(false)
        // var begintext = this.add.text(w/2, h * 4/5, "Begin Game", {fill: '#eeeeee'}).setFontFamily('Verdana').setFontStyle('bold').setFontSize(24).setOrigin(0.5,0.5).setVisible(false)
@@ -86,14 +87,20 @@ export class LoadingScene extends Scene {
        var beginbtn = this.add.image(w/2, h * 4/5, texture).setVisible(false)
        //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14).setStroke('rgba(80,80,80,1)', 4)
 
-       this.addClickable(beginbtn)
-
         beginbtn.setInteractive()
         beginbtn.on('pointerdown', () => {
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd()
+                    this.scene.start('scene-1')
+                }
+            }
+            else {
+                this.scene.start('scene-1')
+            }
             //this.displayAd()
-            this.scene.start('scene-1')
         })
-
 
         progressBox.lineStyle(2, 0xcccccc)
         progressBox.strokeRect(w/2 - 160, h * 4/5 + 15, 320, 40);
@@ -117,22 +124,6 @@ export class LoadingScene extends Scene {
         });
 
         this.load.start()
-    }
-
-
-    addClickable = (btn) => {
-        return
-        btn.on('pointermove', () => {
-            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
-        })
-
-        btn.on('pointerover', () => {
-            //this.clicktext.setVisible(true)
-        })
-
-        btn.on('pointerout', () => {
-            //this.clicktext.setVisible(false)
-        })
     }
 
 

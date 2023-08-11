@@ -58,15 +58,31 @@ export const type3 = (scene) => {
 
     socket.once('playAgain', () => {
         scene.sound.stopByKey('winner')
-        if (scene.winnerBlastInterval !== null) {
-            clearInterval(scene.winnerBlastInterval)
-            scene.winnerBlastInterval = null
-        }
-        if (window.sdk === 'crazygames') {
-            window.CrazyGames.SDK.game.gameplayStop();
+
+        const restartGame = () => {
+            scene.scene.start('scene-5', scene.sceneData)
         }
 
-        scene.scene.start('scene-5', scene.sceneData)
+        if (window.sdk === 'crazygames') {
+            window.CrazyGames.SDK.game.gameplayStop();
+            const callbacks = {
+                adFinished: () => {this.game.sound.mute = false; restartGame()},
+                adError: () => {this.game.sound.mute = false; restartGame(); window.CrazyGames.SDK.game.gameplayStop()},
+                adStarted: () => {this.game.sound.mute = true; window.CrazyGames.SDK.game.gameplayStop()},
+            };
+            window.CrazyGames.SDK.ad.requestAd("midgame", callbacks);
+            
+        }
+        if (window.sdk === 'gdsdk') {
+            var gdsdk = window.gdsdk
+            if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                gdsdk.showAd()
+                restartGame()
+            }
+        }
+        else {
+            restartGame()
+        }
     })
 
 

@@ -107,7 +107,6 @@ export const createAngleDisplay = (hud) => {
                 //hud.mouseLocked = false
             }
             else {
-                console.log('here1')
                 hud.scene.sound.play('click', {volume: 0.3})
                 hud.crossAir.setVisible(false)
                 hud.crossAir.setData('toShow', false)
@@ -124,8 +123,6 @@ export const createAngleDisplay = (hud) => {
 
         hud.scene.sound.play('click', {volume: 0.3})
         hud.scene.hideTurnPointer()
-
-        console.log('here2')
 
         if (hud.scene.activeTank === 1) {
             hud.scene.input.on('pointerdown', releasePointer)

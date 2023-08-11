@@ -26,7 +26,7 @@ export class Computer {
         var randomIndex = Math.floor(Math.random() * this.tank.weapons.length)
         var randomWeapon = this.tank.weapons[randomIndex]
 
-        console.log(randomWeapon.name)
+        //console.log(randomWeapon.name)
 
         if (randomWeapon.type === 0) {
             this.handleType0(randomWeapon, randomIndex)
@@ -112,7 +112,7 @@ export class Computer {
 
         var distBetweenTank = Math.sqrt( Math.pow( this.tank.x - this.playerTank.x, 2 ) + Math.pow( this.tank.y - this.playerTank.y, 2 ) )
 
-        console.log(distBetweenTank, dist)
+        //console.log(distBetweenTank, dist)
         var moveRight = false
         var moveLeft = false
 
@@ -135,7 +135,7 @@ export class Computer {
             }
         }
 
-        console.log(clearUp, moveLeft, moveRight)
+        //console.log(clearUp, moveLeft, moveRight)
         if (clearUp) {
             var availableClearUp = []
             for (let i = 0; i < this.tank.weapons.length; i++) {
@@ -145,7 +145,7 @@ export class Computer {
             }
             if (availableClearUp.length > 0) {
                 var idx = Math.floor(Math.random() * availableClearUp.length)
-                console.log('clearup later')
+                //console.log('clearup later')
                 this.handleType2(this.tank.weapons[availableClearUp[idx]], availableClearUp[idx])
                 return
             }

@@ -63,11 +63,11 @@ export class Scene5 extends Scene {
             this.handleType4()
         }
 
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
+        // this.input.on('pointerdown', () => {
+        //     if (window.game.sound.mute === true) {
+        //         window.game.sound.mute = false
+        //     }
+        // })
         
     }
 

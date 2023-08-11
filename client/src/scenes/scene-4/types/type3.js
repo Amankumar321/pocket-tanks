@@ -9,7 +9,7 @@ export const type3 = (scene) => {
     const socket = window.socket
     socket.removeAllListeners()
 
-    console.log(scene.roomList)
+    //console.log(scene.roomList)
 
     scene.player1 = scene.sceneData.player1
 
@@ -88,7 +88,7 @@ export const type3 = (scene) => {
 
     const clearRooms = () => {
         scene.roomList.forEach((room, index) => {
-            console.log(index + " removed")
+            //console.log(index + " removed")
             room.x.destroy(true)
             room.y.destroy(true)
             room.z.destroy(true)
@@ -101,13 +101,13 @@ export const type3 = (scene) => {
 
     socket.on('setRooms', ({rooms}) => {
         clearRooms()
-        console.log('setRooms ', rooms.length)
+        //console.log('setRooms ', rooms.length)
         rooms.forEach((room) => { scene.roomList.push(room) })
         updateRooms()
     })
 
     if (socket.connected) {
-        console.log('connected')
+        //console.log('connected')
         socket.emit('getRooms', {})
     }
     else {

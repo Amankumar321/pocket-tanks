@@ -84,11 +84,11 @@ export class Scene2 extends Scene {
             this.scene.start('scene-3', {gameType: 4})
         })
 
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
+        // this.input.on('pointerdown', () => {
+        //     if (window.game.sound.mute === true) {
+        //         window.game.sound.mute = false
+        //     }
+        // })
     }
 
     addClickable = (btn) => {

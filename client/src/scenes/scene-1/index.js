@@ -18,6 +18,7 @@ export class Scene1 extends Scene {
 
 
     preload = () => {
+        //console.log(window.gdsdk)
         //
     }
 
@@ -63,17 +64,16 @@ export class Scene1 extends Scene {
 
         //this.sound.add('click')
 
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
+        // this.input.on('pointerdown', () => {
+        //     if (window.game.sound.mute === true) {
+        //         window.game.sound.mute = false
+        //     }
+        // })
 
         const w = this.cameras.main.width
 
         var [guideOption, guideBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
         guideOption.setDisplaySize(80, 60)
-        this.addClickable(guideOption)
         guideBox.setInteractive()
         guideBox.on('pointerdown', () => { this.scene.start('guide-scene') })
 
@@ -138,25 +138,9 @@ export class Scene1 extends Scene {
             this.scene.start('scene-2')
         })
 
-        //this.addClickable(this.playbtn)
     }
 
 
-    addClickable = (btn) => {
-        return
-        btn.on('pointermove', () => {
-            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
-        })
-
-        btn.on('pointerover', () => {
-            //this.clicktext.setPosition(this.input.mousePointer.x, this.input.mousePointer.y + 32)
-            //this.clicktext.setVisible(true)
-        })
-
-        btn.on('pointerout', () => {
-            //this.clicktext.setVisible(false)
-        })
-    }
 
     createOption = (image, text, x, y) => {
         var option = this.add.image(x, y - 15, image).setAlpha(0.8).setOrigin(0.5, 0.5)

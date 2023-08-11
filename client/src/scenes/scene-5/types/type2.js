@@ -7,7 +7,7 @@ import { Display } from "phaser";
 */
 
 export const type2 = (scene) => {
-    const totalWeapons = 20
+    const totalWeapons = 2
 
     scene.player1 = scene.sceneData.player1
     scene.player2 = scene.sceneData.player2

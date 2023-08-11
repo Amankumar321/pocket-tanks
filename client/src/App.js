@@ -2,47 +2,52 @@ import Phaser from 'phaser';
 import { socket } from './socket/index'
 import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene } from './scenes';
 
-// window["GD_OPTIONS"] = {
-//   "debug": false,
-//   "gameId": "f9717fceefa44437b4eed3e894966144",
-//   "advertisementSettings": {
-//     debug: false, // Enable IMA SDK debugging.
-//     //"locale": "en", // Locale used in IMA SDK, this will localize the "Skip ad after x seconds" phrases.
-//   },
-//   "onEvent": function(event) {
-//       switch (event.name) {
-//           case "SDK_READY":
-//             window.gdsdk.preload()
-//           case "SDK_GAME_START":
-//               if (window.game)
-//                   window.game.sound.mute = false
-//           case "SDK_GAME_PAUSE":
-//               if (window.game)
-//                   window.game.sound.mute = true
-//               break;
-//           case "SDK_GDPR_TRACKING":
-//               // this event is triggered when your user doesn't want to be tracked
-//               break;
-//           case "SDK_GDPR_TARGETING":
-//               // this event is triggered when your user doesn't want personalised targeting of ads and such
-//               break;
-//           case "SDK_REWARDED_WATCH_COMPLETE":
-//               if (window.game) {
-//                 window.game.sound.mute = false
-//               }
-//           default:
-//               break;
-//       }
-//   }
-// };
-// (function(d, s, id) {
-//   var js, fjs = d.getElementsByTagName(s)[0];
-//   if (d.getElementById(id)) return;
-//   js = d.createElement(s);
-//   js.id = id;
-//   js.src = 'https://html5.api.gamedistribution.com/main.min.js';
-//   fjs.parentNode.insertBefore(js, fjs);
-// }(document, 'script', 'gamedistribution-jssdk')); 
+window["GD_OPTIONS"] = {
+  "debug": false,
+  "gameId": "ce66a6ade0ac4ff4b62d518fc0a9f22f",
+  "advertisementSettings": {
+    debug: false, // Enable IMA SDK debugging.
+    //"locale": "en", // Locale used in IMA SDK, this will localize the "Skip ad after x seconds" phrases.
+  },
+  "onEvent": function(event) {
+      switch (event.name) {
+          case "SDK_READY":
+            //console.log('sdk ready')
+            //window.gdsdk.preloadAd()
+            break;
+          case "SDK_GAME_START":
+              if (window.game) {
+                window.game.sound.mute = false
+                window.game.loop.wake()
+              }
+              break;
+          case "SDK_GAME_PAUSE":
+              if (window.game) {
+                window.game.sound.mute = true
+                window.game.loop.sleep()
+              }
+              break;
+          case "SDK_GDPR_TRACKING":
+              // this event is triggered when your user doesn't want to be tracked
+              break;
+          case "SDK_GDPR_TARGETING":
+              // this event is triggered when your user doesn't want personalised targeting of ads and such
+              break;
+          case "SDK_REWARDED_WATCH_COMPLETE":
+              // reward
+          default:
+              break;
+      }
+  }
+};
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = 'https://html5.api.gamedistribution.com/main.min.js';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'gamedistribution-jssdk')); 
 
 
 
@@ -95,7 +100,8 @@ const gameConfig = {
   scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 
-window.sdk = 'crazygames'
+//window.sdk = 'crazygames'
+window.sdk = 'gdsdk'
 window.socket = socket
 window.game = new Phaser.Game(gameConfig);
 
@@ -111,7 +117,7 @@ window.addEventListener("keydown", (event) => {
 
 const openFullscreen = () => {
   var elem = document.getElementsByTagName('canvas')[0];
-  console.log(elem)
+  //console.log(elem)
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
   } else if (elem.webkitRequestFullscreen) { /* Safari */

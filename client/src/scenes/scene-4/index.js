@@ -58,8 +58,8 @@ export class Scene4 extends Scene {
         backbtn.on('pointerdown', () => {
             this.sound.play('click', {volume: 0.3})
             if (this.sceneData.gameType === 3) {
-                console.log(this.roomList?.length)
-                console.log('clearing rooms')
+                //console.log(this.roomList?.length)
+                //console.log('clearing rooms')
                 this.clearRooms()
                 const socket = window.socket
                 socket.emit('leaveRoom', {})
@@ -67,11 +67,11 @@ export class Scene4 extends Scene {
             this.scene.start('scene-3', {gameType: this.sceneData.gameType})
         })
 
-        this.input.on('pointerdown', () => {
-            if (window.game.sound.mute === true) {
-                window.game.sound.mute = false
-            }
-        })
+        // this.input.on('pointerdown', () => {
+        //     if (window.game.sound.mute === true) {
+        //         window.game.sound.mute = false
+        //     }
+        // })
     }
 
 
