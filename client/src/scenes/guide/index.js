@@ -61,7 +61,7 @@ export class GuideScene extends Scene {
         const buttons = {
             'Angle': 'Click on the dome and a crosshair will appear over the tank. Moving the mouse left and right will change the angle to fire in. Clicking the mouse again will select that angle.',
             'Fire': 'Fires the weapon based on the angle and power that were selected. Some specialty weapons like the Dirt Mover, Well Digger, Laser, etc... only use angle, power, or neither, so be aware that there are exceptions to the rule.',
-            'Move': 'Move the tank a small distance, only 4 moves per game, you still get to shoot after moving',
+            'Move': 'Move the tank a small distance, only 4 moves per game, you still get to shoot after moving.',
             'Power': 'Click the red power bar and move the mouse left and right to change the amount of power that will be used to launch the bullet.',
             'Weapon': 'Click on the weapon name for a weapon selection pop-up. Moving the mouse up and down with change the selected weapon, which will be flashing yellow.',
         }
@@ -129,7 +129,7 @@ export class GuideScene extends Scene {
         const buttons = {
             'Angle': 'Tap on the dome and a crosshair will appear over the tank. Dragging left and right on screen will change the angle to fire in. Removing touch will select that angle.',
             'Fire': 'Fires the weapon based on the angle and power that were selected. Some specialty weapons like the Dirt Mover, Well Digger, Laser, etc... only use angle, power, or neither, so be aware that there are exceptions to the rule.',
-            'Move': 'Move the tank a small distance, only 4 moves per game, you still get to shoot after moving',
+            'Move': 'Move the tank a small distance, only 4 moves per game, you still get to shoot after moving.',
             'Power': 'Tap the red power bar and power will flash continously. Drag left and right to change the amount of power that will be used to launch the bullet. Removing touch will select that power.',
             'Weapon': 'Tap on the weapon name for a weapon selection pop-up. Dragging up and down with change the selected weapon, which will be flashing yellow.'
         }

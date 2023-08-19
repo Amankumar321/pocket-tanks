@@ -183,7 +183,7 @@ export const type3 = (scene) => {
         }
 
         for (let index = 0; index < randomArray.length/2; index++) {
-            var randomWeaponIndex = randomArray[index]
+            var randomWeaponIndex = randomArray[index + randomArray.length/2]
             var pickable = scene.add.container(rect2.x - rect2.width/2 + 180, rect2.y - rect2.height/2 + 10 + index * 40)
             var txt = scene.add.text(30,5,weaponArray[randomWeaponIndex].name).setDepth(10)
             var img = scene.add.image(10,15, scene.textures.addCanvas(Math.random().toString(32).slice(3,7), weaponArray[randomWeaponIndex].logoCanvas)).setDepth(10)

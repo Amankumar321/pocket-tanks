@@ -7,6 +7,7 @@ import { type2 } from './types/type2';
 import { type3 } from './types/type3';
 import { type4 } from './types/type4';
 import { drawBackBtn } from '../../graphics/back-btn';
+import { BlastCache } from '../../classes/BlastCache';
 
 export class MainScene extends Scene {
     constructor() {
@@ -28,6 +29,7 @@ export class MainScene extends Scene {
         this.winnerBlastTween = null
         this.gameOver = false
         this.exitMenuContent = null
+        this.blastCache = new BlastCache(this)
     }
 
 

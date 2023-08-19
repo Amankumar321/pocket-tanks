@@ -3,69 +3,66 @@ import Phaser from "phaser"
 export class Blast {
     /**
      * @param {Phaser.Scene} scene 
-     * @param {number} type 
+     * @param {number} animationType 
      * @param {number} x 
      * @param {number} y 
      * @param {number} radius
      * @param {boolean} blowTank
+     * @param {string} blastType
      */
-    constructor(scene, type, x, y, radius, data, blowTank) {
-        this.type = type 
+    constructor(scene, animationType, x, y, radius, data, blowTank, blastType) {
+        this.animationType = animationType
         this.data = data
         this.scene = scene
         this.count = 0
-        this.optimized = (this.data.optimize === undefined) ? false : (this.data.optimize)
-        //this.optimized = 1
-        
-        this.canvas = document.createElement('canvas')
-        this.canvas.width = scene.renderer.width
-        this.canvas.height = scene.renderer.height
-        this.textureId = Math.random().toString(32).slice(2, 7)
-        scene.textures.addCanvas(this.textureId, this.canvas)
-        this.image = this.scene.add.image(this.canvas.width/2, this.canvas.height/2, this.textureId)
+        this.blastType = blastType
         
         this.terrain = scene.terrain
-        this.maxRadius = radius
+        this.maxRadius = Math.max(radius, 1)
         this.outerRadius = 0
         this.innerRadius = 0
         this.thickness = 0
-        this.gradient = null
-        this.circles = []
         this.x = x
         this.y = y
+        this.canvas = document.createElement('canvas')
+        this.canvas.width = this.maxRadius * 2
+        this.canvas.height = this.maxRadius * 2
+        this.textureId = Math.random().toString(32).slice(2, 7)
+        
+        this.scene.textures.addCanvas(this.textureId, this.canvas)
+        this.image = this.scene.add.image(this.x, this.y, this.textureId).setOrigin(0.5, 0.5)
+
+        this.gradient = null
+        this.circles = []
         this.toRemove = false
         this.blowTank = blowTank
         this.soundEffect = data.soundEffect
         this.soundConfig = data.soundConfig
 
         this.init()
-
     }
 
 
     init = () => {
-        if (this.type === 1) {
+        if (this.animationType === 1) {
             this.gradient = this.data.gradient
             this.thickness = this.data.thickness
             if (this.soundEffect) {
-                //this.scene.sound.stopByKey(this.soundEffect)
                 this.scene.sound.play(this.soundEffect, this.soundConfig)
             }
         }
-        if (this.type === 2) {
+        if (this.animationType === 2) {
             this.circles = this.data.circles
             this.thickness = this.data.thickness
             if (this.soundEffect) {
-                //this.scene.sound.stopByKey(this.soundEffect)
                 this.scene.sound.play(this.soundEffect, this.soundConfig)
             }
         }
-        if (this.type === 3) {
+        if (this.animationType === 3) {
             this.circles = this.data.circles
             this.thickness = this.data.thickness
             this.variableRadius = this.maxRadius
             if (this.soundEffect) {
-                this.scene.sound.stopByKey(this.soundEffect)
                 this.scene.sound.play(this.soundEffect, this.soundConfig)
             }
         }
@@ -73,13 +70,13 @@ export class Blast {
 
 
     update = () => {
-        if (this.type === 1) {
+        if (this.animationType === 1) {
             this.updateType1()
         }
-        if (this.type === 2) {
+        if (this.animationType === 2) {
             this.updateType2()
         }
-        if (this.type === 3) {
+        if (this.animationType === 3) {
             this.updateType3()
         }
     }
@@ -151,10 +148,6 @@ export class Blast {
 
 
     animateHole1 = () => {
-        if (this.count === 1 && this.optimized){
-            this.count = 0
-            return
-        }
         var ctx = this.terrain.canvas.getContext('2d')
         ctx.globalCompositeOperation = 'destination-out'
 
@@ -164,39 +157,41 @@ export class Blast {
         ctx.arc(this.x, this.y, Math.min(this.outerRadius, this.maxRadius), 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-        this.terrain.update()
 
         var canvas = this.canvas
         var ctx2 = canvas.getContext('2d')
-
-        ctx2.clearRect(0, 0, canvas.width, canvas.height)
-        
-        ctx2.globalCompositeOperation = 'source-over'
-
         this.innerRadius = Math.max(this.outerRadius - this.thickness, 0)
+        ctx2.clearRect(0, 0, canvas.width, canvas.height)
 
-        var grd = ctx2.createRadialGradient(this.x, this.y, this.innerRadius, this.x, this.y, this.outerRadius)
+        if (this.scene.blastCache.exists(this.blastType, this.outerRadius) === false) {
+            ctx2.globalCompositeOperation = 'source-over'
+    
+            var grd = ctx2.createRadialGradient(this.maxRadius, this.maxRadius, this.innerRadius, this.maxRadius, this.maxRadius, this.outerRadius)
+    
+            this.gradient.forEach((ele) => {
+                grd.addColorStop(ele.relativePosition, ele.color)
+            });
+            
+            ctx2.fillStyle = grd
+            ctx2.beginPath()
+            ctx2.arc(this.maxRadius, this.maxRadius, this.outerRadius, 0, Math.PI * 2)
+            ctx2.closePath()
+            ctx2.fill()
+            
+            ctx2.globalCompositeOperation = 'destination-in'
+    
+            ctx2.fillStyle = 'rgba(0,0,0,1)'
+            
+            ctx2.beginPath()
+            ctx2.arc(this.maxRadius, this.maxRadius, this.maxRadius, 0, Math.PI * 2)
+            ctx2.closePath()
+            ctx2.fill()
 
-        this.gradient.forEach((ele) => {
-            grd.addColorStop(ele.relativePosition, ele.color)
-        });
-        
-        ctx2.fillStyle = grd
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.outerRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-        
-        ctx2.globalCompositeOperation = 'destination-in'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.maxRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-
-        this.count = 1
+            this.scene.blastCache.addCanvas(this.blastType, this.outerRadius, canvas)
+        }
+        else {
+            ctx2.drawImage(this.scene.blastCache.getCanvas(this.blastType, this.outerRadius), 0, 0)
+        }
     }
 
 
@@ -228,60 +223,57 @@ export class Blast {
         ctx.arc(this.x, this.y, Math.min(this.outerRadius, this.maxRadius), 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-        this.terrain.update()
 
         var canvas = this.canvas
         var ctx2 = canvas.getContext('2d')
 
-        ctx2.globalCompositeOperation = 'destination-out'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
+        ctx2.clearRect(0, 0, canvas.width, canvas.height)
         
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.outerRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-        
-        ctx2.globalCompositeOperation = 'source-over'
-
-        for (var i = 0; i < this.circles.length; i++) {
-            this.innerRadius = Math.max(this.outerRadius - this.thickness * (i + 1), 0)
+        if (this.scene.blastCache.exists(this.blastType, this.outerRadius) === false) {
+            ctx2.globalCompositeOperation = 'source-over'
+            
+            for (var i = 0; i < this.circles.length; i++) {
+                this.innerRadius = Math.max(this.outerRadius - this.thickness * (i + 1), 0)
+                var grd = ctx2.createRadialGradient(this.maxRadius, this.maxRadius, this.innerRadius, this.maxRadius, this.maxRadius, Math.min(this.outerRadius, this.innerRadius + this.thickness))
+                var gradient = this.circles[i]
+                
+                gradient.forEach((ele) => {
+                    grd.addColorStop(ele.relativePosition, ele.color)
+                });
+                
+                ctx2.fillStyle = grd
+                ctx2.beginPath()
+                ctx2.arc(this.maxRadius, this.maxRadius, Math.min(this.maxRadius, this.outerRadius, this.innerRadius + this.thickness), 0, Math.PI * 2)
+                ctx2.closePath()
+                ctx2.fill()
+                
+                if (this.innerRadius === 0) {
+                    break
+                }
+            }
     
-            var grd = ctx2.createRadialGradient(this.x, this.y, this.innerRadius, this.x, this.y, Math.min(this.outerRadius, this.innerRadius + this.thickness))
-            var gradient = this.circles[i]
-
-            gradient.forEach((ele) => {
-                grd.addColorStop(ele.relativePosition, ele.color)
-            });
-      
-            ctx2.fillStyle = grd
+            ctx2.globalCompositeOperation = 'destination-in'
+            ctx2.fillStyle = 'rgba(0,0,0,1)'
+            
             ctx2.beginPath()
-            ctx2.arc(this.x, this.y, Math.min(this.maxRadius, this.outerRadius, this.innerRadius + this.thickness), 0, Math.PI * 2)
+            ctx2.arc(this.maxRadius, this.maxRadius, this.maxRadius, 0, Math.PI * 2)
             ctx2.closePath()
             ctx2.fill()
 
-            if (this.innerRadius === 0) {
-                break
-            }
+            ctx2.globalCompositeOperation = 'destination-out'
+            ctx2.fillStyle = 'rgba(0,0,0,1)'
+            
+            ctx2.beginPath()
+            ctx2.arc(this.maxRadius, this.maxRadius, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
+            ctx2.closePath()
+            ctx2.fill()
+
+            this.scene.blastCache.addCanvas(this.blastType, this.outerRadius, canvas)
         }
-   
-        ctx2.globalCompositeOperation = 'destination-in'
+        else { 
+            ctx2.drawImage(this.scene.blastCache.getCanvas(this.blastType, this.outerRadius), 0, 0)
+        }
 
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.maxRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-
-        ctx2.globalCompositeOperation = 'destination-out'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
     }
 
 
@@ -316,55 +308,55 @@ export class Blast {
         var canvas = this.canvas
         var ctx2 = canvas.getContext('2d')
 
-        ctx2.globalCompositeOperation = 'destination-out'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
+        ctx2.clearRect(0, 0 , canvas.width, canvas.height)
         
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, this.outerRadius, 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-        
-        ctx2.globalCompositeOperation = 'source-over'
-
-        for (var i = 0; i < this.circles.length; i++) {
-            this.innerRadius = Math.max(this.outerRadius - this.thickness * (i + 1), 0)
+        if (this.scene.blastCache.exists(this.blastType, this.outerRadius) === false) {
+            ctx2.globalCompositeOperation = 'source-over'
     
-            var grd = ctx2.createRadialGradient(this.x, this.y, this.innerRadius, this.x, this.y, Math.min(this.outerRadius, this.innerRadius + this.thickness))
-            var gradient = this.circles[i]
-
-            gradient.forEach((ele) => {
-                grd.addColorStop(ele.relativePosition, ele.color)
-            });
-      
-            ctx2.fillStyle = grd
+            for (var i = 0; i < this.circles.length; i++) {
+                this.innerRadius = Math.max(this.outerRadius - this.thickness * (i + 1), 0)
+        
+                var grd = ctx2.createRadialGradient(this.maxRadius, this.maxRadius, this.innerRadius, this.maxRadius, this.maxRadius, Math.min(this.outerRadius, this.innerRadius + this.thickness))
+                var gradient = this.circles[i]
+    
+                gradient.forEach((ele) => {
+                    grd.addColorStop(ele.relativePosition, ele.color)
+                });
+          
+                ctx2.fillStyle = grd
+                ctx2.beginPath()
+                ctx2.arc(this.maxRadius, this.maxRadius, Math.min(this.maxRadius, this.outerRadius, this.innerRadius + this.thickness), 0, Math.PI * 2)
+                ctx2.closePath()
+                ctx2.fill()
+    
+                if (this.innerRadius === 0) {
+                    break
+                }
+            }
+       
+            ctx2.globalCompositeOperation = 'destination-in'
+    
+            ctx2.fillStyle = 'rgba(0,0,0,1)'
+            
             ctx2.beginPath()
-            ctx2.arc(this.x, this.y, Math.min(this.maxRadius, this.outerRadius, this.innerRadius + this.thickness), 0, Math.PI * 2)
+            ctx2.arc(this.maxRadius, this.maxRadius, Math.max(this.variableRadius, 0), 0, Math.PI * 2)
+            ctx2.closePath()
+            ctx2.fill()
+    
+            ctx2.globalCompositeOperation = 'destination-out'
+    
+            ctx2.fillStyle = 'rgba(0,0,0,1)'
+            
+            ctx2.beginPath()
+            ctx2.arc(this.maxRadius, this.maxRadius, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
             ctx2.closePath()
             ctx2.fill()
 
-            if (this.innerRadius === 0) {
-                break
-            }
+            this.scene.blastCache.addCanvas(this.blastType, this.outerRadius, canvas)
         }
-   
-        ctx2.globalCompositeOperation = 'destination-in'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, Math.max(this.variableRadius, 0), 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
-
-        ctx2.globalCompositeOperation = 'destination-out'
-
-        ctx2.fillStyle = 'rgba(0,0,0,1)'
-        
-        ctx2.beginPath()
-        ctx2.arc(this.x, this.y, Math.max(this.innerRadius + 1, 0), 0, Math.PI * 2)
-        ctx2.closePath()
-        ctx2.fill()
+        else {
+            ctx2.drawImage(this.scene.blastCache.getCanvas(this.blastType, this.outerRadius), 0, 0)
+        }
 
         if (this.outerRadius >= this.maxRadius) {
             this.variableRadius--

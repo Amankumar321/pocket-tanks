@@ -105,7 +105,7 @@ export class singleshot {
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
         var data = {thickness: 15, gradient: grd, blowPower: 200, soundEffect: 'expmedium2', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 46 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 46 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 46, 60/46)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -224,7 +224,7 @@ export class bigshot {
     blast = (weapon) => {
         var grd = [{relativePosition: 0, color: 'rgba(255,0,0,0)'}, {relativePosition: 1, color: 'rgba(255,0,0,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 90 - weapon.scene.tank1.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 90 - weapon.scene.tank1.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 90, 30/90)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -367,7 +367,7 @@ export class threeshot {
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.5, color: 'rgba(100,100,0,1)'}, {relativePosition: 1, color: 'rgba(255,255,0,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 46 - weapon.tank.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 46 - weapon.tank.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(obj.body.x, obj.body.y, 46, 20/46)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
@@ -520,7 +520,7 @@ export class fiveshot {
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.5, color: 'rgba(100,30,0,1)'}, {relativePosition: 1, color: 'rgba(255,100,20,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 46 - weapon.tank.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 46 - weapon.tank.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(obj.body.x, obj.body.y, 46, 20/46)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
@@ -658,7 +658,7 @@ export class jackhammer {
             this.frameCount = 10
             var grd = [{relativePosition: 0, color: 'rgba(255,51,153,0)'}, {relativePosition: 1, color: 'rgba(230,0,115,1)'}]
             var data = {thickness: 15, gradient: grd, soundEffect: 'expshort', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank)
+            weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
             weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 36, 10/36)
             if (this.jumpCount <= 0) {
                 this.projectile.destroy(true)
@@ -832,7 +832,7 @@ export class heatseeker {
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.4, color: 'rgba(120,0,0,1)'}, {relativePosition: 1, color: 'rgba(230,0,0,1)'}]
         var data = {thickness: 15, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 80, 40/80)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -1166,8 +1166,9 @@ export class piledriver {
         }
 
         if (y <= weapon.terrain.height - 1) {
-            weapon.terrain.blast(1, Math.floor(x), Math.floor(y), blastRadius - weapon.scene.tank1.hitRadius, data, blowTank)
+            weapon.terrain.blast(1, Math.floor(x), Math.floor(y), blastRadius - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString() + '.' + this.blastCount.toString())
             weapon.defaultUpdateScore(x, y, blastRadius, 20/blastRadius)
+
         }
     }
 }
@@ -1523,7 +1524,7 @@ export class crazyivan {
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,0.4)'}, {relativePosition: 0.4, color: 'rgba(120,120,0,1)'}, {relativePosition: 1, color: 'rgba(255,255,0,1)'}]
         var data = {thickness: 18, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 36 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(obj.body.x, obj.body.y, 36, 20/36)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
@@ -1809,7 +1810,7 @@ export class spider {
         
         if (this.dissipated === false) {
             var data = {thickness: 16, gradient: grd, blowPower: 200, soundEffect: 'expmedium', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
+            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString() + '.1')
             weapon.defaultUpdateScore(obj.body.x, obj.body.y, 80, 20/80)
             obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
@@ -1817,7 +1818,7 @@ export class spider {
         }
         else {
             var data = {thickness: 16, gradient: grd, blowPower: 30, optimize: true,  soundEffect: 'expshort', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 28 - weapon.scene.tank1.hitRadius, data, blowTank)
+            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 28 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString() + '.2')
             weapon.defaultUpdateScore(obj.body.x, obj.body.y, 28, 20/28)
             obj.destroy(true)
             weapon.scene.textures.remove(obj.texture.key)
@@ -1943,7 +1944,7 @@ export class sniperrifle {
     blast = (weapon, obj, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 1, color: 'rgba(220,220,220,1)'}]
         var data = {thickness: 0, gradient: grd, blowPower: 300, soundEffect: 'sniper', soundConfig: {volume: 2}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 1, data, true)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 1, data, true, this.id.toString())
         var vec = new Phaser.Math.Vector2(1,1)
 
         for (let index = 0; index < 200; index++) {
@@ -2521,7 +2522,7 @@ export class zapper {
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(0,0,0,1)'}, {relativePosition: 0.4, color: 'rgba(120,80,0,1)'}, {relativePosition: 1, color: 'rgba(230,160,0,1)'}]
         var data =  {thickness: 15, gradient: grd, blowPower: 50, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 40 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 40 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 40, 40/40)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -3283,7 +3284,7 @@ export class groundhog {
     blast = (weapon) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(150,0,80,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
         var data =  {thickness: 15, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 70 - weapon.scene.tank1.hitRadius,data, true)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 70 - weapon.scene.tank1.hitRadius,data, true, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 70, 50/70)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -3425,7 +3426,7 @@ export class worm {
     blast = (weapon) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(0,20,100,1)'}, {relativePosition: 1, color: 'rgba(150,100,255,1)'}]
         var data = {thickness: 12, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 60 - weapon.scene.tank1.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 60 - weapon.scene.tank1.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 60, 50/60)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -3585,7 +3586,7 @@ export class homingworm {
     blast = (weapon) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(50,0,100,1)'}, {relativePosition: 1, color: 'rgba(100,0,200,1)'}]
         var data = {thickness: 14, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 46 - weapon.scene.tank1.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 46 - weapon.scene.tank1.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 46, 30/46)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -3720,7 +3721,7 @@ export class skipper {
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.3, color: 'rgba(50,50,0,1)'}, {relativePosition: 1, color: 'rgba(240,240,20,1)'}]
         var data = {thickness: 14, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 52 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 52 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 52, 40/52)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -3890,7 +3891,7 @@ export class chainreaction {
 
         offx = arr[i].x
         offy = arr[i].y
-        weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 46 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50}, blowTank)
+        weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 46 - weapon.scene.tank1.hitRadius, {thickness: 16, gradient: grd, blowPower: 50}, blowTank, this.id.toString())
         weapon.defaultUpdateScore(initX + offx, initY + offy, 46, 20/46)
         i++
 
@@ -3899,7 +3900,7 @@ export class chainreaction {
             offy = arr[i].y
             if (Math.floor(this.projectile.y) + offy < weapon.terrain.height) {
                 var data = {thickness: 16, gradient: grd, blowPower: 50, soundEffect: 'expshort', soundConfig: {}}
-                weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 46 - weapon.scene.tank1.hitRadius, data, blowTank)
+                weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 46 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
                 weapon.defaultUpdateScore(initX + offx, initY + offy, 46, 20/46)
             }
             i++
@@ -4100,7 +4101,7 @@ export class pineapple {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(50,50,0,1)'}, {relativePosition: 0.4, color: 'rgba(100,100,0,1)'}, {relativePosition: 1, color: 'rgba(240,2400,0,1)'}]
         if (obj === this.projectile) {
             var data =  {thickness: 15, gradient: grd, blowPower: 100, soundEffect: 'expmedium', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, true)
+            weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, true, this.id.toString() + '.1')
             weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 80, 40/80)
             this.projectile.destroy(true)
             weapon.scene.textures.remove('projectile')
@@ -4108,7 +4109,7 @@ export class pineapple {
         }
         else {
             var data = {thickness: 12, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'expshort', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 20 - weapon.scene.tank1.hitRadius, data, true)
+            weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 20 - weapon.scene.tank1.hitRadius, data, true, this.id.toString() + '.2')
             weapon.defaultUpdateScore(obj.body.x, obj.body.y, 20, 30/20)
             this.particles = this.particles.filter(ele => { return obj !== ele })
             obj.destroy(true)
@@ -4247,18 +4248,18 @@ export class firecracker {
         var offx, offy
         var data = {thickness: 16, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'firecracker', soundConfig: {}}
 
-        weapon.terrain.blast(1, Math.floor(initX), Math.floor(initY), 24 - weapon.scene.tank1.hitRadius, data, false)
+        weapon.terrain.blast(1, Math.floor(initX), Math.floor(initY), 24 - weapon.scene.tank1.hitRadius, data, false, this.id.toString())
         weapon.defaultUpdateScore(initX, initY, 24, 5/24)
 
         const createBlast = () => {
             offx = -7*i + arrLeftX[i]
             offy = arrLeftY[i]
             var data = {thickness: 16, gradient: grd, blowPower: 50, optimize: true, soundEffect: 'firecracker', soundConfig: {}}
-            weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 24 - weapon.scene.tank1.hitRadius, data, false)
+            weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 24 - weapon.scene.tank1.hitRadius, data, false, this.id.toString())
             weapon.defaultUpdateScore(initX + offx, initY + offy, 24, 5/24)
             offx = 7*i + arrRightX[i]
             offy = arrRightY[i]
-            weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 24 - weapon.scene.tank1.hitRadius, data, false)
+            weapon.terrain.blast(1, Math.floor(initX) + offx, Math.floor(initY) + offy, 24 - weapon.scene.tank1.hitRadius, data, false, this.id.toString())
             weapon.defaultUpdateScore(initX + offx, initY + offy, 24, 5/24)
             i++
         }
@@ -4420,7 +4421,7 @@ export class homingmissile {
     blast = (weapon, blowTank = false) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(20,0,100,0.8)'}, {relativePosition: 0.3, color: 'rgba(50,20,150,1)'}, {relativePosition: 0.6, color: 'rgba(100,80,180,1)'}, {relativePosition: 0.9, color: 'rgba(170,170,220,1)'}, {relativePosition: 1, color: 'rgba(200,200,255,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 80, soundEffect: 'expmedium', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 60 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 60 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 60, 20/60)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
@@ -4831,7 +4832,7 @@ export class tommygun {
     blast = (weapon, obj) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.01, color: 'rgba(50,50,150,1)'}, {relativePosition: 0.6, color: 'rgba(50,50,255,1)'}, {relativePosition: 0.7, color: 'rgba(230,240,255,1)'}, {relativePosition: 1, color: 'rgba(230,240,255,1)'}]
         var data = {thickness: 12, gradient: grd, blowPower: 30, soundEffect: 'expshort2', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 16 - weapon.tank.hitRadius, data, true)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 16 - weapon.tank.hitRadius, data, true, this.id.toString())
         weapon.defaultUpdateScore(obj.body.x, obj.body.y, 16, 20/16)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key)
@@ -4922,7 +4923,7 @@ export class mountainmover {
         //grd.concat(grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1)
         var circles = [grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1, grd1]
         var data = {thickness: 10, circles: circles, soundEffect: 'explong', soundConfig: {}}
-        weapon.terrain.blast(3, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 160, data, false)
+        weapon.terrain.blast(3, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 160, data, false, this.id.toString())
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')
         weapon.turret.activeWeapon = null
@@ -5135,7 +5136,7 @@ export class scattershot {
     blast = (weapon, obj, blowTank) => {
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,0)'}, {relativePosition: 0.4, color: 'rgba(100,0,0,1)'}, {relativePosition: 1, color: 'rgba(255,0,0,1)'}]
         var data = {thickness: 14, gradient: grd, blowPower: 30, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 36, data, true)
+        weapon.terrain.blast(1, Math.floor(obj.body.x), Math.floor(obj.body.y), 36, data, true, this.id.toString())
         weapon.defaultUpdateScore(obj.body.x, obj.body.y, 36, 10/36)
         obj.destroy(true)
         weapon.scene.textures.remove(obj.texture.key);
@@ -5304,7 +5305,7 @@ export class cruiser {
         this.destroyed = true
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,20)'}, {relativePosition: 0.4, color: 'rgba(100,0,40,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
-        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank)
+        weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
         weapon.defaultUpdateScore(this.projectile.body.x, this.projectile.body.y, 80, 60/80)
         this.projectile.destroy(true)
         weapon.scene.textures.remove('projectile')

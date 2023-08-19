@@ -157,7 +157,7 @@ const mainsocket = (io) => {
 
 
         client.on('weaponPick', ({arrayIndex}) => {
-            client.broadcast.emit('opponentWeaponPick', {arrayIndex})
+            client.to(client.roomId).emit('opponentWeaponPick', {arrayIndex})
         })
 
 
@@ -177,9 +177,10 @@ const mainsocket = (io) => {
             var x, randomArray = []
             for (let index = 0; index < count; index++) {
                 x = Math.floor(Math.random() * max)
-                //x= 9
+                console.log(x)
                 randomArray.push(x)
             }
+
             room.randomArray = randomArray
             io.sockets.in(client.roomId).emit('setWeaponArray', {randomArray: room.randomArray})
         })
@@ -187,7 +188,7 @@ const mainsocket = (io) => {
 
 
         client.on('shoot', ({selectedWeapon, power, rotation, rotation1, rotation2, position1, position2}) => {
-            client.broadcast.emit('opponentShoot', {selectedWeapon, power, rotation, rotation1, rotation2, position1, position2})
+            client.to(client.roomId).emit('opponentShoot', {selectedWeapon, power, rotation, rotation1, rotation2, position1, position2})
         })
 
         
@@ -203,7 +204,7 @@ const mainsocket = (io) => {
             room.terrainPath = [...path]
             room.host.pos = {...hostPos}
             room.player.pos = {...playerPos}
-            client.broadcast.emit('setTerrainPath', {path: room.terrainPath, hostPos: room.host.pos, playerPos: room.player.pos})
+            client.to(client.roomId).emit('setTerrainPath', {path: room.terrainPath, hostPos: room.host.pos, playerPos: room.player.pos})
             //console.log(room.terrainPath)
         })
 
@@ -220,26 +221,26 @@ const mainsocket = (io) => {
 
 
         client.on('stepLeft', () => {
-            client.broadcast.emit('opponentStepLeft', {})
+            client.to(client.roomId).emit('opponentStepLeft', {})
         })
 
 
 
         client.on('stepRight', () => {
-            client.broadcast.emit('opponentStepRight', {})
+            client.to(client.roomId).emit('opponentStepRight', {})
         })
 
 
 
         client.on('giveTurn', ({terrainData, pos1, pos2, rotation1, rotation2}) => {
-            client.broadcast.emit('recieveTurn', {terrainData, pos1, pos2, rotation1, rotation2})
+            client.to(client.roomId).emit('recieveTurn', {terrainData, pos1, pos2, rotation1, rotation2})
         })
 
 
 
 
         client.on('requestTurn', () => {
-            client.broadcast.emit('opponentRequestTurn', {})
+            client.to(client.roomId).emit('opponentRequestTurn', {})
         })
 
 
