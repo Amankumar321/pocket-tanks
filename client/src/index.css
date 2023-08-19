@@ -21,6 +21,10 @@ canvas {
   image-rendering: pixelated;
   background-color: black;
 }
+
+div {
+  background-color: transparent;
+}
 /*
 background-image: linear-gradient(rgba(0, 0, 0, 1), rgb(120, 20, 140))
 

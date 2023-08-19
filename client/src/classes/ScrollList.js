@@ -1,4 +1,4 @@
-import Phaser from "phaser"
+import Phaser, { Time } from "phaser"
 import { socket } from "../socket"
 import { weaponArray } from "../weapons/array"
 
@@ -20,6 +20,9 @@ export class ScrollList {
         this.toHide = false
         this.toShow = false
         this.visible = false
+        this.scrollStartPos = null;
+        this.scrollCurrentPos = null;
+        this.scrollEndPos = null;
         this.weaponLogo = weaponLogo
 
         this.tileHeight = 0
@@ -50,7 +53,43 @@ export class ScrollList {
         this.y = this.scrollBackground.parentContainer.y + this.scrollBackground.y
 
         this.scrollList = this.scene.add.group()
-        //this.scrollTiles = this.scene.add.group()
+
+        const releasePointer = () => {
+            if (this.visible === true ) {
+                if (this.activeItem !== null) {
+                    this.scene.sound.play('click', {volume: 0.3})
+                    this.setActive(this.activeItem)
+                    this.hide()
+                    this.activeItem = null
+                }
+                this.scene.HUD.mouseLocked = false
+                this.scene.input.off('pointerdown', scrollStart)
+                //this.scrollBox.off('pointerdown', scrollStart)
+                this.scene.input.off('pointerup', scrollEnd)
+            }
+        }
+
+        var initialScroll; 
+
+        const scrollStart = () => {
+            this.scrollStartPos = this.scene.input.activePointer.position.clone()
+            this.scrollCurrentPos = this.scrollStartPos.clone()
+            this.scene.input.on('pointerup', scrollEnd)
+        }
+
+        const scrollEnd = () => {
+            this.scrollCurrentPos = null
+            if (initialScroll === true) {
+                initialScroll = false;
+                return;
+            }
+            this.scrollEndPos = this.scene.input.activePointer.position.clone()
+            
+            if (this.scrollStartPos.clone().subtract(this.scrollEndPos).length() < 2) {
+                releasePointer()
+            }
+            this.scene.input.off('pointerup', scrollEnd)
+        }
         
         this.selectedDisplay.setInteractive()
         this.selectedDisplay.on('pointerdown', () => {
@@ -61,35 +100,13 @@ export class ScrollList {
             this.scene.hideTurnPointer()
             //this.scene.input.mouse.requestPointerLock()
             this.toShow = true
+            initialScroll = true;
+            this.scene.input.on('pointerdown', scrollStart)
+            //this.scrollBox.on('pointerdown', scrollStart)
         })
 
-        this.scene.input.on('pointerdown', () => {
-            if (this.visible === true ) {
-                if (this.activeItem !== null) {
-                    this.scene.sound.play('click', {volume: 0.3})
-                    this.setActive(this.activeItem)
-                    //this.scene.input.mouse.releasePointerLock()
-                    this.hide()
-                    this.activeItem = null
-                }
-                this.scene.HUD.mouseLocked = false
-            }
-        })
 
         this.scrollBox.setInteractive()
-        this.scrollBox.on('pointerdown', (e) => {
-            if (this.visible === true ) {
-                if (this.activeItem !== null) {
-                    this.scene.sound.play('click', {volume: 0.3})
-                    this.setActive(this.activeItem)
-                    //this.scene.input.mouse.releasePointerLock()
-                    this.hide()
-                    this.activeItem = null
-                }
-                this.scene.HUD.mouseLocked = false
-            }
-            //e.event.stopPropagation()
-        })
 
         // socket.on('setWeapon', ({index}) => {
         //     this.setActive(index)
@@ -144,6 +161,9 @@ export class ScrollList {
 
             var textWidth = this.tileWidth - weaponLogo.width + margin * 2
             name = this.scene.add.text(-this.tileWidth/2 + weaponLogo.width + margin * 2 + textWidth/2, 0, weapon.name).setFont('18px Geneva')
+            if (!this.scene.game.device.os.desktop) {
+                name.setFontSize(26) 
+            }
             name.setOrigin(0.5)
 
             container.add(weaponLogo)
@@ -217,7 +237,13 @@ export class ScrollList {
             //var prev = this.scene.input.mousePointer.prev ? this.scene.input.mousePointer.prev : this.scene.input.mousePointer.prevPosition
             //var delY = (curr.y - prev.y)/2
 
-            this.scrollList.incY(-this.scene.input.mousePointer.deltaY)
+            //if (this.scene.game.input.)
+            this.scrollList.incY(-this.scene.input.activePointer.deltaY)
+
+            if (this.scrollCurrentPos !== null && this.scene.input.activePointer.isDown) {
+                this.scrollList.incY(this.scene.input.activePointer.position.clone().subtract(this.scrollCurrentPos).y)
+                this.scrollCurrentPos = this.scene.input.activePointer.position.clone()
+            }
             //this.scrollTiles.incY(this.scene.input.mousePointer.movementY)
 
             this.scrollList.setY(Math.min(this.scrollList.getChildren()[0].y, this.y), this.tileHeight)

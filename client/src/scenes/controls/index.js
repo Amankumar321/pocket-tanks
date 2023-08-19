@@ -8,6 +8,7 @@ export class ControlsScene extends Scene {
 
     create = () => {
         const controls = {
+            'Touch': 'Tap and Swipe',
             'Esc': 'Exit Match',
             'W': 'Increase Power',
             'S': 'Decrease Power',
@@ -61,7 +62,7 @@ export class ControlsScene extends Scene {
 
         drawBackBtn(ctx, canvas.width, canvas.height)
         var backtexture = this.textures.addCanvas('back-btn', canvas, true)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
+        var backbtn = this.add.image(100, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()

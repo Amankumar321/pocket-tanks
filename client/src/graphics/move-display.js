@@ -4,15 +4,18 @@ import { HUD } from "../classes/HUD"
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawMoveFrame = (ctx, width, height) => {
+const drawMoveFrame = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.fillRect(0, 0, width, height * 4/9)
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.fillRect(0, height * 4/9, width, height)
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.textAlign = 'center'
-    ctx.font = '18px Arial'
-    ctx.fillText('Move', width/2, height * 2/7)
+    ctx.font = '500 18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
+    ctx.fillText('Move', width/2, height * 2.3/7)
 }
 
 
@@ -20,7 +23,7 @@ const drawMoveFrame = (ctx, width, height) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawArrow = (ctx, width, height, angle) => {
+const drawArrow = (ctx, width, height, angle, scene) => {
     var txt =  String.fromCharCode(0x25B6)
     //var strokeThickness = 4
     if (angle === Math.PI) txt = String.fromCharCode(0x25C0)
@@ -39,7 +42,10 @@ const drawArrow = (ctx, width, height, angle) => {
     ctx.fill()
     ctx.textAlign = 'center'
     ctx.fillStyle = 'rgba(0,0,0,1)'
-    ctx.font = '18px Arial'
+    ctx.font = '500 18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
 
     if (angle === Math.PI) {
         ctx.fillText(txt, width * 9/12, height * 5/8)
@@ -101,10 +107,15 @@ export const drawMoveDisplay = (scene, x, y, w = 60, h = 60) => {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
 
+    if (!scene.game.device.os.desktop) {
+        h = h * 1.3
+        w = w * 1.3
+    }
+
     canvas.height = h
     canvas.width = w
 
-    drawMoveFrame(ctx, canvas.width, canvas.height)
+    drawMoveFrame(ctx, canvas.width, canvas.height, scene)
     if (scene.textures.exists('move-display')) scene.textures.remove('move-display')
     scene.textures.addCanvas('move-display', canvas);
 
@@ -112,7 +123,7 @@ export const drawMoveDisplay = (scene, x, y, w = 60, h = 60) => {
     ctx = canvas.getContext('2d')
     canvas.height = h
     canvas.width = w
-    drawArrow(ctx, canvas.width, canvas.height, 0)
+    drawArrow(ctx, canvas.width, canvas.height, 0, scene)
     if (scene.textures.exists('move-display-right')) scene.textures.remove('move-display-right')
     scene.textures.addCanvas('move-display-right', canvas);
 
@@ -120,7 +131,7 @@ export const drawMoveDisplay = (scene, x, y, w = 60, h = 60) => {
     ctx = canvas.getContext('2d')
     canvas.height = h
     canvas.width = w
-    drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    drawArrow(ctx, canvas.width, canvas.height, Math.PI, scene)
     if (scene.textures.exists('move-display-left')) scene.textures.remove('move-display-left')
     scene.textures.addCanvas('move-display-left', canvas);
     
@@ -138,6 +149,9 @@ export const drawMoveDisplay = (scene, x, y, w = 60, h = 60) => {
     moveLeftBtn.setInteractive().setOrigin(1,0.5);
 
     var moveDisplayText = scene.add.text(0, -h/2 + h * 4/9 + h * 5/18, '4').setOrigin(0.5).setFont('26px Geneva')
+    if (!scene.game.device.os.desktop){
+        moveDisplayText.setFontSize(36)
+    }
     moveDisplay.add(moveDisplayText)
 
     return [moveBtn, moveDisplayText, moveLeftBtn, moveRightBtn]

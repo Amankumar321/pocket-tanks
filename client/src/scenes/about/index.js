@@ -16,7 +16,7 @@ export class AboutScene extends Scene {
 
         drawBackBtn(ctx, canvas.width, canvas.height)
         var backtexture = this.textures.addCanvas('back-btn', canvas, true)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
+        var backbtn = this.add.image(100, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()
@@ -34,6 +34,12 @@ export class AboutScene extends Scene {
         power, and fire over 30 distinct weapons at your opponent. There is an innovative
         weapon shop to keep the game moving fast and a target practice mode for
         experimenting with all the weapons "no holds barred!"`
+
+        var aboutText1Mobile = `
+        The fastest game of artillery you\'ll ever play. Pocket Tanks is designed to be easy
+        to learn, and fun to master. Select your angle, power, and fire over 30 distinct
+        weapons at your opponent. There is an innovative weapon shop and a target
+        practice mode for experimenting with all the weapons "no holds barred!"`
         
         var aboutText2 = `This is a remake of famous game Pocket Tanks from 2001 which is available on windows, Mac, iOS and
         android with over 500k download on play store. You would find a lot of videos on YouTube of
@@ -45,8 +51,14 @@ export class AboutScene extends Scene {
         var w = this.game.renderer.width
         var h = this.game.renderer.height
 
-        this.add.text(w/2, h/5, header).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(32)
-        this.add.text(w/2, h/2.6, aboutText1).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(21).setAlign('center')
+        if (this.game.device.os.desktop) {
+            this.add.text(w/2, h/5, header).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(32).setWordWrapWidth(this.renderer.width)
+            this.add.text(w/2, h/2.6, aboutText1).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(21).setAlign('center').setWordWrapWidth(this.renderer.width)
+        }
+        else {
+            this.add.text(w/2, h/6, header).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(36).setWordWrapWidth(this.renderer.width)
+            this.add.text(w/2, h/2.8, aboutText1).setFontFamily('Verdana').setOrigin(0.5, 0.5).setFontSize(28).setAlign('center').setWordWrapWidth(this.renderer.width)
+        }
         //this.add.text(w/2, h/2, aboutText2).setFontFamily('Verdana').setWordWrapWidth(400)
         
         var pt1 = this.add.image(w/2 - 10, h/1.4, 'pt_4')

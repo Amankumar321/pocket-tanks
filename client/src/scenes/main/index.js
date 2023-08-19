@@ -6,6 +6,7 @@ import { type1 } from './types/type1';
 import { type2 } from './types/type2';
 import { type3 } from './types/type3';
 import { type4 } from './types/type4';
+import { drawBackBtn } from '../../graphics/back-btn';
 
 export class MainScene extends Scene {
     constructor() {
@@ -55,11 +56,6 @@ export class MainScene extends Scene {
 
 
     create = () => {
-        const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-        const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-        //this.fps = this.add.text(screenCenterX, 30, this.game.loop.actualFps)
-        //this.fps.setOrigin(0.5)
-
         if (this.winnerBlastTween !== null) {
             this.winnerBlastTween.stop()
             this.winnerBlastTween = null
@@ -97,8 +93,7 @@ export class MainScene extends Scene {
         this.createHUD()
 
         this.sound.stopAll()
-        // var bg = this.sound.add('background', {loop: true})
-        // bg.play()
+       
         this.sound.play('background', {loop: true})
 
         this.terrain.multiplayerPoints = []
@@ -154,19 +149,33 @@ export class MainScene extends Scene {
             }
         })
         
+        var canvas = document.createElement('canvas')
+        var ctx = canvas.getContext('2d')
+        canvas.width = 150
+        canvas.height = 100
+        drawBackBtn(ctx, canvas.width, canvas.height)
+        var backtexture = this.textures.addCanvas('back-btn', canvas, true)
+        var backbtn = this.add.image(100, this.game.renderer.height - 100, backtexture)
+        backbtn.setDepth(10)
+        
+        backbtn.setInteractive()
+
+        backbtn.on('pointerdown', () => {
+            this.sound.play('click', {volume: 0.3})
+            if (this.HUD.mouseLocked === false) {
+                this.showExitMenu()
+            }
+        })
     }
 
 
 
     update = (time, delta) => {
-        //this.fps.setText(this.game.loop.actualFps)
-        //this.terrain.updateTerrain()
-        //this.tank1.update()
-        //this.tank2.update()
         this.HUD.refresh()
         this.checkSwitchTurn()
 
         this.input.mousePointer.prev = {x: this.input.mousePointer.x, y: this.input.mousePointer.y}
+        this.input.activePointer.prev = {x: this.input.activePointer.x, y: this.input.activePointer.y}
     }
 
 
@@ -266,18 +275,39 @@ export class MainScene extends Scene {
 
 
     createAutoAdjust = () => {
-        var adBtn = this.add.text(this.renderer.width/2 - 20, this.renderer.height * 8/9, "Auto Adjust").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
-        adBtn.setOrigin(0.5, 0.5).setColor("rgba(0,0,0,1)").setDepth(101)
+        var h = 60
+        var w = 180
 
-        var clapperBoard = this.add.image(this.renderer.width/2 + 60, this.renderer.height * 8/9, 'clapperboard').setDepth(101)
-        clapperBoard.displayHeight = 30
-        clapperBoard.displayWidth = 30
+        var adBtnContainer = this.add.container(this.renderer.width/2, this.renderer.height * 8/9)
+        
+        var adBtnText = this.add.text(0, 0, "Auto Adjust").setFontSize(18).setFontFamily('Verdana').setFontStyle('bold')
+        
+        if (!this.game.device.os.desktop){
+            adBtnText.setFontSize(26)
+            h = h * 1.3
+            w = w * 1.3
+        }
+        adBtnText.setOrigin(0.5, 0.5).setColor("rgba(0,0,0,1)")
 
-        var adImg = this.add.rectangle(this.renderer.width/2, this.renderer.height * 8/9, 180, 60, 0xcccccc)
-        adImg.setDepth(100).setOrigin(0.5,0.5)
+        var clapperBoard = this.add.image(0, 0, 'clapperboard')
+        clapperBoard.displayHeight = 40
+        clapperBoard.displayWidth = 40
+
+        var averageWidth = (adBtnText.displayWidth + clapperBoard.displayWidth + 10) / 2
+        adBtnText.setX(adBtnText.displayWidth/2 - averageWidth)
+        clapperBoard.setX(averageWidth - clapperBoard.displayWidth/2)
+        
+        var adBtnBackground = this.add.rectangle(0, 0, w, h, 0xcccccc)
+        adBtnBackground.setOrigin(0.5,0.5)
+        
+        adBtnContainer.add(adBtnBackground)
+        adBtnContainer.add(clapperBoard)
+        adBtnContainer.add(adBtnText)
+
+        adBtnContainer.setDepth(100)
 
         if (this.sceneData.gameType === 3) {
-            adImg.setFillStyle(0x999999)
+            adBtnBackground.setFillStyle(0x999999)
         }
 
         const autoAdjust = () => {
@@ -287,9 +317,9 @@ export class MainScene extends Scene {
             if (tank !== null) {
                 tank.autoAdjust()
             }
-            adBtn.setText("Auto Adjust")
-            adImg.setInteractive()
-            adBtn.setInteractive()
+            adBtnText.setText("Auto Adjust")
+            adBtnBackground.setInteractive()
+            //adBtnContainer.setInteractive()
         }
 
         const clickHandler = () => {
@@ -297,10 +327,11 @@ export class MainScene extends Scene {
             if (this.sceneData.gameType === 3) return
             this.sound.play('click', {volume: 0.3})
 
-            adBtn.disableInteractive()
-            adImg.disableInteractive()
-            
-            adBtn.setText("Loading")
+            //adBtn.disableInteractive()
+            //adImg.disableInteractive()
+            adBtnBackground.disableInteractive()
+            //adBtnContainer.disableInteractive()
+            adBtnText.setText("Loading")
             
             if (window.sdk === 'gdsdk') {
                 var gdsdk = window.gdsdk
@@ -324,11 +355,13 @@ export class MainScene extends Scene {
             }
         }
 
-        adBtn.setInteractive()
-        adImg.setInteractive()
+        //adBtnText.setInteractive()
+        //adImg.setInteractive()
+        adBtnBackground.setInteractive()
 
-        adBtn.on('pointerdown', clickHandler)
-        adImg.on('pointerdown', clickHandler)
+        ///adBtn.on('pointerdown', clickHandler)
+        //adImg.on('pointerdown', clickHandler)
+        adBtnBackground.on('pointerdown', clickHandler)
     }
 
 

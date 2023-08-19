@@ -8,9 +8,7 @@ export class LoadingScene extends Scene {
     constructor() {
         super('loading-scene');
         this.fps = null
-        this.playbtn = null
-        this.k = null
-        //this.clicktext = null
+        this.checkResize = null
     }
 
 
@@ -19,18 +17,13 @@ export class LoadingScene extends Scene {
             window.CrazyGames.SDK.game.sdkGameLoadingStart();
         }
         this.load.image('logo', 'assets/images/logo.png');
+        this.load.image('compress', 'assets/images/compress.png')
+        this.load.image('expand', 'assets/images/expand.png')
     }
 
 
     create = () => {
-
         this.sound.stopAll()
-
-        // this.input.on('pointerdown', () => {
-        //     if (window.game.sound.mute === true) {
-        //         window.game.sound.mute = false
-        //     }
-        // })
 
         window.game.sound.mute = false
 
@@ -38,12 +31,20 @@ export class LoadingScene extends Scene {
         this.load.image('pt_3', 'assets/images/pt_3.png')
         this.load.image('pt_4', 'assets/images/pt_4.png')
         this.load.image('pt_5', 'assets/images/pt_5.png')
-        this.load.svg('clapperboard', 'assets/images/clapperboard.svg')
-        this.load.svg('face-frown-regular', 'assets/images/face-frown-regular.svg')
-        this.load.svg('address-book-regular', 'assets/images/address-book-regular.svg')
-        this.load.svg('question-solid', 'assets/images/question-solid.svg')
-        this.load.svg('keyboard-regular', 'assets/images/keyboard-regular.svg')
-        this.load.svg('youtube', 'assets/images/youtube.svg')
+
+        this.load.image('ptss1', 'assets/images/ptss1.png')
+        this.load.image('ptss2', 'assets/images/ptss2.png')
+        this.load.image('ptss3', 'assets/images/ptss3.png')
+        this.load.image('ptss4', 'assets/images/ptss4.png')
+       
+        this.load.image('clapperboard', 'assets/images/clapperboard.png')
+        this.load.image('exit', 'assets/images/exit.png')
+        this.load.image('face-frown-regular', 'assets/images/face-frown-regular.png')
+        this.load.image('address-book-regular', 'assets/images/address-book-regular.png')
+        this.load.image('question-solid', 'assets/images/question-solid.png')
+        this.load.image('keyboard-regular', 'assets/images/keyboard-regular.png')
+        this.load.image('youtube', 'assets/images/youtube.png')
+        this.load.image('screenshot', 'assets/images/screenshot.png')
         this.load.image('wall', 'assets/images/wall.png');
         this.load.audio('intro', ['assets/sounds/intro.mp3'])
         this.load.audio('background', ['assets/sounds/background.mp3'])
@@ -75,32 +76,10 @@ export class LoadingScene extends Scene {
             }
         });
 
-        //this.add.rectangle(0, 0, this.renderer.width, this.renderer.height, 0x000000).setOrigin(0, 0).setDepth(-5)
-
         loadingText.setOrigin(0.5, 1).setFontSize(36).setFontFamily('Verdana').setFontStyle('bold');
 
-        //var beginbtn = this.add.rectangle(w / 2, h * 4/5, 200, 50, 0x444444).setOrigin(0.5, 0.5).setVisible(false)
-       // var begintext = this.add.text(w/2, h * 4/5, "Begin Game", {fill: '#eeeeee'}).setFontFamily('Verdana').setFontStyle('bold').setFontSize(24).setOrigin(0.5,0.5).setVisible(false)
-
-       var beginbtnctx = createBeginButton()
-       var texture = this.textures.addCanvas('begin-btn', beginbtnctx, true)
-       var beginbtn = this.add.image(w/2, h * 4/5, texture).setVisible(false)
-       //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14).setStroke('rgba(80,80,80,1)', 4)
-
-        beginbtn.setInteractive()
-        beginbtn.on('pointerdown', () => {
-            if (window.sdk === 'gdsdk') {
-                var gdsdk = window.gdsdk
-                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
-                    gdsdk.showAd()
-                    this.scene.start('scene-1')
-                }
-            }
-            else {
-                this.scene.start('scene-1')
-            }
-            //this.displayAd()
-        })
+        var beginbtn = this.addBeginButton()
+        this.addScreenResize()
 
         progressBox.lineStyle(2, 0xcccccc)
         progressBox.strokeRect(w/2 - 160, h * 4/5 + 15, 320, 40);
@@ -127,7 +106,88 @@ export class LoadingScene extends Scene {
     }
 
 
+
+
+    addBeginButton = () => {
+        var w = this.renderer.width
+        var h = this.renderer.height
+
+        var beginbtnctx = createBeginButton(this)
+        var texture = this.textures.addCanvas('begin-btn', beginbtnctx, true)
+        var beginbtn = this.add.image(w/2, h * 4/5, texture).setVisible(false)
+
+        beginbtn.setInteractive()
+        beginbtn.on('pointerdown', () => {
+            if (window.sdk === 'gdsdk') {
+                var gdsdk = window.gdsdk
+                if (typeof gdsdk !== undefined && gdsdk.showAd !== undefined) {
+                    gdsdk.showAd()
+                    this.scene.start('scene-1')
+                }
+            }
+            else {
+                this.scene.start('scene-1')
+            }
+        })
+
+        return beginbtn
+    }
+
+
+
+    addScreenResize = () =>{
+        var w = this.renderer.width
+        
+        var resizeScreenContainer = this.add.container(w - 30, 30)
+        var resizeScreenText = this.add.text(0, 0, 'Fullscreen').setOrigin(1, 0).setFontFamily('Verdana').setFontSize(18).setPadding(0,0,10,0).setColor('rgba(240,240,240,1)')
+        var expandScreenIcon = this.add.image(0, 0, 'expand').setOrigin(1, 0).setDisplaySize(20, 20).setAlpha(0.8)
+        var compressScreenIcon = this.add.image(0, 0, 'compress').setOrigin(1, 0).setDisplaySize(20, 20).setVisible(false).setAlpha(0.8)
+
+        if (!this.game.device.os.desktop) {
+            resizeScreenText.setFontSize(30)
+            expandScreenIcon.setDisplaySize(30, 30)
+            compressScreenIcon.setDisplaySize(30, 30)
+        }
+
+        resizeScreenText.setX(resizeScreenText.x - expandScreenIcon.displayWidth)
+        resizeScreenContainer.add([resizeScreenText, expandScreenIcon, compressScreenIcon])
+
+        const onClickResize = () => {
+            if (this.game.scale.isFullscreen === true) {
+                this.game.scale.stopFullscreen()
+            }
+            else {
+                this.game.scale.startFullscreen()
+            }
+        }
+
+        resizeScreenText.setInteractive()
+        expandScreenIcon.setInteractive()
+        compressScreenIcon.setInteractive()
+        resizeScreenText.on('pointerup', onClickResize)
+        expandScreenIcon.on('pointerup', onClickResize)
+        compressScreenIcon.on('pointerup', onClickResize)
+
+        this.checkResize = () => {
+            if (this.game.scale.isFullscreen === false) {
+                resizeScreenText.setText('Fullscreen')
+                compressScreenIcon.setVisible(false)
+                expandScreenIcon.setVisible(true)
+            }
+            else {
+                resizeScreenText.setText('Minimise')
+                compressScreenIcon.setVisible(true)
+                expandScreenIcon.setVisible(false)
+            }
+        }
+    }
+
+
+
+
     update = () => {
-       
+        if (this.checkResize !== null) {
+            this.checkResize()
+        }
     }
 }

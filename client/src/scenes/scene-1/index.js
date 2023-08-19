@@ -11,8 +11,7 @@ export class Scene1 extends Scene {
         super('scene-1');
         this.fps = null
         this.playbtn = null
-        this.k = null
-        //this.clicktext = null
+        this.checkResize = null
     }
 
 
@@ -22,26 +21,12 @@ export class Scene1 extends Scene {
         //
     }
 
-    toggleFullscreen = () => {
-        if (this.scale.isFullscreen) {
-            this.scale.stopFullscreen();
-            // On stop fulll screen
-        } else {
-            this.scale.startFullscreen();
-            // On start fulll screen
-        }
-    }
+
 
 
     create = () => {
-        
-        //this.fps = this.add.text(0, 0, this.game.loop.actualFps)
-        //this.clicktext = this.add.text(0, 0, "click").setFontFamily('Verdana').setVisible(false).setFontSize(14)
-
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
         const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-        //const a = this.add.text(screenCenterX, screenCenterY - 200, 'Pocket');
-        //const b = this.add.text(screenCenterX, screenCenterY - 50, 'Tanks');
 
         var cover = this.physics.add.image(screenCenterX, screenCenterY - 500, 'cover').setScale(1.01)
 
@@ -52,25 +37,14 @@ export class Scene1 extends Scene {
             duration: 2200
         })
 
-        //a.setOrigin(0.5).setFontSize(200)
-        //b.setOrigin(0.5).setFontSize(200)
         this.createPlayBtn()
-        this.sound.stopAll()
+        this.addScreenResize()
 
-        // var intro = this.sound.add('intro', {loop: true})
-        // intro.play()
+        this.sound.stopAll()
         this.sound.stopByKey('winner')
         this.sound.play('intro', {loop: true})
 
-        //this.sound.add('click')
-
-        // this.input.on('pointerdown', () => {
-        //     if (window.game.sound.mute === true) {
-        //         window.game.sound.mute = false
-        //     }
-        // })
-
-        const w = this.cameras.main.width
+        const w = this.game.renderer.width
 
         var [guideOption, guideBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
         guideOption.setDisplaySize(80, 60)
@@ -87,31 +61,14 @@ export class Scene1 extends Scene {
         controlsBox.setInteractive()
         controlsBox.on('pointerdown', () => { this.scene.start('controls-scene') })
 
-        var [tutorialOption, tutorialBox] = this.createOption('youtube', 'Tutorial', w * 6/7, screenCenterY * 5/3 - 50)
-        tutorialOption.setDisplaySize(100, 80)
-        tutorialBox.setInteractive()
-        tutorialBox.on('pointerdown', () => { this.scene.start('tutorial-scene') })
-
-
-        var canvas = document.createElement('canvas')
-        canvas.width = 40
-        canvas.height = 40
-        var ctx = canvas.getContext('2d')
-        ctx.fillStyle = 'rgba(0,255,0,1)'
-        ctx.beginPath()
-        ctx.arc(20, 20, 20, 0, Math.PI * 2)
-        ctx.closePath()
-        ctx.fill()
-
-        //
-        // var fullscreen = this.add.rectangle(screenCenterX + 400,screenCenterY * 1.7,200,200,0xff0000)
-        // fullscreen.setInteractive({draggable: true})
-        // fullscreen.on('pointerdown', this.toggleFullscreen)
-        // fullscreen.setVisible(false)
-        //fullscreen.on('dragend', () => {alert()})
-        //this.k = new WeaponShopScroll(this)
-        //this.k.reset([{name: 'abd', id: 1}, {name: 'd', id: 2}, {name: 'ad', id: 3}, {name: 'sd', id: 4}, {name: 'td', id: 5}])
+        var [screenshotOption, screenshotBox] = this.createOption('screenshot', 'Screenshots', w * 6/7, screenCenterY * 5/3 - 50)
+        screenshotOption.setDisplaySize(90, 75)
+        screenshotBox.setInteractive()
+        screenshotBox.on('pointerdown', () => { this.scene.start('screenshot-scene') })
     }
+
+
+
 
     createPlayBtn = () => {
         const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
@@ -152,14 +109,73 @@ export class Scene1 extends Scene {
         box.on('pointerout', () => {
             box.setStrokeStyle(2, 0xcccccc, 0)
         })
-        this.add.text(x, y + 40, text).setOrigin(0.5, 0.5).setFontFamily('Verdana')
+        if (!this.game.device.os.desktop) {
+            this.add.text(x, y + 50, text).setOrigin(0.5, 0.5).setFontFamily('Verdana').setFontSize(26)
+        }
+        else {
+            this.add.text(x, y + 40, text).setOrigin(0.5, 0.5).setFontFamily('Verdana')
+        }
         option.setInteractive()
         return [option, box]
     }
 
 
+
+
+    addScreenResize = () =>{
+        var w = this.renderer.width
+        
+        var resizeScreenContainer = this.add.container(w - 30, 30)
+        var resizeScreenText = this.add.text(0, 0, 'Fullscreen').setOrigin(1, 0).setFontFamily('Verdana').setFontSize(18).setPadding(0,0,10,0)
+        var expandScreenIcon = this.add.image(0, 0, 'expand').setOrigin(1, 0).setDisplaySize(20, 20).setAlpha(0.8)
+        var compressScreenIcon = this.add.image(0, 0, 'compress').setOrigin(1, 0).setDisplaySize(20, 20).setVisible(false).setAlpha(0.8)
+
+        if (!this.game.device.os.desktop) {
+            resizeScreenText.setFontSize(30)
+            expandScreenIcon.setDisplaySize(30, 30)
+            compressScreenIcon.setDisplaySize(30, 30)
+        }
+
+        resizeScreenText.setX(resizeScreenText.x - expandScreenIcon.displayWidth)
+        resizeScreenContainer.add([resizeScreenText, expandScreenIcon, compressScreenIcon])
+
+        const onClickResize = () => {
+            if (this.game.scale.isFullscreen === true) {
+                this.game.scale.stopFullscreen()
+            }
+            else {
+                this.game.scale.startFullscreen()
+            }
+        }
+
+        resizeScreenText.setInteractive()
+        expandScreenIcon.setInteractive()
+        compressScreenIcon.setInteractive()
+        resizeScreenText.on('pointerup', onClickResize)
+        expandScreenIcon.on('pointerup', onClickResize)
+        compressScreenIcon.on('pointerup', onClickResize)
+
+        this.checkResize = () => {
+            if (this.game.scale.isFullscreen === false) {
+                resizeScreenText.setText('Fullscreen')
+                compressScreenIcon.setVisible(false)
+                expandScreenIcon.setVisible(true)
+            }
+            else {
+                resizeScreenText.setText('Minimise')
+                compressScreenIcon.setVisible(true)
+                expandScreenIcon.setVisible(false)
+            }
+        }
+    }
+
+
+
+
     update = (time, delta) => {
-        //this.collider.update()
+        if (this.checkResize !== null) {
+            this.checkResize()
+        }
     }
 
 }

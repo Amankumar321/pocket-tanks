@@ -4,7 +4,7 @@ import { HUD } from "../classes/HUD"
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawPowerFrame = (ctx, width, height) => {
+const drawPowerFrame = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.fillRect(0, 0, width, height/2)
     //ctx.fillStyle = 'rgba(0,0,0,1)'
@@ -15,14 +15,20 @@ const drawPowerFrame = (ctx, width, height) => {
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.fillRect(width * 2/5, height/2, width * 3/5, 30)
     ctx.textAlign = 'center'
-    ctx.font = '18px Arial'
+    ctx.font = '500 18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
     ctx.fillText('Power', width/5, height * 6/9)
 }
 
-const drawPowerMeter = (ctx, width, height, percentage = 0) => {
+const drawPowerMeter = (ctx, width, height, percentage = 0, color) => {
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.fillRect(0, 0, width, height)
     ctx.fillStyle = 'rgba(230,0,0,1)'
+    if (color) {
+        ctx.fillStyle = color
+    }
     ctx.fillRect(0, 0, Math.max(Math.ceil(width * percentage/100), 1), height)
 }
 
@@ -31,7 +37,7 @@ const drawPowerMeter = (ctx, width, height, percentage = 0) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawArrow = (ctx, width, height, angle) => {
+const drawArrow = (ctx, width, height, angle, scene) => {
     var txt =  String.fromCharCode(0x25B6)
     //var strokeThickness = 4
     if (angle === Math.PI) txt = String.fromCharCode(0x25C0)
@@ -41,7 +47,10 @@ const drawArrow = (ctx, width, height, angle) => {
     ctx.fillRect(0, 0, width, height)
     ctx.textAlign = 'center'
     ctx.fillStyle = 'rgba(0,0,0,1)'
-    ctx.font = '18px Arial'
+    ctx.font = '16px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '26px Arial'
+    }
     ctx.fillText(txt, width/2, height * 3/4)
 }
 
@@ -58,18 +67,19 @@ export const createPowerDisplay = (hud) => {
 
     hud.powerDisplayText = powerDisplayText
     hud.powerMeter = powerMeter
+    var powerSelectTimer = Date.now()
+
+    var startDragPos = null
 
     const releasePointer = (e) => {
         if (powerBtn.getData('active') === true) {
-            if (powerBtn.getData('allowHide') === false) {
-                powerBtn.setData('allowHide', true)
-                //hud.mouseLocked = false
-            }
-            else {
+            console.log('lift to select')
+
+            if (startDragPos.clone().subtract(hud.scene.input.activePointer.position).length() > 2) {
                 hud.scene.sound.play('click', {volume: 0.3})
                 powerBtn.setData('active', false)
                 hud.mouseLocked = false
-                hud.scene.input.off('pointerdown', releasePointer)
+                hud.scene.input.off('pointerup', releasePointer)
             }
         }
     }
@@ -82,8 +92,10 @@ export const createPowerDisplay = (hud) => {
         hud.scene.hideTurnPointer()
         //console.log(e.position, hud)
         powerBtn.setData('active', true)
-        powerBtn.setData('allowHide', false)
-        hud.scene.input.on('pointerdown', releasePointer)
+        //powerBtn.setData('allowHide', false)
+        startDragPos = hud.scene.input.activePointer.position.clone()
+        hud.scene.input.on('pointerup', releasePointer)
+        powerSelectTimer = Date.now()
     })
 
     powerRightBtn.on('pointerdown', () => {
@@ -113,8 +125,8 @@ export const createPowerDisplay = (hud) => {
     })
 
     hud.powerMeter.refresh = () => {
-        var curr = hud.scene.input.mousePointer
-        var prev = hud.scene.input.mousePointer.prev ? hud.scene.input.mousePointer.prev : hud.scene.input.mousePointer.prevPosition
+        var curr = hud.scene.input.activePointer
+        var prev = hud.scene.input.activePointer.prev ? hud.scene.input.activePointer.prev : hud.scene.input.activePointer.prevPosition
         var delX = (curr.x - prev.x)/2
 
         if (delX > 0) {
@@ -126,20 +138,28 @@ export const createPowerDisplay = (hud) => {
 
         var canvas = powerMeter.texture.canvas
         var ctx = canvas.getContext('2d')
+        var color = 'rgba(230,0,0,1)'
 
         if (hud.scene.activeTank === 1) {
             if (powerBtn.getData('active') === true) {
                 hud.scene.tank1.setPower(hud.scene.tank1.power + delX)
-                hud.scene.input.mousePointer.movementX = 0
+                hud.scene.input.activePointer.movementX = 0
+                var g = Math.max(Math.floor((Date.now() - powerSelectTimer)/4)%300 - 150, -(Math.floor((Date.now() - powerSelectTimer)/4)%300) + 150)
+                var b = Math.max(Math.floor((Date.now() - powerSelectTimer)/4)%200 - 100, -(Math.floor((Date.now() - powerSelectTimer)/4)%200) + 100)
+                color = `rgba(230,${g},${b},1)`
             }
-            drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank1.power)
+            //console.log(color)
+            drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank1.power, color)
         }
         else if (hud.scene.activeTank === 2) {
             if (powerBtn.getData('active') === true) {
                 hud.scene.tank2.setPower(hud.scene.tank2.power + delX)
-                hud.scene.input.mousePointer.movementX = 0
+                hud.scene.input.activePointer.movementX = 0
+                var g = Math.max(Math.floor((Date.now() - powerSelectTimer)/4)%300 - 150, -(Math.floor((Date.now() - powerSelectTimer)/4)%300) + 150)
+                var b = Math.max(Math.floor((Date.now() - powerSelectTimer)/4)%200 - 100, -(Math.floor((Date.now() - powerSelectTimer)/4)%200) + 100)
+                color = `rgba(230,${g},${b},1)`
             }
-            drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank2.power)
+            drawPowerMeter(ctx, canvas.width, canvas.height, hud.scene.tank2.power, color)
         }
     }
 }
@@ -152,26 +172,31 @@ export const drawPowerDisplay = (scene, x, y, w = 200, h = 80) => {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
 
+    if (!scene.game.device.os.desktop) {
+        h = h * 1.3
+        w = w * 1.3
+    }
+
     canvas.height = h
     canvas.width = w
 
-    drawPowerFrame(ctx, canvas.width, canvas.height)
+    drawPowerFrame(ctx, canvas.width, canvas.height, scene)
     if (scene.textures.exists('power-display')) scene.textures.remove('power-display')
     scene.textures.addCanvas('power-display', canvas);
 
     canvas = document.createElement('canvas');
     ctx = canvas.getContext('2d')
-    canvas.height = 30 
-    canvas.width = 30
-    drawArrow(ctx, canvas.width, canvas.height, 0)
+    canvas.height = 30 * h / 80
+    canvas.width = 30 * h / 80
+    drawArrow(ctx, canvas.width, canvas.height, 0, scene)
     if (scene.textures.exists('power-display-right')) scene.textures.remove('power-display-right')
     scene.textures.addCanvas('power-display-right', canvas);
 
     canvas = document.createElement('canvas');
     ctx = canvas.getContext('2d')
-    canvas.height = 30 
-    canvas.width = 30
-    drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    canvas.height = 30 * h / 80
+    canvas.width = 30 * h / 80
+    drawArrow(ctx, canvas.width, canvas.height, Math.PI, scene)
     if (scene.textures.exists('power-display-left')) scene.textures.remove('power-display-left')
     scene.textures.addCanvas('power-display-left', canvas);
     
@@ -200,6 +225,9 @@ export const drawPowerDisplay = (scene, x, y, w = 200, h = 80) => {
     powerDisplay.add(powerMeter)
 
     var powerDisplayText = scene.add.text(-w/2 + w * 2/5 + w * 3/10, h * 1/5, '60').setOrigin(0.5).setFont('20px Geneva')
+    if (!scene.game.device.os.desktop){
+        powerDisplayText.setFontSize(32)
+    }
     powerDisplay.add(powerDisplayText)
 
     return [powerBtn, powerDisplayText, powerMeter, powerLeftBtn, powerRightBtn]

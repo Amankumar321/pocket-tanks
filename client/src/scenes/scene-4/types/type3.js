@@ -31,17 +31,22 @@ export const type3 = (scene) => {
 
     const noRoom = scene.add.container(scene.renderer.width/2, scene.renderer.height/2).setVisible(false)
     noRoom.add(scene.add.image(0, -50, 'face-frown-regular').setDisplaySize(200, 200).setAlpha(0.8))
-    noRoom.add(scene.add.text(0, 100, 'No online rooms')
-    .setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
-    noRoom.add(scene.add.text(0, 140, 'Create your own room and invite friends.')
-    .setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center'))
+    var noRoomTxt1 = scene.add.text(0, 100, 'No online rooms').setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold')
+    var noRoomTxt2 = scene.add.text(0, 140, 'Create your own room and invite friends.').setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center')
+    noRoom.add([noRoomTxt1, noRoomTxt2])
 
     const serverError = scene.add.container(scene.renderer.width/2, scene.renderer.height/2).setVisible(false)
     serverError.add(scene.add.image(0, -50, 'face-frown-regular').setDisplaySize(200, 200).setAlpha(0.8))
-    serverError.add(scene.add.text(0, 100, 'Server Error')
-    .setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold'))
-    serverError.add(scene.add.text(0, 140, 'Please try again later or refresh.')
-    .setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center'))
+    var serverErrorTxt1 = scene.add.text(0, 100, 'Server Error').setFontFamily('Verdana').setFontSize(32).setOrigin(0.5, 0.5).setAlign('center').setFontStyle('bold')
+    var serverErrorTxt2 = scene.add.text(0, 140, 'Please try again later or refresh.').setFontFamily('Verdana').setFontSize(22).setOrigin(0.5, 0.5).setAlign('center')
+    serverError.add([serverErrorTxt1, serverErrorTxt2])
+
+    if (!scene.game.device.os.desktop) {
+        noRoomTxt1.setFontSize(40)
+        noRoomTxt2.setFontSize(30)
+        serverErrorTxt1.setFontSize(40)
+        serverErrorTxt2.setFontSize(30)
+    }
 
     if (scene.roomList === undefined)
         scene.roomList = []

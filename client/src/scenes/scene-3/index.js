@@ -51,7 +51,7 @@ export class Scene3 extends Scene {
         canvas.height = 100
         drawBackBtn(ctx, canvas.width, canvas.height)
         var backtexture = this.textures.addCanvas('back-btn', canvas, true)
-        var backbtn = this.add.image(125, this.game.renderer.height - 100, backtexture)
+        var backbtn = this.add.image(100, this.game.renderer.height - 100, backtexture)
         backbtn.setDepth(10)
         
         backbtn.setInteractive()

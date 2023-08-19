@@ -2,7 +2,7 @@
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawBeginBtn = (ctx, width, height) => {
+const drawBeginBtn = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(160,160,160,1)'
     ctx.fillRect(0, 0, width, height)
     ctx.lineWidth = 6
@@ -49,19 +49,30 @@ const drawBeginBtn = (ctx, width, height) => {
     ctx.strokeStyle = 'rgba(40,40,40,1)'
     ctx.textAlign = 'center'
     ctx.font = '400 20px Verdana'
+
+    if (!scene.game.device.os.desktop) {
+        ctx.font = '600 32px Verdana'
+        ctx.lineWidth = 8
+    }
+
     ctx.strokeText('Begin Game', width/2, height/2 + 6)
     ctx.fillText('Begin Game', width/2, height/2 + 6)
 }
 
 
-export const createBeginButton = () => {
+export const createBeginButton = (scene) => {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
 
     canvas.height = 50 
     canvas.width = 160
 
-    drawBeginBtn(ctx, canvas.width, canvas.height)
+    if (!scene.game.device.os.desktop) {
+        canvas.height = canvas.height * 1.5
+        canvas.width = canvas.width * 1.5
+    }
+
+    drawBeginBtn(ctx, canvas.width, canvas.height, scene)
 
     return canvas
 }

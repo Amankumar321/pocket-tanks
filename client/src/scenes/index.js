@@ -8,4 +8,4 @@ export * from './loading';
 export * from './controls'
 export * from './about';
 export * from './guide';
-export * from './tutorial';
+export * from './screenshots';

@@ -17,6 +17,9 @@ export class Score {
         this.tank.score = this.tank.score + points
         var text = this.scene.add.text(initX, initY, points)
         text.setOrigin(0.5)
+        if (!this.scene.game.device.os.desktop) {
+            text.setFontSize(22)
+        }
         this.pointsArray.push({value: points, t: 0.0, text: text, initX: initX, initY: initY})
     }
 

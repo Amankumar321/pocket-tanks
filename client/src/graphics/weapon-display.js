@@ -5,8 +5,9 @@ import { weaponArray } from "../weapons/array"
 /**
  * @param {CanvasRenderingContext2D} ctx 
  */
-const drawWeaponBox = (ctx, width, height) => {
+const drawWeaponBox = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
+
     ctx.moveTo(0, height/4)
     ctx.lineTo(width * 3/10, height/4)
     ctx.arcTo(width * 3/10, 0, width/2, 0, height/8)
@@ -21,6 +22,9 @@ const drawWeaponBox = (ctx, width, height) => {
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.textAlign = 'center'
     ctx.font = '500 18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
     ctx.fillText('Weapon', width/2, height/4)
 }
 
@@ -29,8 +33,9 @@ const drawWeaponBox = (ctx, width, height) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawWeaponScrollBox = (ctx, width, height) => {
+const drawWeaponScrollBox = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
+
     ctx.moveTo(0, height/12)
     ctx.lineTo(width * 3/10, height/12)
     ctx.arcTo(width * 3/10, 0, width/2, 0, height/24)
@@ -45,6 +50,9 @@ const drawWeaponScrollBox = (ctx, width, height) => {
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.textAlign = 'center'
     ctx.font = '18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '26px Arial'
+    }
     ctx.fillText('Weapon', width/2, height/12)
 }
 
@@ -66,7 +74,7 @@ export const createWeaponDisplay = (hud) => {
     var w = 220
     var h = 80
     
-    var [weaponBox, weaponName, weaponLogo] = drawWeaponDisplay(hud.scene, hud.width * 1/4, hud.height * 10.6/12, w, h)
+    var [weaponBox, weaponName, weaponLogo, weaponDisplayBackground] = drawWeaponDisplay(hud.scene, hud.width * 1/4, hud.height * 10.6/12, w, h)
     hud.weaponBox = weaponBox
     hud.weaponName = weaponName
 
@@ -76,6 +84,11 @@ export const createWeaponDisplay = (hud) => {
 const createWeaponScrollDisplay = (hud, weaponLogo) => {
     var w = 220
     var h = 80 * 3
+
+    if (!hud.scene.game.device.os.desktop) {
+        w = w * 1.3
+        h = h * 1.3
+    }
 
     hud.weaponScrollDisplay = new ScrollList(hud.scene, hud.weaponName, hud.weaponBox, weaponLogo)
 
@@ -88,7 +101,7 @@ const createWeaponScrollDisplay = (hud, weaponLogo) => {
     canvas.height = h
     canvas.width = w
 
-    drawWeaponScrollBox(ctx, canvas.width, canvas.height)
+    drawWeaponScrollBox(ctx, canvas.width, canvas.height, hud.scene)
     if (hud.scene.textures.exists('weapon-scroll-box')) hud.scene.textures.remove('weapon-scroll-box')
     hud.scene.textures.addCanvas('weapon-scroll-box', canvas);
 
@@ -108,13 +121,18 @@ export const drawWeaponDisplay = (scene, x, y, w = 220, h = 80) => {
     var weaponContainer = scene.add.container(x, y)
     weaponContainer.setDepth(6)
 
+    if (!scene.game.device.os.desktop) {
+        h = h * 1.3
+        w = w * 1.3
+    }
+
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d')
 
     canvas.height = h
     canvas.width = w
 
-    drawWeaponBox(ctx, canvas.width, canvas.height)
+    drawWeaponBox(ctx, canvas.width, canvas.height, scene)
     if (scene.textures.exists('weapon-box')) scene.textures.remove('weapon-box')
     scene.textures.addCanvas('weapon-box', canvas);
 
@@ -149,6 +167,9 @@ export const drawWeaponDisplay = (scene, x, y, w = 220, h = 80) => {
 
     var textWidth = innerW - weaponLogo.width + margin * 2
     var weaponName = scene.add.text(-innerW/2 + weaponLogo.width + margin * 2 + textWidth/2, 0, 'Single Shot').setFontFamily('Geneva').setFontSize(18)
+    if (!scene.game.device.os.desktop){
+        weaponName.setFontSize(26)
+    }
     weaponName.setOrigin(0.5)
     weaponDisplay.add(weaponName)
 
@@ -156,5 +177,5 @@ export const drawWeaponDisplay = (scene, x, y, w = 220, h = 80) => {
 
     weaponBox.setInteractive()
 
-    return [weaponBox, weaponName, weaponLogo]
+    return [weaponBox, weaponName, weaponLogo, weaponDisplayBackground]
 }

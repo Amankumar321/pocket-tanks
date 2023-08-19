@@ -5,7 +5,7 @@ import Phaser from "phaser"
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawAngleFrame = (ctx, width, height) => {
+const drawAngleFrame = (ctx, width, height, scene) => {
     ctx.fillStyle = 'rgba(200,200,200,1)'
     ctx.moveTo(0, height * 2/3)
     ctx.ellipse(width/2, height * 2/3, width/2 + 1, width/2.5, 0, -Math.PI, 0)
@@ -16,7 +16,10 @@ const drawAngleFrame = (ctx, width, height) => {
     ctx.fillRect(0, height * 2/3, width, height/3)
     ctx.fillStyle = 'rgba(0,0,0,1)'
     ctx.textAlign = 'center'
-    ctx.font = '18px Arial'
+    ctx.font = '500 18px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
     ctx.fillText('Angle', width/2, height * 1/2)
 }
 
@@ -62,7 +65,7 @@ const drawAngleFrame = (ctx, width, height) => {
  * @param {CanvasRenderingContext2D} ctx 
  */
 
-const drawArrow = (ctx, width, height, angle) => {
+const drawArrow = (ctx, width, height, angle, scene) => {
     var txt =  String.fromCharCode(0x25B6)
     //var strokeThickness = 4
     if (angle === Math.PI) txt = String.fromCharCode(0x25C0)
@@ -72,7 +75,10 @@ const drawArrow = (ctx, width, height, angle) => {
     ctx.fillRect(0, 0, width, height)
     ctx.textAlign = 'center'
     ctx.fillStyle = 'rgba(0,0,0,1)'
-    ctx.font = '16px Arial'
+    ctx.font = '500 16px Arial'
+    if (!scene.game.device.os.desktop){
+        ctx.font = '500 26px Arial'
+    }
     ctx.fillText(txt, width/2, height * 3/4)
 }
 
@@ -111,7 +117,7 @@ export const createAngleDisplay = (hud) => {
                 hud.crossAir.setVisible(false)
                 hud.crossAir.setData('toShow', false)
                 hud.mouseLocked = false
-                hud.scene.input.off('pointerdown', releasePointer)
+                hud.scene.input.off('pointerup', releasePointer)
             }
         }
     }
@@ -125,7 +131,7 @@ export const createAngleDisplay = (hud) => {
         hud.scene.hideTurnPointer()
 
         if (hud.scene.activeTank === 1) {
-            hud.scene.input.on('pointerdown', releasePointer)
+            hud.scene.input.on('pointerup', releasePointer)
             hud.crossAir.setVisible(true)
             hud.crossAir.setData('allowHide', false)
             hud.crossAir.setData('toShow', true)
@@ -134,7 +140,7 @@ export const createAngleDisplay = (hud) => {
             
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.input.on('pointerdown', releasePointer)
+            hud.scene.input.on('pointerup', releasePointer)
             hud.crossAir.setVisible(true)
             hud.crossAir.setData('toShow', true)
             hud.crossAir.setData('allowHide', false)
@@ -166,8 +172,8 @@ export const createAngleDisplay = (hud) => {
             prevX = hud.crossAir.x
             prevY = hud.crossAir.y
 
-            var delX = hud.scene.input.mousePointer.x - hud.scene.input.mousePointer.prevPosition.x
-            var delY = hud.scene.input.mousePointer.y - hud.scene.input.mousePointer.prevPosition.y
+            var delX = hud.scene.input.activePointer.x - hud.scene.input.activePointer.prevPosition.x
+            var delY = hud.scene.input.activePointer.y - hud.scene.input.activePointer.prevPosition.y
 
             hud.crossAir.setPosition(hud.crossAir.x + delX, hud.crossAir.y + delY)
             Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank1.turret.x, y: hud.scene.tank1.turret.y}, 0, crossAirRadius)
@@ -189,8 +195,8 @@ export const createAngleDisplay = (hud) => {
             prevX = hud.crossAir.x
             prevY = hud.crossAir.y
 
-            var delX = hud.scene.input.mousePointer.x - hud.scene.input.mousePointer.prevPosition.x
-            var delY = hud.scene.input.mousePointer.y - hud.scene.input.mousePointer.prevPosition.y
+            var delX = hud.scene.input.activePointer.x - hud.scene.input.activePointer.prevPosition.x
+            var delY = hud.scene.input.activePointer.y - hud.scene.input.activePointer.prevPosition.y
 
             hud.crossAir.setPosition(hud.crossAir.x + delX, hud.crossAir.y + delY)
             Phaser.Actions.RotateAroundDistance([hud.crossAir], {x: hud.scene.tank2.turret.x, y: hud.scene.tank2.turret.y}, 0, crossAirRadius)
@@ -243,8 +249,21 @@ export const createAngleDisplay = (hud) => {
 }
 
 
-
+/**
+ * 
+ * @param {Phaser.Scene} scene 
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} h 
+ * @param {*} w 
+ * @returns 
+ */
 export const drawAngleDisplay = (scene, x, y, h = 90, w = 120) => {
+    if (!scene.game.device.os.desktop) {
+        h = h * 1.3
+        w = w * 1.3
+    }
+
     var angleDisplay = scene.add.container(x, y)
     var arrowBoxSize = 30 * h / 90
 
@@ -254,7 +273,7 @@ export const drawAngleDisplay = (scene, x, y, h = 90, w = 120) => {
     canvas.height = h
     canvas.width = w
 
-    drawAngleFrame(ctx, canvas.width, canvas.height)
+    drawAngleFrame(ctx, canvas.width, canvas.height, scene)
     if (scene.textures.exists('angle-display')) scene.textures.remove('angle-display')
     scene.textures.addCanvas('angle-display', canvas);
 
@@ -262,7 +281,7 @@ export const drawAngleDisplay = (scene, x, y, h = 90, w = 120) => {
     ctx = canvas.getContext('2d')
     canvas.height = arrowBoxSize 
     canvas.width = arrowBoxSize
-    drawArrow(ctx, canvas.width, canvas.height, 0)
+    drawArrow(ctx, canvas.width, canvas.height, 0, scene)
     if (scene.textures.exists('angle-display-right')) scene.textures.remove('angle-display-right')
     scene.textures.addCanvas('angle-display-right', canvas);
 
@@ -270,7 +289,7 @@ export const drawAngleDisplay = (scene, x, y, h = 90, w = 120) => {
     ctx = canvas.getContext('2d')
     canvas.height = arrowBoxSize 
     canvas.width = arrowBoxSize
-    drawArrow(ctx, canvas.width, canvas.height, Math.PI)
+    drawArrow(ctx, canvas.width, canvas.height, Math.PI, scene)
     if (scene.textures.exists('angle-display-left')) scene.textures.remove('angle-display-left')
     scene.textures.addCanvas('angle-display-left', canvas);
 
@@ -288,6 +307,9 @@ export const drawAngleDisplay = (scene, x, y, h = 90, w = 120) => {
     angleLeftBtn.setInteractive().setOrigin(0,1);
 
     var angleDisplayText = scene.add.text(0, h/3, '90' + String.fromCharCode(176)).setOrigin(0.5).setFont('18px Geneva')
+    if (!scene.game.device.os.desktop){
+        angleDisplayText.setFontSize(32)
+    }
     angleDisplay.add(angleDisplayText)
 
     return [angleBtn, angleLeftBtn, angleRightBtn, angleDisplayText]

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { socket } from './socket/index'
-import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene } from './scenes';
+import { MainScene, Scene1, Scene2, Scene3, Scene4, Scene5, LoadingScene, ControlsScene, AboutScene, GuideScene, ScreenshotScene } from './scenes';
 
 // window["GD_OPTIONS"] = {
 //   "debug": false,
@@ -88,7 +88,7 @@ const gameConfig = {
     //forceSetTimeOut: true
   },
   dom: {
-    createContainer: true
+    createContainer: true,
   },
   // plugins: {
   //   global: [{
@@ -97,7 +97,7 @@ const gameConfig = {
   //       start: true
   //   }]
   // },
-  scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, TutorialScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
+  scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, ScreenshotScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 
 //window.sdk = 'crazygames'
@@ -117,23 +117,24 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
-const openFullscreen = () => {
-  var elem = document.getElementsByTagName('canvas')[0];
-  //console.log(elem)
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) { /* Safari */
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { /* IE11 */
-    elem.msRequestFullscreen();
-  }
-}
 
-window.addEventListener('touchstart', () => {
-  if (navigator.userAgent.match(/Android/i) ||navigator.userAgent.match(/iPhone/i)) {
-    //openFullscreen()
-  } 
-})
+// const openFullscreen = () => {
+//   var elem = document.getElementsByTagName('canvas')[0];
+//   //console.log(elem)
+//   if (elem.requestFullscreen) {
+//     elem.requestFullscreen();
+//   } else if (elem.webkitRequestFullscreen) { /* Safari */
+//     elem.webkitRequestFullscreen();
+//   } else if (elem.msRequestFullscreen) { /* IE11 */
+//     elem.msRequestFullscreen();
+//   }
+// }
+
+// window.addEventListener('touchstart', () => {
+//   if (navigator.userAgent.match(/Android/i) ||navigator.userAgent.match(/iPhone/i)) {
+//     //openFullscreen()
+//   } 
+// })
 
 
 

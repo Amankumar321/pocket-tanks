@@ -992,6 +992,9 @@ export class tracer {
         var sign = obj.relativeAngle > 0 ? '+' : ''
         var angleText = weapon.scene.add.text(obj.body.x, obj.body.y + 10, sign + obj.relativeAngle + String.fromCharCode(176))
         angleText.setOrigin(0.5, 0.5).setFont('14px Geneva')
+        if (!weapon.scene.game.device.os.desktop) {
+            angleText.setFont('20px Geneva')
+        }
 
         setTimeout(() => {
             angleText.destroy(true)
