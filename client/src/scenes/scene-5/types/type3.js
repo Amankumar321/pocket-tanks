@@ -10,7 +10,7 @@ import { Display } from "phaser";
 export const type3 = (scene) => {
     const socket = window.socket
     socket.removeAllListeners()
-    const totalWeapons = 20
+    const totalWeapons = 4
 
     scene.player1 = scene.sceneData.player1
     scene.player2 = scene.sceneData.player2

@@ -41,13 +41,16 @@ export class Tank extends GameObjects.Sprite {
         this.moving = false
         this.hitRadius = this.height/4
         this.gameType = this.scene.sceneData.gameType
+        this.needEmitPowerChange = false
+        this.aimPower = 0
+        this.previousPowerTimer = null
         
         this.keyA = this.scene.input.keyboard.addKey('A');
         this.keyD = this.scene.input.keyboard.addKey('D');
         this.keyW = this.scene.input.keyboard.addKey('W');
         this.keyS = this.scene.input.keyboard.addKey('S');
 
-        this.turret = new Turret(scene, this, id)
+        this.turret = null
         this.scoreHandler = new Score(this.scene, this)
     }
 
@@ -85,6 +88,7 @@ export class Tank extends GameObjects.Sprite {
         this.scene.physics.add.collider(this, this.scene.rightWall)
 
         this.body.setSize(1,1)
+        this.turret = new Turret(this.scene, this, this.id)
 
         socket.on('opponentShoot', ({selectedWeapon, power, rotation, rotation1, rotation2, position1, position2}) => {
             if (this.active === false) return
@@ -97,12 +101,24 @@ export class Tank extends GameObjects.Sprite {
             this.scene.tank2.setRotation(rotation1)
 
             this.selectedWeapon = selectedWeapon
-            this.power = power
+            this.setPower(power)
             this.turret.setRelativeRotation(rotation)
             this.scene.HUD.weaponScrollDisplay.reset(this)
             this.shoot()
         })
 
+        socket.on('opponentPowerChange', ({power}) => {
+            if (this.active && this === this.scene.tank2) {
+                this.aimPower = power
+
+                if (this.previousPowerTimer !== null) {
+                    this.previousPowerTimer.destroy()
+                }
+
+                this.previousPowerTimer = this.scene.time.addEvent({delay: 20, callback: () => {this.lerpPower()}, callbackScope: this, loop: true})
+            }
+        })
+        
         socket.on('opponentStepLeft', () => {
             if (this.active === false) return
             this.stepLeft()
@@ -132,12 +148,39 @@ export class Tank extends GameObjects.Sprite {
         })
 
         this.texture.update()
+        
+
+        this.scene.time.addEvent({delay: 500, callback: this.emitPower, callbackScope: this, loop: true})
 
         this.scene.physics.world.on('worldstep', this.physicsStep, this)
-        this.scene.physics.world.on('worldstep', this.update, this)
+        this.scene.physics.world.on('worldstep', this.step, this)
     }
 
 
+
+    emitPower = () => {
+        if (this.gameType === 3 && this === this.scene.tank1 && this.active) {
+            if (this.needEmitPowerChange === true) {
+                window.socket.emit('powerChange', {power: this.power})
+                this.needEmitPowerChange = false
+            }
+        }
+    }
+
+
+
+    lerpPower = () => {
+        var difference = this.aimPower - this.power
+        var unit = difference > 0 ? 1 : -1
+        this.setPower(this.power + unit)
+
+        if (difference === 0) {
+            this.setPower(this.aimPower)
+            this.previousPowerTimer.destroy()
+            this.previousPowerTimer = null
+        }
+    }
+    
 
     randomPos = () => {
         var initX = Math.ceil(Math.random() * this.terrain.width / 1.0)
@@ -159,7 +202,7 @@ export class Tank extends GameObjects.Sprite {
 
 
 
-    update = () => {
+    step = () => {
         this.turret.update()
         this.scoreHandler.update()
 
@@ -387,6 +430,7 @@ export class Tank extends GameObjects.Sprite {
         if (power < 1)
             power = 1
         this.power = power
+        this.needEmitPowerChange = true
     }
 
 
@@ -468,7 +512,7 @@ export class Tank extends GameObjects.Sprite {
         }
 
         this.turret.setRotation(k.angle)
-        this.turret.relativeRotation = k.angle - this.rotation
+        this.turret.setRelativeRotation(k.angle - this.rotation)
         this.setPower(k.v / this.turret.powerFactor)
     }
 

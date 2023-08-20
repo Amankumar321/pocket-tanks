@@ -177,7 +177,6 @@ const mainsocket = (io) => {
             var x, randomArray = []
             for (let index = 0; index < count; index++) {
                 x = Math.floor(Math.random() * max)
-                console.log(x)
                 randomArray.push(x)
             }
 
@@ -193,10 +192,25 @@ const mainsocket = (io) => {
 
         
         
-        // client.on('changeWeapon', ({index}) => {
-        //     client.broadcast.emit('setWeapon', {index})
-        // })
+        client.on('weaponChange', ({index}) => {
+            client.to(client.roomId).emit('opponentWeaponChange', {index})
+        })
 
+
+
+        client.on('angleChange', ({rotation}) => {
+            //console.log(rotation)
+            client.to(client.roomId).emit('opponentAngleChange', {rotation: rotation})
+        })
+
+
+
+        client.on('powerChange', ({power}) => {
+            //console.log(rotation)
+            client.to(client.roomId).emit('opponentPowerChange', {power: power})
+        })
+    
+    
 
 
         client.on('terrainPath', ({path, hostPos, playerPos}) => {

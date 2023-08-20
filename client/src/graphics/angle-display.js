@@ -187,7 +187,7 @@ export const createAngleDisplay = (hud) => {
             sign = vec1.cross(vec2)
             angle = sign >= 0 ? -angle : angle 
             
-            hud.scene.tank1.turret.relativeRotation += angle
+            hud.scene.tank1.turret.setRelativeRotation(hud.scene.tank1.turret.relativeRotation + angle)
         }
 
         else if (hud.scene.activeTank === 2 && hud.crossAir.getData('toShow')) {
@@ -212,7 +212,7 @@ export const createAngleDisplay = (hud) => {
             sign = vec1.cross(vec2)
             angle = sign >= 0 ? -angle : angle
             
-            hud.scene.tank2.turret.relativeRotation += angle
+            hud.scene.tank2.turret.setRelativeRotation(hud.scene.tank2.turret.relativeRotation + angle)
         }
     }
 
@@ -223,10 +223,10 @@ export const createAngleDisplay = (hud) => {
 
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
-            hud.scene.tank1.turret.relativeRotation += Math.PI/180
+            hud.scene.tank1.turret.setRelativeRotation(hud.scene.tank1.turret.relativeRotation + Math.PI/180)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank2.turret.relativeRotation += Math.PI/180
+            hud.scene.tank2.turret.setRelativeRotation(hud.scene.tank2.turret.relativeRotation + Math.PI/180)
         }
     })
 
@@ -237,10 +237,10 @@ export const createAngleDisplay = (hud) => {
 
         hud.scene.hideTurnPointer()
         if (hud.scene.activeTank === 1) {
-            hud.scene.tank1.turret.relativeRotation -= Math.PI/180
+            hud.scene.tank1.turret.setRelativeRotation(hud.scene.tank1.turret.relativeRotation - Math.PI/180)
         }
         else if (hud.scene.activeTank === 2) {
-            hud.scene.tank2.turret.relativeRotation -= Math.PI/180
+            hud.scene.tank2.turret.setRelativeRotation(hud.scene.tank2.turret.relativeRotation - Math.PI/180)
         }
     })
 

@@ -42,11 +42,7 @@ export class ScrollList {
 
 
     create = () => {
-        //this.scrollBox = this.scene.add.rectangle(this.x, this.y - 50, 100, 150, 0x222222, 0).setStrokeStyle(2, 0x000000, 1)
-        //this.scrollBox.setDepth(9)
-        //this.scrollBackground = this.scene.add.rectangle(this.x, this.y - 50, 100, 150, 0x222222, 255)
-        //this.scrollBackground.setDepth(8)
-        //this.tileHeight = this.scrollBackground.height/4
+        
         this.tileWidth = this.scrollBackground.width
 
         this.x = this.scrollBackground.parentContainer.x + this.scrollBackground.x
@@ -108,26 +104,24 @@ export class ScrollList {
 
         this.scrollBox.setInteractive()
 
-        // socket.on('setWeapon', ({index}) => {
-        //     this.setActive(index)
-        // })
+        socket.on('opponentWeaponChange', ({index}) => {
+            var tank = this.scene.activeTank === 1 ? this.scene.tank1 : this.scene.tank2
+            if (tank.active && tank === this.scene.tank2) {
+                this.setActive(index)
+            }
+        })
     }
 
 
 
     setActive = (index) => {
         var tank = this.scene.activeTank === 1 ? this.scene.tank1 : this.scene.tank2
-        //var index = this.activeItem
         tank.selectedWeapon = index
         this.selected.setText(tank.weapons[tank.selectedWeapon]?.name)
-        // this.scrollList.setY(this.sh * 5/6 - index * this.tileHeight, this.tileHeight)
-        // this.scrollTiles.setY(this.sh * 5/6 - index * this.tileHeight, this.tileHeight)
-        // this.scrollList.setY(this.sh * 5/6 - tank.selectedWeapon * this.tileHeight, this.tileHeight)
-        // this.scrollTiles.setY(this.sh * 5/6 - tank.selectedWeapon * this.tileHeight, this.tileHeight)
         
-        // if (this.scene.sceneData.gameType === 3) {
-        //     socket.emit('changeWeapon', {index})
-        // }
+        if (this.scene.sceneData.gameType === 3 && tank === this.scene.tank1 && tank.active) {
+            socket.emit('weaponChange', {index})
+        }
 
         var key = Math.random().toString(32).slice(3,7)
         var logoCanvas = weaponArray[tank.weapons[tank.selectedWeapon].id].logoCanvas
