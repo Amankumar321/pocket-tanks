@@ -4563,7 +4563,9 @@ export class dirtball {
         var x, y;
         var vec = new Phaser.Math.Vector2(1,1)
         var dist = {currentLength: 0}
-        var points = []
+        var points = {}
+        var highPoints = {}
+        var lowPoints = {}
         var pixel;
         const projX = Math.floor(this.projectile.body.x)
         const projY = Math.floor(this.projectile.body.y)
@@ -4584,10 +4586,32 @@ export class dirtball {
                     vec.setAngle(angle);
                     x = Math.floor(projX + vec.x)
                     y = Math.floor(projY + vec.y)
-                    if (x <= 0 || x >= weapon.terrain.width - 1) continue
-                    if (y < 0 || y >= weapon.terrain.height) continue
+                    if (x < 0 || x > weapon.terrain.width - 1) continue
+                    if (y < 0 || y > weapon.terrain.height - 1) continue
                     if (weapon.terrain.getPixel(x, y).alpha < 100) {
                         weapon.terrain.setPixel(x, y, 180, 100, 50, 110 + 2*dist.currentLength)
+                        if (points.hasOwnProperty(x)) {
+                            points[x].push(y)
+                        }
+                        else {
+                            points[x] = [y]
+                        }
+                        if (highPoints.hasOwnProperty(x)) {
+                            if (highPoints[x] > y) {
+                                highPoints[x] = y
+                            }
+                        }
+                        else {
+                            highPoints[x] = y
+                        }
+                        if (lowPoints.hasOwnProperty(x)) {
+                            if (lowPoints[x] < y) {
+                                lowPoints[x] = y
+                            }
+                        }
+                        else {
+                            lowPoints[x] = y
+                        }
                     }
                 }
                 for (let i = 0; i < soundEffects.length; i++) {
@@ -4609,25 +4633,16 @@ export class dirtball {
                 canvas.height = this.r * 2;
                 weapon.terrain.update()
 
-                for (let i = 0; i < this.r * 2; i++) {
-                    for (let j = 0; j < this.r * 2; j++) {
-                        x = projX + i - this.r
-                        y = projY + j - this.r
-                        if (Phaser.Math.Distance.Between(x, y, projX, projY) > 72) continue
-                        if (x < 0 || x >= weapon.terrain.width - 1) continue
-                        if (y < 0 || y >= weapon.terrain.height) continue
+                //console.log(points.length)
 
-                        pixel = weapon.terrain.getPixel(x, y)
-                        if (pixel.alpha >= 100) {
-                            pixel = weapon.terrain.getPixel(x, y + 1)
-                            if (pixel.alpha < 100) {
-                                points.push({x: x, y: y, toRemove: false})
-                            }
-                        }
-                    }
-                }
+                this.startFixTerrainTween(weapon, points, highPoints, lowPoints)
 
-                this.startFixTerrainTween(weapon, points)
+                // for (var i in points) {
+                //     //console.log(lowPoints[i], highPoints[i])
+                //     weapon.terrain.setPixel(i, lowPoints[i], 255,0,0,255)
+                //     weapon.terrain.setPixel(i, highPoints[i], 255,255,0,255)
+                // }
+                
             }
         })
 
@@ -4635,34 +4650,44 @@ export class dirtball {
         weapon.scene.textures.remove('projectile')
     }
 
-    startFixTerrainTween = (weapon, points) => {
+    startFixTerrainTween = (weapon, points, highPoints, lowPoints) => {
         var soundEffects = ['rocks_1', 'rocks_2', 'rocks_3', 'rocks_4', 'rocks_5', 'rocks_6']
         var soundEffectIndex = 0
         var pixel;
 
         this.fixTerrainTween = new Tween({
             targets: [],
-            frames: 2,
+            frames: 1,
             loop: -1,
             onLoop: () => {
-                points.forEach(p => {
-                    pixel = weapon.terrain.getPixel(p.x, p.y + 1)
-                    if (pixel.alpha < 100) {
-                        var count = -1
-                        pixel = weapon.terrain.getPixel(p.x, p.y)
-                        weapon.terrain.setPixel(p.x, p.y + 1, pixel.r, pixel.g, pixel.b, pixel.alpha)
-                        while (pixel.alpha !== 0) {
-                            pixel = weapon.terrain.getPixel(p.x, p.y + count)
-                            weapon.terrain.setPixel(p.x, p.y + count + 1, pixel.r, pixel.g, pixel.b, pixel.alpha)
-                            count--
+                var toDelete = []
+
+                for (var x in points) {
+                    pixel = weapon.terrain.getPixel(x, lowPoints[x] + 1)
+                    while (lowPoints[x] - highPoints[x] >= 0) {
+                        if (pixel.alpha < 100) {
+                            break;
                         }
-                        p.y++
+                        lowPoints[x] = lowPoints[x] - 1
+                        pixel = weapon.terrain.getPixel(x, lowPoints[x] + 1)
+                    }
+
+                    if (lowPoints[x] - highPoints[x] >= 0) {
+                        var data = weapon.terrain.context.getImageData(x, highPoints[x], 1, lowPoints[x] - highPoints[x] + 1)
+                        weapon.terrain.context.putImageData(data, x, highPoints[x] + 1)
+                        weapon.terrain.setPixel(x, highPoints[x], 0, 0, 0, 0)
+                        highPoints[x] = highPoints[x] + 1
+                        lowPoints[x] = lowPoints[x] + 1
                     }
                     else {
-                        p.toRemove = true
+                        toDelete.push(x)
                     }
+                }
+
+                toDelete.forEach((x) => {
+                    delete points[x]
                 })
-                points = points.filter(p => { return p.toRemove === false })
+
                 weapon.terrain.update()
 
                 for (let i = 0; i < soundEffects.length; i++) {
@@ -4681,7 +4706,7 @@ export class dirtball {
         })
 
         var myInterval = setInterval(() => {
-            if (points.length === 0) {
+            if (Object.keys(points).length === 0) {
                 this.fixTerrainTween.destroy()
                 weapon.turret.activeWeapon = null
                 clearInterval(myInterval)
@@ -5303,6 +5328,7 @@ export class cruiser {
     blast = (weapon, blowTank = false) => {
         if (this.destroyed === true) return
         this.destroyed = true
+        this.projectile.body.y = Math.min(weapon.terrain.height - 1, this.projectile.body.y)
         var grd = [{relativePosition: 0, color: 'rgba(0,0,0,0)'}, {relativePosition: 0.1, color: 'rgba(50,0,0,20)'}, {relativePosition: 0.4, color: 'rgba(100,0,40,1)'}, {relativePosition: 1, color: 'rgba(255,0,100,1)'}]
         var data = {thickness: 16, gradient: grd, blowPower: 100, soundEffect: 'expshort', soundConfig: {}}
         weapon.terrain.blast(1, Math.floor(this.projectile.body.x), Math.floor(this.projectile.body.y), 80 - weapon.scene.tank1.hitRadius, data, blowTank, this.id.toString())
@@ -5371,7 +5397,7 @@ export class cruiser {
 
         var x = this.projectile.body.x
         var y = this.projectile.body.y
-        if (x <= 0 || x >= weapon.scene.terrain.width - 1) {
+        if (x < 0 || x > weapon.scene.terrain.width - 1) {
             this.onOutOfBound(weapon, this.projectile)
         }
         

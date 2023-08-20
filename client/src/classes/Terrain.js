@@ -79,7 +79,6 @@ export class Terrain extends Textures.CanvasTexture {
 
 
     updateTerrain = () => {
-        if (this.frameCount >= 0) this.frameCount++
         if (this.blastArray.length !== 0) {
             this.blastArray.forEach((hole) => {
                 hole.update()
@@ -111,16 +110,19 @@ export class Terrain extends Textures.CanvasTexture {
             this.matrix = this.matrix.filter((ele) => {
                 return (ele.base < ele.ground)
             })
-    
-            this.matrix.forEach((ele) => {
-                try {
+
+            //this.update()
+            var toDelete = []
+        
+            this.matrix.forEach((ele, i) => {
+                //try {
                     var data = this.context.getImageData(ele.x, ele.top, 1, ele.base - ele.top)
                     this.context.putImageData(data, ele.x, ele.top + 1)
+                    this.setPixel(ele.x, ele.top, 0, 0, 0, 0)
                     ele.top = ele.top + 1
                     ele.base = ele.base + 1
-                } 
-                catch {}
             })
+
             this.update()
         }
     }
