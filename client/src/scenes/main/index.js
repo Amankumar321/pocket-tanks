@@ -506,6 +506,17 @@ export class MainScene extends Scene {
         a.setInteractive()
         b.setInteractive()
 
+        if (window.sdk === 'kongregate' && !window.kongregate.services.isGuest()) {
+            if (this.sceneData.gameType === 1) {
+                window.kongregate.stats.submit('Highscore (CPU)', this.tank1.score);
+                window.kongregate.stats.submit('Lifetime (CPU)', this.tank1.score);
+            }
+            else if (this.sceneData.gameType === 3) {
+                window.kongregate.stats.submit('Highscore (Online)', this.tank1.score);
+                window.kongregate.stats.submit('Lifetime (Online)', this.tank1.score);
+            }
+        }
+
         //var gdsdk = window.gdsdk
         
         a.once('pointerdown', () => {

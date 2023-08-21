@@ -90,19 +90,13 @@ const gameConfig = {
   dom: {
     createContainer: true,
   },
-  // plugins: {
-  //   global: [{
-  //       key: 'rexYoutubePlayer',
-  //       plugin: YoutubePlayerPlugin,
-  //       start: true
-  //   }]
-  // },
   scene: [LoadingScene, ControlsScene, AboutScene, GuideScene, ScreenshotScene, Scene1, Scene2, Scene3, Scene4, Scene5, MainScene],
 };
 
 //window.sdk = 'crazygames'
 //window.sdk = 'gdsdk'
 window.sdk = ''
+
 
 window.socket = socket
 window.game = new Phaser.Game(gameConfig);
@@ -116,26 +110,6 @@ window.addEventListener("keydown", (event) => {
     event.preventDefault();
   }
 });
-
-
-// const openFullscreen = () => {
-//   var elem = document.getElementsByTagName('canvas')[0];
-//   //console.log(elem)
-//   if (elem.requestFullscreen) {
-//     elem.requestFullscreen();
-//   } else if (elem.webkitRequestFullscreen) { /* Safari */
-//     elem.webkitRequestFullscreen();
-//   } else if (elem.msRequestFullscreen) { /* IE11 */
-//     elem.msRequestFullscreen();
-//   }
-// }
-
-// window.addEventListener('touchstart', () => {
-//   if (navigator.userAgent.match(/Android/i) ||navigator.userAgent.match(/iPhone/i)) {
-//     //openFullscreen()
-//   } 
-// })
-
 
 
 function App() {

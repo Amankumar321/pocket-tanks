@@ -49,22 +49,22 @@ export class Scene1 extends Scene {
         var [guideOption, guideBox] = this.createOption('address-book-regular', 'Guide', w * 5/7, screenCenterY * 5/3 - 50)
         guideOption.setDisplaySize(80, 60)
         guideBox.setInteractive()
-        guideBox.on('pointerdown', () => { this.scene.start('guide-scene') })
+        guideBox.on('pointerdown', () => { this.sound.play('click', {volume: 0.3}); this.scene.start('guide-scene') })
 
         var [aboutOption, aboutBox] = this.createOption('question-solid', 'About', w * 2/7, screenCenterY * 5/3 - 50)
         aboutOption.setDisplaySize(60, 80)
         aboutBox.setInteractive()
-        aboutBox.on('pointerdown', () => { this.scene.start('about-scene') })
+        aboutBox.on('pointerdown', () => { this.sound.play('click', {volume: 0.3}); this.scene.start('about-scene') })
 
         var [controlsOption, controlsBox] = this.createOption('keyboard-regular', 'Controls', w * 1/7, screenCenterY * 5/3 - 50)
         controlsOption.setDisplaySize(100, 80)
         controlsBox.setInteractive()
-        controlsBox.on('pointerdown', () => { this.scene.start('controls-scene') })
+        controlsBox.on('pointerdown', () => { this.sound.play('click', {volume: 0.3}); this.scene.start('controls-scene') })
 
         var [screenshotOption, screenshotBox] = this.createOption('screenshot', 'Screenshots', w * 6/7, screenCenterY * 5/3 - 50)
         screenshotOption.setDisplaySize(90, 75)
         screenshotBox.setInteractive()
-        screenshotBox.on('pointerdown', () => { this.scene.start('screenshot-scene') })
+        screenshotBox.on('pointerdown', () => { this.sound.play('click', {volume: 0.3}); this.scene.start('screenshot-scene') })
     }
 
 

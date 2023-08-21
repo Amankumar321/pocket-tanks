@@ -14,6 +14,12 @@ export const type3 = (scene) => {
     const c = scene.add.text(screenCenterX, 200, usernameArray[Math.floor(Math.random()*usernameArray.length)]).setFontSize(50);
     const d = scene.add.text(screenCenterX + 50, 200, '_').setFontSize(50);
 
+    if (window.sdk === 'kongregate' && !window.kongregate.services.isGuest()) {
+        var username = window.kongregate.services.getUsername()
+        username = username.length < 16 ? username : username.substr(0, 15)
+        c.setText(username)
+    }
+
     const e = scene.add.text(screenCenterX, 300, 'COLOR :  ').setFontSize(50);
     const f = scene.add.text(screenCenterX, 300, '').setFontSize(50);
 

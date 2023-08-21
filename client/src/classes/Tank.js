@@ -25,6 +25,7 @@ export class Tank extends GameObjects.Sprite {
         this.terrain = this.scene.terrain
         this.prevPos = {x: null, y: null}
         this.power = 60;
+        this.powerFactor = 8
         this.id = id
         this.active = false;
         this.weapons = []

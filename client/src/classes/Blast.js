@@ -303,7 +303,7 @@ export class Blast {
         ctx.arc(this.x, this.y, Math.min(this.outerRadius, this.maxRadius), 0, Math.PI * 2)
         ctx.closePath()
         ctx.fill()
-        this.terrain.update()
+        //this.terrain.update()
 
         var canvas = this.canvas
         var ctx2 = canvas.getContext('2d')

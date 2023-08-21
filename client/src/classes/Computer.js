@@ -14,7 +14,7 @@ export class Computer {
         this.tank = tank
         this.playerTank = scene.tank1
         this.terrain = scene.terrain
-        this.powerFactor = tank.turret.powerFactor
+        this.powerFactor = tank.powerFactor
         this.level = level
         this.maxLevel = 8;
         this.factor = this.maxLevel - this.level + 1
