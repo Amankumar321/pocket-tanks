@@ -95,6 +95,7 @@ const gameConfig = {
 
 //window.sdk = 'crazygames'
 //window.sdk = 'gdsdk'
+//window.sdk = 'kongregate'
 window.sdk = ''
 
 

@@ -5056,10 +5056,7 @@ export class scattershot {
             obj.body.x = x
             obj.body.y = y
 
-            if (weapon.terrain.getPixel(x, y).alpha > 0) {
-                this.blast(weapon, obj, true)
-            }
-            else if (this.destroyed === false) {
+            if (this.destroyed === false) {
                 this.dissociate(weapon)
                 weapon.scene.textures.remove('projectile')
                 obj.destroy(true)
@@ -5076,7 +5073,7 @@ export class scattershot {
             this.onTerrainHit(weapon, obj)
         }
         else {
-            this.particleOnTerrainHit(weapon, obj)
+            this.onTerrainHit(weapon, obj)
         }
     }
 
